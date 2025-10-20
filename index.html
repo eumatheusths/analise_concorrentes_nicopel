@@ -82,14 +82,14 @@
             width: 100%;
             max-width: 800px;
             height: 90%;
-            max-height: 700px; /* Altura máxima para o modal */
+            max-height: 700px;
             display: flex;
             flex-direction: column;
             position: relative;
             transform: scale(0.95);
             transition: transform 0.3s ease;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden; /* Garante que os cantos arredondados sejam aplicados */
+            overflow: hidden;
         }
         .modal-overlay.active .modal-content { transform: scale(1); }
 
@@ -118,8 +118,28 @@
         .insta-post svg { width: 40px; height: 40px; color: #ced4da; }
 
         .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); flex-shrink: 0; background-color: #f8f9fa; }
-        .card-actions { display: flex; gap: 15px; }
-        .action-btn { display: flex; align-items: center; justify-content: center; gap: 8px; flex-grow: 1; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s ease; border: 1px solid transparent; }
+        
+        /* --- AJUSTE NOS BOTÕES --- */
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end; /* Alinha os botões à direita */
+        }
+        .action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            /* flex-grow: 1; -- REMOVIDO PARA OS BOTÕES NÃO ESTICAREM */
+            padding: 10px 16px; /* Ajustado para um tamanho menor */
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        /* --- FIM DO AJUSTE --- */
+
         .btn-website { background-color: #e7f1ff; color: var(--primary-color); }
         .btn-website:hover { background-color: #d0e3ff; }
         .btn-instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; }
@@ -155,7 +175,6 @@
             <h1>Dashboard de Concorrência</h1>
             <p>Análise de Mercado para Nicopel Embalagens</p>
         </header>
-
         <nav class="tabs-nav">
             <button class="tab-btn active" data-category="todos">Todos</button>
             <button class="tab-btn" data-category="potes-copos">Potes e Copos</button>
@@ -163,13 +182,11 @@
             <button class="tab-btn" data-category="caixas-pizza">Caixas de Pizza</button>
             <button class="tab-btn" data-category="embalagens-industriais">Embalagens Industriais</button>
         </nav>
-
         <div class="legend">
             <div class="legend-item"><span class="threat-level threat-high"></span><span>Ameaça Direta / Alta</span></div>
             <div class="legend-item"><span class="threat-level threat-medium"></span><span>Ameaça Média</span></div>
             <div class="legend-item"><span class="threat-level threat-low"></span><span>Ameaça Baixa / Indireta</span></div>
         </div>
-
         <main id="competitors-grid">
             <article class="competitor-card" 
                 data-category="potes-copos embalagens-industriais"
@@ -182,7 +199,6 @@
                     <div class="info-item"><svg><use href="#icon-focus"/></svg><span>Solução completa para fast-food.</span></div>
                 </div>
             </article>
-
             <article class="competitor-card" 
                 data-category="potes-copos caixas-sorvete"
                 data-name="Soller Embalagens" data-location="Biguaçu - SC" data-focus="Especialista em potes de açaí e sorvetes."
@@ -194,7 +210,6 @@
                     <div class="info-item"><svg><use href="#icon-focus"/></svg><span>Especialista em potes de açaí e sorvetes.</span></div>
                 </div>
             </article>
-
             <article class="competitor-card" 
                 data-category="potes-copos"
                 data-name="BoxBe" data-location="São Paulo - SP" data-focus="Foco absoluto em copos de papel."
@@ -206,7 +221,6 @@
                     <div class="info-item"><svg><use href="#icon-focus"/></svg><span>Foco absoluto em copos de papel.</span></div>
                 </div>
             </article>
-
             <article class="competitor-card" 
                 data-category="caixas-sorvete embalagens-industriais"
                 data-name="Nazapack" data-location="Jaraguá do Sul - SC" data-focus="Caixas de papel-cartão com foco em design."
@@ -218,7 +232,6 @@
                     <div class="info-item"><svg><use href="#icon-focus"/></svg><span>Caixas de papel-cartão com foco em design.</span></div>
                 </div>
             </article>
-
             <article class="competitor-card" 
                 data-category="potes-copos"
                 data-name="Papello Embalagens" data-location="Caxias do Sul - RS" data-focus="Copos, potes e baldes de papel."
@@ -230,7 +243,6 @@
                     <div class="info-item"><svg><use href="#icon-focus"/></svg><span>Copos, potes e baldes de papel.</span></div>
                 </div>
             </article>
-
             <article class="competitor-card" 
                 data-category="caixas-sorvete embalagens-industriais caixas-pizza"
                 data-name="Gráfica Tambosi" data-location="Blumenau - SC" data-focus="Gráfica industrial para grandes volumes."
@@ -242,7 +254,6 @@
                     <div class="info-item"><svg><use href="#icon-focus"/></svg><span>Gráfica industrial para grandes volumes.</span></div>
                 </div>
             </article>
-
             <article class="competitor-card" 
                 data-category="caixas-pizza embalagens-industriais"
                 data-name="DCX Embalagens" data-location="São Paulo - SP" data-focus="Caixas de papelão para e-commerce e delivery."
@@ -267,7 +278,6 @@
                 <div id="modal-header-content" class="card-header"></div>
                 <button id="modal-close-btn" class="modal-close-btn">&times;</button>
             </header>
-            
             <div class="modal-body">
                 <div class="modal-main-content">
                     <h4>Informações</h4>
@@ -287,7 +297,6 @@
                     </div>
                 </div>
             </div>
-
             <footer class="modal-footer">
                 <div id="modal-actions" class="card-actions"></div>
             </footer>
@@ -295,7 +304,7 @@
     </div>
 
     <script>
-        // O JavaScript continua o mesmo da versão anterior, pois ele já é capaz de lidar com os cards adicionados.
+        // O JavaScript continua o mesmo, pois é robusto e não precisa de alterações.
         document.addEventListener('DOMContentLoaded', () => {
             const tabsContainer = document.querySelector('.tabs-nav');
             const competitorCards = document.querySelectorAll('.competitor-card');
@@ -314,7 +323,6 @@
                     }
                 });
             });
-
             const grid = document.getElementById('competitors-grid');
             const modal = document.getElementById('competitor-modal');
             const modalCloseBtn = document.getElementById('modal-close-btn');
@@ -356,9 +364,8 @@
             modal.addEventListener('click', (event) => {
                 if (event.target === modal) closeModal();
             });
-
             const today = new Date();
-            const formattedDate = today.toLocaleDateDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+            const formattedDate = today.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
             document.getElementById('last-updated').textContent = formattedDate;
         });
     </script>
