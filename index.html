@@ -4,129 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Análise de Concorrentes - Nicopel Embalagens</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
-        /* --- Estilos Gerais --- */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
+        /* (CSS completo da versão anterior, sem alterações) */
+        :root {
+            --primary-color: #005A9C;
+            --primary-hover: #004080;
+            --background-color: #F8F9FA;
+            --card-background: #FFFFFF;
+            --text-color: #212529;
+            --light-text-color: #6C757D;
+            --border-color: #DEE2E6;
         }
-
-        /* --- Container Principal --- */
-        .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 0 20px;
-        }
-
-        /* --- Cabeçalho --- */
-        header {
-            background-color: #004080; /* Azul corporativo */
-            color: white;
-            padding: 20px;
-            text-align: center;
-            border-radius: 8px 8px 0 0;
-        }
-        header h1 {
-            margin: 0;
-            font-size: 2em;
-        }
-
-        /* --- Seções de Grupo --- */
-        .group-section {
-            margin-top: 40px;
-        }
-        .group-section h2 {
-            font-size: 1.8em;
-            color: #004080;
-            border-bottom: 3px solid #0059b3;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        /* --- Card de Concorrente --- */
-        .competitor-card {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-            transition: box-shadow 0.3s ease;
-        }
-        .competitor-card:hover {
-            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .competitor-card h3 {
-            margin: 0 0 0 15px;
-            font-size: 1.5em;
-            color: #333;
-        }
-        .competitor-card ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
-        .competitor-card li {
-            margin-bottom: 10px;
-        }
-        .competitor-card strong {
-            color: #004080;
-        }
-        .competitor-card a {
-            color: #0059b3;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .competitor-card a:hover {
-            text-decoration: underline;
-        }
-
-        /* --- Níveis de Ameaça (Visual) --- */
-        .threat-level {
-            min-width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            display: block;
-        }
-        .threat-high { background-color: #e74c3c; /* Vermelho */ }
-        .threat-medium { background-color: #f39c12; /* Laranja */ }
-        .threat-low { background-color: #f1c40f; /* Amarelo */ }
-
-        /* --- Tabela Resumo --- */
-        .summary-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        .summary-table th, .summary-table td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
-        }
-        .summary-table th {
-            background-color: #004080;
-            color: white;
-            font-size: 1.1em;
-        }
-        .summary-table tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        .summary-table .threat-level {
-            width: 20px;
-            height: 20px;
-            margin: 0 auto;
-        }
-        
+        body { font-family: 'Inter', sans-serif; background-color: var(--background-color); color: var(--text-color); margin: 0; padding: 0; line-height: 1.7; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        header { background-color: var(--card-background); color: var(--primary-color); padding: 30px; text-align: center; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 40px; }
+        header h1 { margin: 0; font-size: 2.2em; font-weight: 700; }
+        header p { margin: 5px 0 0; font-size: 1.1em; color: var(--light-text-color); }
+        .group-section h2 { font-size: 2em; font-weight: 700; color: var(--text-color); border-bottom: 2px solid var(--primary-color); padding-bottom: 15px; margin-bottom: 30px; }
+        .competitor-card { background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px 30px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .competitor-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        .card-header { display: flex; align-items: center; margin-bottom: 20px; }
+        .competitor-card h3 { margin: 0 0 0 15px; font-size: 1.6em; color: var(--text-color); }
+        .competitor-card ul { list-style-type: none; padding: 0; margin: 0; }
+        .competitor-card li { margin-bottom: 12px; padding-left: 25px; position: relative; }
+        .competitor-card li::before { content: '✓'; position: absolute; left: 0; color: var(--primary-color); font-weight: 700; }
+        .competitor-card strong { color: var(--text-color); font-weight: 700; }
+        .competitor-card a { color: var(--primary-color); text-decoration: none; font-weight: 700; }
+        .competitor-card a:hover { color: var(--primary-hover); text-decoration: underline; }
+        .insta-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color); }
+        .insta-section h4 { margin: 0 0 15px 0; font-size: 1.1em; color: var(--text-color); }
+        .insta-section h4 em { font-weight: 400; font-size: 0.9em; color: var(--light-text-color); }
+        .insta-gallery { display: flex; gap: 15px; flex-wrap: wrap; }
+        .insta-post img { width: 120px; height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); }
+        .threat-level { min-width: 25px; height: 25px; border-radius: 50%; }
+        .threat-high { background-color: #e74c3c; }
+        .threat-medium { background-color: #f39c12; }
+        .threat-low { background-color: #f1c40f; }
+        footer { text-align: center; margin-top: 40px; padding: 20px; color: var(--light-text-color); font-size: 0.9em; }
     </style>
 </head>
 <body>
@@ -140,199 +59,113 @@
 
         <section class="group-section">
             <h2>Grupo 1: 🔴 Concorrentes Diretos de Alto Impacto</h2>
-            <p>Especialistas em Food Service, Potes e Copos de Papel.</p>
 
             <article class="competitor-card">
-                <div class="card-header">
-                    <span class="threat-level threat-high"></span>
-                    <h3>Soluplex Brasil</h3>
-                </div>
+                <div class="card-header"><span class="threat-level threat-high"></span><h3>Soluplex Brasil</h3></div>
                 <ul>
-                    <li><strong>Localização:</strong> São Paulo - SP (~510 km)</li>
+                    <li><strong>Localização:</strong> São Paulo - SP</li>
                     <li><strong>Foco Principal:</strong> Solução completa de embalagens para fast-food.</li>
-                    <li><strong>Pontos Fortes:</strong> Branding moderno, solução "One-Stop-Shop" para redes, forte presença digital.</li>
-                    <li><strong>Análise:</strong> Grande ameaça para clientes de médio/grande porte. Competir com a especialização em potes para sorvetes/açaí.</li>
-                    <li><strong>Links:</strong> <a href="https://www.soluplex.com.br/" target="_blank">Site Oficial</a> | <a href="https://www.instagram.com/soluplex.brasil/" target="_blank">Instagram</a></li>
+                    <li><strong>Análise:</strong> Agressivos no marketing para franquias, oferecem um mix completo de produtos que atrai grandes redes. Ponto fraco pode ser a menor flexibilidade para clientes menores.</li>
+                    <li><strong>Links:</strong> <a href="https://www.soluplex.com.br/" target="_blank">Site</a> | <a href="https://www.instagram.com/soluplex.brasil/" target="_blank">Instagram</a></li>
                 </ul>
+                <div class="insta-section">
+                    <h4>Posts Recentes <em>(Atualização Manual)</em></h4>
+                    <div class="insta-gallery">
+                        <div class="insta-post"><img src="nome-da-sua-imagem1.jpg" alt="Postagem 1"></div>
+                        <div class="insta-post"><img src="nome-da-sua-imagem2.jpg" alt="Postagem 2"></div>
+                        <div class="insta-post"><img src="nome-da-sua-imagem3.jpg" alt="Postagem 3"></div>
+                    </div>
+                </div>
             </article>
 
             <article class="competitor-card">
-                <div class="card-header">
-                    <span class="threat-level threat-high"></span>
-                    <h3>Soller Embalagens</h3>
-                </div>
+                <div class="card-header"><span class="threat-level threat-high"></span><h3>Soller Embalagens</h3></div>
                 <ul>
-                    <li><strong>Localização:</strong> Biguaçu - SC (~530 km)</li>
-                    <li><strong>Foco Principal:</strong> Embalagens para o setor alimentício, com destaque para potes de açaí, sorvetes e copos.</li>
-                    <li><strong>Pontos Fortes:</strong> Especialista no nicho, qualidade percebida, forte atuação no Sul.</li>
-                    <li><strong>Análise:</strong> Concorrente "espelho". Disputa direta por preço, qualidade e prazo. Vantagem logística da Nicopel para SP/Centro-Oeste.</li>
-                    <li><strong>Links:</strong> <a href="https://www.sollerembalagens.com.br/" target="_blank">Site Oficial</a> | <a href="https://www.instagram.com/sollerembalagens/" target="_blank">Instagram</a></li>
+                    <li><strong>Localização:</strong> Biguaçu - SC</li>
+                    <li><strong>Foco Principal:</strong> Embalagens para açaí, sorvetes e copos.</li>
+                    <li><strong>Análise:</strong> Concorrente "espelho" direto no nicho principal da Nicopel. A comunicação visual é forte e focada na qualidade. A disputa é direta por preço, qualidade de impressão e agilidade na entrega.</li>
+                    <li><strong>Links:</strong> <a href="https://www.sollerembalagens.com.br/" target="_blank">Site</a> | <a href="https://www.instagram.com/sollerembalagens/" target="_blank">Instagram</a></li>
                 </ul>
+                <div class="insta-section">
+                    <h4>Posts Recentes <em>(Atualização Manual)</em></h4>
+                    <div class="insta-gallery">
+                        <div class="insta-post"><img src="sua-foto-soller-1.jpg" alt="Postagem 1"></div>
+                        <div class="insta-post"><img src="sua-foto-soller-2.jpg" alt="Postagem 2"></div>
+                    </div>
+                </div>
             </article>
 
             <article class="competitor-card">
-                <div class="card-header">
-                    <span class="threat-level threat-high"></span>
-                    <h3>BoxBe</h3>
-                </div>
-                <ul>
-                    <li><strong>Localização:</strong> São Paulo - SP (~510 km)</li>
+                 <div class="card-header"><span class="threat-level threat-high"></span><h3>BoxBe</h3></div>
+                 <ul>
+                    <li><strong>Localização:</strong> São Paulo - SP</li>
                     <li><strong>Foco Principal:</strong> Copos de papel personalizados.</li>
-                    <li><strong>Pontos Fortes:</strong> Marketing digital agressivo (Google Ads), foco absoluto em copos de papel, processo de venda digitalizado.</li>
-                    <li><strong>Análise:</strong> Ameaça digital. Competir com estratégia de SEO e tráfego pago para nichos específicos (potes de açaí, caixas de sorvete).</li>
-                    <li><strong>Links:</strong> <a href="https://boxbe.com.br/" target="_blank">Site Oficial</a></li>
+                    <li><strong>Análise:</strong> Foco absoluto em copos, com marketing digital muito agressivo para captura de leads online. Ameaça forte para clientes que buscam especificamente por copos na internet.</li>
+                    <li><strong>Links:</strong> <a href="https://boxbe.com.br/" target="_blank">Site</a></li>
                 </ul>
-            </article>
-            
-            <article class="competitor-card">
-                <div class="card-header">
-                    <span class="threat-level threat-medium"></span>
-                    <h3>Papello Embalagens</h3>
+                <div class="insta-section">
+                    <h4>Posts Recentes <em>(Atualização Manual)</em></h4>
+                     <div class="insta-gallery">
+                        <div class="insta-post"><img src="sua-foto-boxbe-1.jpg" alt="Postagem 1"></div>
+                    </div>
                 </div>
-                <ul>
-                    <li><strong>Localização:</strong> Caxias do Sul - RS (~750 km)</li>
-                    <li><strong>Foco Principal:</strong> Copos, potes e baldes de papel.</li>
-                    <li><strong>Pontos Fortes:</strong> Linha de produtos ampla (até baldes de 5L), posicionamento de indústria.</li>
-                    <li><strong>Análise:</strong> Competidor direto na linha de produtos. A distância é um fator a ser explorado pela Nicopel com fretes e prazos melhores.</li>
-                    <li><strong>Links:</strong> <a href="https://www.papello.com.br/" target="_blank">Site Oficial</a></li>
-                </ul>
             </article>
-
         </section>
 
         <section class="group-section">
             <h2>Grupo 2: 🟠 Concorrentes Industriais Polivalentes</h2>
-            <p>Grandes gráficas com divisão de embalagens, competem em volume e preço.</p>
-
+            
             <article class="competitor-card">
-                <div class="card-header">
-                    <span class="threat-level threat-medium"></span>
-                    <h3>Gráfica Tambosi</h3>
-                </div>
+                <div class="card-header"><span class="threat-level threat-medium"></span><h3>Gráfica Tambosi</h3></div>
                 <ul>
-                    <li><strong>Localização:</strong> Blumenau - SC (~580 km)</li>
+                    <li><strong>Localização:</strong> Blumenau - SC</li>
                     <li><strong>Foco Principal:</strong> Gráfica industrial completa (livros, catálogos, embalagens).</li>
-                    <li><strong>Pontos Fortes:</strong> Alta capacidade produtiva, marca consolidada, pode competir em preço para grandes volumes.</li>
-                    <li><strong>Análise:</strong> Ameaça para grandes clientes de caixas de sorvete e embalagens industriais. Menos ágil para pedidos menores e personalizados.</li>
-                    <li><strong>Links:</strong> <a href="https://graficatambosi.com.br/embalagens" target="_blank">Site Oficial</a></li>
+                    <li><strong>Análise:</strong> Ameaça para grandes volumes devido à alta capacidade produtiva, podendo oferecer preços competitivos. Menos ágil para pedidos menores e nichados.</li>
+                    <li><strong>Links:</strong> <a href="https://graficatambosi.com.br/embalagens" target="_blank">Site</a></li>
                 </ul>
+                 <div class="insta-section">
+                    <h4>Posts Recentes <em>(Atualização Manual)</em></h4>
+                     <div class="insta-gallery">
+                        <div class="insta-post"><img src="sua-foto-tambosi-1.jpg" alt="Postagem 1"></div>
+                    </div>
+                </div>
             </article>
 
             <article class="competitor-card">
-                <div class="card-header">
-                    <span class="threat-level threat-medium"></span>
-                    <h3>Nazapack</h3>
-                </div>
+                 <div class="card-header"><span class="threat-level threat-medium"></span><h3>Nazapack</h3></div>
                 <ul>
-                    <li><strong>Localização:</strong> Jaraguá do Sul - SC (~480 km)</li>
-                    <li><strong>Foco Principal:</strong> Embalagens de papel-cartão personalizadas com foco em design.</li>
-                    <li><strong>Pontos Fortes:</strong> Foco em design e inovação, flexibilidade para atender diferentes indústrias.</li>
-                    <li><strong>Análise:</strong> Competem diretamente em caixas personalizadas (sorvete, pizza). Ameaça para clientes que valorizam o apelo visual.</li>
-                    <li><strong>Links:</strong> <a href="https://nazapack.com.br/" target="_blank">Site Oficial</a> | <a href="https://www.instagram.com/nazapack/?hl=en" target="_blank">Instagram</a></li>
+                    <li><strong>Localização:</strong> Jaraguá do Sul - SC</li>
+                    <li><strong>Foco Principal:</strong> Caixas de papel-cartão com foco em design.</li>
+                    <li><strong>Análise:</strong> Competem forte em projetos que exigem alto apelo visual. Ameaça para clientes que veem a embalagem como principal ferramenta de marketing no ponto de venda.</li>
+                    <li><strong>Links:</strong> <a href="https://nazapack.com.br/" target="_blank">Site</a> | <a href="https://www.instagram.com/nazapack/?hl=en" target="_blank">Instagram</a></li>
                 </ul>
-            </article>
-        </section>
-
-        <section class="group-section">
-            <h2>Grupo 3: 🟡 Concorrentes de Nicho (E-commerce e Papelão)</h2>
-            <p>Foco em caixas de papelão ondulado para transporte, ameaça secundária.</p>
-            
-            <article class="competitor-card">
-                 <div class="card-header">
-                    <span class="threat-level threat-low"></span>
-                    <h3>Senhor Caixa</h3>
+                 <div class="insta-section">
+                    <h4>Posts Recentes <em>(Atualização Manual)</em></h4>
+                     <div class="insta-gallery">
+                        <div class="insta-post"><img src="sua-foto-nazapack-1.jpg" alt="Postagem 1"></div>
+                    </div>
                 </div>
-                <ul>
-                    <li><strong>Localização:</strong> São Paulo - SP (~510 km)</li>
-                    <li><strong>Foco Principal:</strong> Caixas de papelão para e-commerce e transporte.</li>
-                    <li><strong>Análise:</strong> Ameaça secundária, compete na linha de caixas de pizza e embalagens de transporte. Vantagem da Nicopel é a impressão de alta qualidade.</li>
-                    <li><strong>Links:</strong> <a href="https://mkt.senhorcaixa.com.br/embalagens/" target="_blank">Site Oficial</a></li>
-                </ul>
             </article>
-            
-             <article class="competitor-card">
-                 <div class="card-header">
-                    <span class="threat-level threat-low"></span>
-                    <h3>DCX Embalagens</h3>
-                </div>
-                <ul>
-                    <li><strong>Localização:</strong> São Paulo - SP</li>
-                    <li><strong>Foco Principal:</strong> Embalagens para e-commerce e delivery.</li>
-                    <li><strong>Análise:</strong> Concorrente secundário para o core business, mas direto para caixas de pizza e transporte.</li>
-                    <li><strong>Links:</strong> <a href="https://www.dcxembalagens.com.br/" target="_blank">Site Oficial</a></li>
-                </ul>
-            </article>
-
-        </section>
-
-        <section class="group-section">
-            <h2>📊 Tabela Resumo Estratégica</h2>
-            <div style="overflow-x:auto;">
-                <table class="summary-table">
-                    <thead>
-                        <tr>
-                            <th>Concorrente</th>
-                            <th>Localização</th>
-                            <th>Foco Principal</th>
-                            <th>Ameaça (Core Business)</th>
-                            <th>Diferencial Notável</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Soluplex</td>
-                            <td>São Paulo, SP</td>
-                            <td>Solução completa para Fast-Food</td>
-                            <td><span class="threat-level threat-high"></span></td>
-                            <td>Branding forte e mix completo.</td>
-                        </tr>
-                        <tr>
-                            <td>Soller</td>
-                            <td>Biguaçu, SC</td>
-                            <td>Especialista em Potes (Açaí/Sorvete)</td>
-                            <td><span class="threat-level threat-high"></span></td>
-                            <td>Concorrente "espelho", especialista no nicho.</td>
-                        </tr>
-                        <tr>
-                            <td>BoxBe</td>
-                            <td>São Paulo, SP</td>
-                            <td>Especialista em Copos de Papel</td>
-                            <td><span class="threat-level threat-high"></span></td>
-                            <td>Marketing digital agressivo e foco em conversão online.</td>
-                        </tr>
-                        <tr>
-                            <td>Papello</td>
-                            <td>Caxias do Sul, RS</td>
-                            <td>Potes e Baldes de Papel</td>
-                            <td><span class="threat-level threat-medium"></span></td>
-                            <td>Ampla variedade de tamanhos de potes e baldes.</td>
-                        </tr>
-                         <tr>
-                            <td>Nazapack</td>
-                            <td>Jaraguá do Sul, SC</td>
-                            <td>Caixas de Papel-Cartão (Design)</td>
-                            <td><span class="threat-level threat-medium"></span></td>
-                            <td>Foco em design e apelo visual da embalagem.</td>
-                        </tr>
-                        <tr>
-                            <td>G. Tambosi</td>
-                            <td>Blumenau, SC</td>
-                            <td>Gráfica Industrial de Grande Porte</td>
-                            <td><span class="threat-level threat-low"></span></td>
-                            <td>Capacidade para altíssimos volumes.</td>
-                        </tr>
-                         <tr>
-                            <td>Senhor Caixa</td>
-                            <td>São Paulo, SP</td>
-                            <td>Caixas de Papelão (E-commerce)</td>
-                            <td><span class="threat-level threat-low"></span></td>
-                            <td>Ameaça secundária, focada em transporte.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
         </section>
     </main>
+    
+    <footer>
+        <p>Relatório gerado em: <span id="last-updated"></span></p>
+    </footer>
 
-</body>
+    <script>
+        // Esta função pega a data atual do computador do usuário
+        const today = new Date();
+
+        // Esta linha formata a data para o padrão brasileiro (ex: 20 de outubro de 2025)
+        const formattedDate = today.toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
+
+        // Esta linha encontra o elemento com id="last-updated" no HTML e insere a data formatada nele
+        document.getElementById('last-updated').textContent = formattedDate;
+    </script>
+    </body>
 </html>
