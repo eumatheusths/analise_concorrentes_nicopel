@@ -43,10 +43,10 @@
         /* HEADER, ABAS E LEGENDA                          */
         /* =============================================== */
         header { text-align: center; margin-bottom: 2rem; }
-        header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+        header h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; }
         header p { font-size: 1.1rem; color: var(--secondary-color); margin-top: 0; }
         .tabs-nav { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 1rem; }
-        .tab-btn { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; padding: 10px 20px; border: 1px solid var(--border-color); background-color: var(--card-background); color: var(--secondary-color); border-radius: 50px; cursor: pointer; transition: all 0.3s ease; }
+        .tab-btn { font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600; padding: 8px 16px; border: 1px solid var(--border-color); background-color: var(--card-background); color: var(--secondary-color); border-radius: 50px; cursor: pointer; transition: all 0.3s ease; }
         .tab-btn:hover { background-color: #e9ecef; color: var(--text-color); }
         .tab-btn.active { background-color: var(--primary-color); color: #fff; border-color: var(--primary-color); }
         .legend { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 20px; padding: 15px; background-color: #f1f3f5; border-radius: 12px; margin-bottom: 2rem; }
@@ -56,7 +56,7 @@
         /* =============================================== */
         /* GRID E CARDS PRINCIPAIS                         */
         /* =============================================== */
-        #competitors-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 25px; }
+        #competitors-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
         .competitor-card { cursor: pointer; background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; box-shadow: var(--shadow); transition: all 0.3s ease; display: flex; flex-direction: column; }
         .competitor-card.hidden { display: none; }
         .competitor-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
@@ -65,7 +65,7 @@
         .threat-high { background-color: #dc3545; }
         .threat-medium { background-color: #fd7e14; }
         .threat-low { background-color: #ffc107; }
-        .card-header h3 { margin: 0 0 0 12px; font-size: 1.5rem; font-weight: 700; }
+        .card-header h3 { margin: 0 0 0 12px; font-size: 1.4rem; font-weight: 700; }
         .card-body { flex-grow: 1; padding-top: 1rem; }
         .info-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
         .info-item svg { width: 20px; height: 20px; flex-shrink: 0; color: var(--secondary-color); }
@@ -77,66 +77,37 @@
         .modal-overlay.active { opacity: 1; visibility: visible; }
         
         .modal-content {
-            background-color: var(--card-background);
-            border-radius: 16px;
-            width: 100%;
-            max-width: 800px;
-            height: 90%;
-            max-height: 700px;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            transform: scale(0.95);
-            transition: transform 0.3s ease;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden;
+            background-color: var(--card-background); border-radius: 16px; width: 100%; max-width: 800px;
+            height: 90%; max-height: 700px; display: flex; flex-direction: column; position: relative;
+            transform: scale(0.95); transition: transform 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden;
         }
         .modal-overlay.active .modal-content { transform: scale(1); }
-
         .modal-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
         .modal-header .card-header { padding: 0; border: none; }
         .modal-close-btn { position: absolute; top: 10px; right: 10px; background: #f1f3f5; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; color: var(--secondary-color); display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; }
         .modal-close-btn:hover { background-color: #dee2e6; }
-        
-        .modal-body {
-            display: flex;
-            flex-direction: column; /* Padrão mobile-first */
-            padding: 1.5rem;
-            overflow-y: auto; /* Apenas o corpo rola */
-            flex-grow: 1;
-            gap: 1.5rem;
-        }
-
+        .modal-body { display: flex; flex-direction: column; padding: 1.5rem; overflow-y: auto; flex-grow: 1; gap: 1.5rem; }
         .modal-main-content { flex-grow: 1; }
         .modal-sidebar-content { flex-shrink: 0; }
-        
-        .modal-body h4 { margin: 0 0 1rem 0; font-size: 1.2rem; color: var(--text-color); }
+        .modal-body h4 { margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 700; color: var(--text-color); }
         .modal-info-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 1rem; }
         #modal-analysis { line-height: 1.7; color: #495057; margin: 0; }
-        .insta-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+        .insta-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
         .insta-post { background-color: #f1f3f5; border-radius: 8px; border: 1px solid var(--border-color); aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; }
-        .insta-post svg { width: 40px; height: 40px; color: #ced4da; }
-
+        .insta-post svg { width: 30px; height: 30px; color: #ced4da; }
         .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); flex-shrink: 0; background-color: #f8f9fa; }
         
-        /* --- AJUSTE NOS BOTÕES --- */
+        /* --- AJUSTE FINAL NOS BOTÕES --- */
         .card-actions {
             display: flex;
             gap: 10px;
             justify-content: flex-end; /* Alinha os botões à direita */
         }
         .action-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            /* flex-grow: 1; -- REMOVIDO PARA OS BOTÕES NÃO ESTICAREM */
-            padding: 10px 16px; /* Ajustado para um tamanho menor */
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
+            display: flex; align-items: center; justify-content: center; gap: 6px; /* Gap menor */
+            padding: 8px 14px; /* Padding menor */
+            font-size: 0.9rem; /* Fonte menor */
+            border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s ease; border: 1px solid transparent;
         }
         /* --- FIM DO AJUSTE --- */
 
@@ -145,14 +116,14 @@
         .btn-instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; }
         .btn-instagram:hover { opacity: 0.9; }
         
-        /* Scrollbar customizada */
         .modal-body::-webkit-scrollbar { width: 8px; }
         .modal-body::-webkit-scrollbar-track { background: #f1f1f1; }
         .modal-body::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
         .modal-body::-webkit-scrollbar-thumb:hover { background: #aaa; }
 
-        /* Media Query para telas maiores (Desktop) */
+        /* Media Query para telas maiores */
         @media (min-width: 768px) {
+            header h1 { font-size: 2.5rem; }
             .modal-body { flex-direction: row; }
             .modal-sidebar-content { flex-basis: 240px; }
             .modal-info-grid { grid-template-columns: 1fr 1fr; }
