@@ -1,4 +1,3 @@
-// Todo o código JavaScript que estava no final do seu HTML vai aqui.
 document.addEventListener('DOMContentLoaded', () => {
     const categoryNav = document.getElementById('category-nav');
     const threatNav = document.getElementById('threat-nav');
