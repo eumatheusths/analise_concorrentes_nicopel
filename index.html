@@ -10,180 +10,72 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    :root {
-      --primary-color: #0d6efd;
-      --secondary-color: #6c757d;
-      --background-color: #f8f9fa;
-      --card-background: #ffffff;
-      --text-color: #212529;
-      --border-color: #e9ecef;
-      --shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
-      --shadow-hover: 0 7px 14px rgba(0, 0, 0, 0.07);
+    :root{
+      --primary-color:#0d6efd;--secondary-color:#6c757d;--background-color:#f8f9fa;
+      --card-background:#ffffff;--text-color:#212529;--border-color:#e9ecef;
+      --shadow:0 4px 6px rgba(0,0,0,.04);--shadow-hover:0 7px 14px rgba(0,0,0,.07)
     }
+    /* base responsiva */
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--background-color);color:var(--text-color);line-height:1.5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+    .container{max-width:1200px;margin:0 auto;padding:clamp(12px,2vw,20px)}
+    header{text-align:center;margin-bottom:clamp(16px,3vw,28px)}
+    header h1{margin:0 0 6px;font-weight:700;font-size:clamp(1.25rem,2.4vw+0.5rem,2.2rem)}
+    header p{margin:0;color:var(--secondary-color);font-size:clamp(.9rem,1.2vw+.5rem,1rem)}
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--background-color);
-      color: var(--text-color);
-      margin: 0;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
+    /* tabs roláveis */
+    .tabs-nav{display:flex;gap:8px;margin:12px 0 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+    .tab-btn{flex:0 0 auto;white-space:nowrap;font-weight:600;font-size:.95rem;padding:10px 14px;border:1px solid var(--border-color);background:#fff;color:var(--secondary-color);border-radius:999px;cursor:pointer;transition:.2s}
+    .tab-btn:hover{background:#f1f3f5} .tab-btn.active{background:var(--primary-color);color:#fff;border-color:var(--primary-color)}
 
-    .container { max-width: 1200px; margin: 0 auto; padding: 16px; }
+    /* legenda */
+    .legend{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px 16px;background:#f1f3f5;padding:12px;border-radius:12px;margin-bottom:clamp(16px,3vw,24px)}
+    .legend-item{display:flex;align-items:center;gap:8px}
+    .threat-level{width:14px;height:14px;border-radius:50%}
+    .threat-high{background:#dc3545}.threat-medium{background:#fd7e14}.threat-low{background:#ffc107}
 
-    header { text-align: center; margin-bottom: 1.5rem; }
-    header h1 { font-size: 1.8rem; margin: 0; font-weight: 700; }
-    header p { color: var(--secondary-color); margin-top: 0.3rem; }
+    /* grid */
+    #competitors-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:clamp(12px,2.2vw,20px)}
+    .competitor-card{cursor:pointer;background:#fff;border:1px solid var(--border-color);border-radius:12px;padding:clamp(14px,1.8vw,20px);box-shadow:var(--shadow);transition:.2s;display:flex;flex-direction:column;min-height:160px}
+    .competitor-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover)}
+    .competitor-card.hidden{display:none}
+    .card-header{display:flex;align-items:center;gap:12px}
+    .card-header h3{margin:0;font-size:clamp(1.05rem,1.2vw+.8rem,1.3rem);font-weight:700}
+    .info-item{display:flex;align-items:center;gap:10px;margin:8px 0}
+    .info-item svg{width:20px;height:20px;color:var(--secondary-color)}
 
-    .tabs-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 1rem; }
-    .tab-btn {
-      font-size: 0.9rem;
-      font-weight: 600;
-      padding: 8px 14px;
-      border-radius: 999px;
-      border: 1px solid var(--border-color);
-      background: #fff;
-      color: var(--secondary-color);
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .tab-btn.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
-    .tab-btn:hover { background: #f1f3f5; }
+    /* modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(33,37,41,.6);display:flex;justify-content:center;align-items:center;z-index:1000;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s;padding:1rem}
+    .modal-overlay.active{opacity:1;visibility:visible}
+    .modal-content{background:#fff;border-radius:12px;width:100%;max-width:800px;max-height:min(90vh,700px);display:flex;flex-direction:column;overflow:hidden;transform:translateY(10px);transition:transform .25s}
+    .modal-overlay.active .modal-content{transform:translateY(0)}
+    .modal-header{padding:12px 16px;border-bottom:1px solid var(--border-color);position:sticky;top:0;background:#fff;z-index:1}
+    .modal-close-btn{position:absolute;top:10px;right:10px;background:#f1f3f5;border:none;width:32px;height:32px;border-radius:50%;font-size:1.2rem;cursor:pointer;color:var(--secondary-color)}
+    .modal-body{padding:14px;overflow:auto;display:flex;flex-direction:column;gap:12px}
+    .modal-footer{padding:12px 16px;border-top:1px solid var(--border-color);background:#f8f9fa;position:sticky;bottom:0}
 
-    .legend {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px 16px;
-      background: #f1f3f5;
-      padding: 10px;
-      border-radius: 10px;
-      margin-bottom: 1.5rem;
-    }
-    .legend-item { display: flex; align-items: center; gap: 6px; }
-    .threat-level { width: 14px; height: 14px; border-radius: 50%; }
-    .threat-high { background: #dc3545; }
-    .threat-medium { background: #fd7e14; }
-    .threat-low { background: #ffc107; }
+    /* botões compactos/clean do pop-up */
+    .card-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .action-btn{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;font-size:.9rem;line-height:1;border-radius:8px;border:1px solid var(--border-color);background:#fff;color:var(--text-color);font-weight:600;text-decoration:none;transition:background .15s,border-color .15s,transform .06s}
+    .action-btn svg{width:18px;height:18px;color:var(--secondary-color)}
+    .action-btn:hover{background:#f8f9fa}
+    .action-btn:active{transform:scale(.985)}
+    .btn-website{color:var(--primary-color);border-color:#d0e3ff}
+    .btn-website:hover{background:#f3f8ff}
+    .btn-instagram{color:#d6336c;border-color:#f3d0db}
+    .btn-instagram:hover{background:#fff5f7}
 
-    #competitors-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 16px;
-    }
-
-    .competitor-card {
-      background: #fff;
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 16px;
-      box-shadow: var(--shadow);
-      transition: 0.2s;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-    }
-    .competitor-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
-
-    .card-header { display: flex; align-items: center; gap: 10px; }
-    .card-header h3 { margin: 0; font-size: 1.2rem; }
-
-    .info-item { display: flex; align-items: center; gap: 8px; font-size: 0.95rem; margin-top: 6px; }
-    .info-item svg { width: 18px; height: 18px; color: var(--secondary-color); }
-
-    /* === Modal === */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-      opacity: 0;
-      visibility: hidden;
-      transition: 0.3s;
-    }
-    .modal-overlay.active { opacity: 1; visibility: visible; }
-    .modal-content {
-      background: #fff;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 600px;
-      max-height: 90vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .modal-header {
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border-color);
-      position: relative;
-    }
-    .modal-close-btn {
-      position: absolute;
-      top: 8px;
-      right: 10px;
-      background: #f1f3f5;
-      border: none;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      font-size: 1.3rem;
-      cursor: pointer;
-      color: var(--secondary-color);
-    }
-    .modal-body {
-      padding: 16px;
-      overflow-y: auto;
-      flex-grow: 1;
-    }
-    .modal-footer {
-      padding: 12px 16px;
-      border-top: 1px solid var(--border-color);
-      background: #f8f9fa;
-    }
-
-    /* === Botões compactos e limpos === */
-    .card-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .action-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 12px;
-      font-size: 0.9rem;
-      line-height: 1;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-      background: #fff;
-      color: var(--text-color);
-      font-weight: 600;
-      text-decoration: none;
-      transition: 0.15s;
-    }
-    .action-btn svg { width: 18px; height: 18px; color: var(--secondary-color); }
-    .action-btn:hover { background: #f8f9fa; }
-    .btn-website { color: var(--primary-color); border-color: #d0e3ff; }
-    .btn-website:hover { background: #f3f8ff; }
-    .btn-instagram { color: #d6336c; border-color: #f3d0db; }
-    .btn-instagram:hover { background: #fff5f7; }
-
-    @media (max-width: 767px) {
-      .modal-content { width: 100%; height: 100%; border-radius: 0; }
-    }
+    /* mobile fullscreen */
+    @media (max-width:767px){.modal-content{width:100%;height:100%;max-width:none;max-height:none;border-radius:0}}
+    @media (max-width:360px){#competitors-grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-  <svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
-    <symbol id="icon-location" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></symbol>
-    <symbol id="icon-focus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></symbol>
-    <symbol id="icon-website" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></symbol>
-    <symbol id="icon-instagram" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></symbol>
+  <!-- Ícones -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <symbol id="icon-location" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></symbol>
+    <symbol id="icon-focus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></symbol>
+    <symbol id="icon-website" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></symbol>
+    <symbol id="icon-instagram" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></symbol>
   </svg>
 
   <div class="container">
@@ -192,46 +84,109 @@
       <p>Análise de Mercado para Nicopel Embalagens</p>
     </header>
 
-    <nav class="tabs-nav">
-      <button class="tab-btn active" data-category="todos">Todos</button>
-      <button class="tab-btn" data-category="potes-copos">Potes e Copos</button>
-      <button class="tab-btn" data-category="caixas-sorvete">Caixas de Sorvete</button>
-      <button class="tab-btn" data-category="caixas-pizza">Caixas de Pizza</button>
-      <button class="tab-btn" data-category="embalagens-industriais">Embalagens Industriais</button>
+    <nav class="tabs-nav" aria-label="Categorias">
+      <button class="tab-btn active" data-category="todos" type="button">Todos</button>
+      <button class="tab-btn" data-category="potes-copos" type="button">Potes e Copos</button>
+      <button class="tab-btn" data-category="caixas-sorvete" type="button">Caixas de Sorvete</button>
+      <button class="tab-btn" data-category="caixas-pizza" type="button">Caixas de Pizza</button>
+      <button class="tab-btn" data-category="embalagens-industriais" type="button">Embalagens Industriais</button>
     </nav>
 
-    <div class="legend">
+    <div class="legend" role="note">
       <div class="legend-item"><span class="threat-level threat-high"></span><span>Ameaça Alta</span></div>
       <div class="legend-item"><span class="threat-level threat-medium"></span><span>Ameaça Média</span></div>
       <div class="legend-item"><span class="threat-level threat-low"></span><span>Ameaça Baixa</span></div>
     </div>
 
     <main id="competitors-grid">
+      <!-- TODOS OS CARDS RESTAURADOS -->
       <article class="competitor-card"
         data-category="potes-copos embalagens-industriais"
-        data-name="Soluplex Brasil"
-        data-location="São Paulo - SP"
-        data-focus="Solução completa para fast-food."
-        data-analysis="Agressivos no marketing para franquias, oferecem um mix completo de produtos que atrai grandes redes."
-        data-website="https://www.soluplex.com.br/"
-        data-instagram="https://www.instagram.com/soluplex.brasil/">
+        data-name="Soluplex Brasil" data-location="São Paulo - SP" data-focus="Solução completa para fast-food."
+        data-analysis="Agressivos no marketing para franquias, oferecem um mix completo de produtos que atrai grandes redes. Ponto fraco pode ser a menor flexibilidade para clientes menores."
+        data-website="https://www.soluplex.com.br/" data-instagram="https://www.instagram.com/soluplex.brasil/">
         <div class="card-header"><span class="threat-level threat-high"></span><h3>Soluplex Brasil</h3></div>
         <div class="info-item"><svg><use href="#icon-location"/></svg><span>São Paulo - SP</span></div>
         <div class="info-item"><svg><use href="#icon-focus"/></svg><span>Solução completa para fast-food.</span></div>
       </article>
+
+      <article class="competitor-card"
+        data-category="potes-copos caixas-sorvete"
+        data-name="Soller Embalagens" data-location="Biguaçu - SC" data-focus="Especialista em potes de açaí e sorvetes."
+        data-analysis="Concorrente 'espelho' direto no nicho principal da Nicopel. A comunicação visual é forte e focada na qualidade. A disputa é direta por preço, qualidade de impressão e agilidade na entrega."
+        data-website="https://www.sollerembalagens.com.br/" data-instagram="https://www.instagram.com/sollerembalagens/">
+        <div class="card-header"><span class="threat-level threat-high"></span><h3>Soller Embalagens</h3></div>
+        <div class="info-item"><svg><use href="#icon-location"/></svg><span>Biguaçu - SC</span></div>
+        <div class="info-item"><svg><use href="#icon-focus"/></svg><span>Especialista em potes de açaí e sorvetes.</span></div>
+      </article>
+
+      <article class="competitor-card"
+        data-category="potes-copos"
+        data-name="BoxBe" data-location="São Paulo - SP" data-focus="Foco absoluto em copos de papel."
+        data-analysis="Ameaça forte para clientes que buscam especificamente por copos na internet, com marketing digital muito agressivo para captura de leads online."
+        data-website="https://boxbe.com.br/" data-instagram="https://www.instagram.com/boxbeembalagens/">
+        <div class="card-header"><span class="threat-level threat-high"></span><h3>BoxBe</h3></div>
+        <div class="info-item"><svg><use href="#icon-location"/></svg><span>São Paulo - SP</span></div>
+        <div class="info-item"><svg><use href="#icon-focus"/></svg><span>Foco absoluto em copos de papel.</span></div>
+      </article>
+
+      <article class="competitor-card"
+        data-category="caixas-sorvete embalagens-industriais"
+        data-name="Nazapack" data-location="Jaraguá do Sul - SC" data-focus="Caixas de papel-cartão com foco em design."
+        data-analysis="Competem forte em projetos que exigem alto apelo visual. Ameaça para clientes que veem a embalagem como principal ferramenta de marketing no ponto de venda."
+        data-website="https://nazapack.com.br/" data-instagram="https://www.instagram.com/nazapack/?hl=en">
+        <div class="card-header"><span class="threat-level threat-medium"></span><h3>Nazapack</h3></div>
+        <div class="info-item"><svg><use href="#icon-location"/></svg><span>Jaraguá do Sul - SC</span></div>
+        <div class="info-item"><svg><use href="#icon-focus"/></svg><span>Caixas de papel-cartão com foco em design.</span></div>
+      </article>
+
+      <article class="competitor-card"
+        data-category="potes-copos"
+        data-name="Papello Embalagens" data-location="Caxias do Sul - RS" data-focus="Copos, potes e baldes de papel."
+        data-analysis="Competem diretamente na linha de produtos. A distância pode ser um fator que a Nicopel pode explorar, oferecendo fretes mais competitivos e prazos de entrega menores."
+        data-website="https://www.papello.com.br/" data-instagram="https://www.instagram.com/papelloembalagens/">
+        <div class="card-header"><span class="threat-level threat-medium"></span><h3>Papello Embalagens</h3></div>
+        <div class="info-item"><svg><use href="#icon-location"/></svg><span>Caxias do Sul - RS</span></div>
+        <div class="info-item"><svg><use href="#icon-focus"/></svg><span>Copos, potes e baldes de papel.</span></div>
+      </article>
+
+      <article class="competitor-card"
+        data-category="caixas-sorvete embalagens-industriais caixas-pizza"
+        data-name="Gráfica Tambosi" data-location="Blumenau - SC" data-focus="Gráfica industrial para grandes volumes."
+        data-analysis="Ameaça para grandes volumes devido à alta capacidade produtiva, podendo oferecer preços competitivos. Menos ágil para pedidos menores e nichados."
+        data-website="https://graficatambosi.com.br/embalagens" data-instagram="https://www.instagram.com/graficatambosi/">
+        <div class="card-header"><span class="threat-level threat-medium"></span><h3>Gráfica Tambosi</h3></div>
+        <div class="info-item"><svg><use href="#icon-location"/></svg><span>Blumenau - SC</span></div>
+        <div class="info-item"><svg><use href="#icon-focus"/></svg><span>Gráfica industrial para grandes volumes.</span></div>
+      </article>
+
+      <article class="competitor-card"
+        data-category="caixas-pizza embalagens-industriais"
+        data-name="DCX Embalagens" data-location="São Paulo - SP" data-focus="Caixas de papelão para e-commerce e delivery."
+        data-analysis="Competem no segmento de caixas de papelão para transporte e delivery. Ameaça indireta ao core business, mas direta para caixas de pizza mais simples."
+        data-website="https://www.dcxembalagens.com.br/" data-instagram="https://www.instagram.com/dcxembalagens/">
+        <div class="card-header"><span class="threat-level threat-low"></span><h3>DCX Embalagens</h3></div>
+        <div class="info-item"><svg><use href="#icon-location"/></svg><span>São Paulo - SP</span></div>
+        <div class="info-item"><svg><use href="#icon-focus"/></svg><span>Caixas de papelão para e-commerce e delivery.</span></div>
+      </article>
     </main>
+
+    <footer style="text-align:center;margin-top:16px;color:var(--secondary-color)">
+      <p>Dashboard atualizado em <span id="last-updated"></span></p>
+    </footer>
   </div>
 
-  <div id="competitor-modal" class="modal-overlay">
+  <!-- Modal -->
+  <div id="competitor-modal" class="modal-overlay" aria-hidden="true" role="dialog" aria-modal="true">
     <div class="modal-content">
       <header class="modal-header">
         <div id="modal-header-content" class="card-header"></div>
-        <button id="modal-close-btn" class="modal-close-btn">&times;</button>
+        <button id="modal-close-btn" class="modal-close-btn" aria-label="Fechar modal">&times;</button>
       </header>
       <div class="modal-body">
         <div id="modal-location" class="info-item"></div>
         <div id="modal-focus" class="info-item"></div>
-        <p id="modal-analysis"></p>
+        <p id="modal-analysis" style="margin:0"></p>
       </div>
       <footer class="modal-footer">
         <div id="modal-actions" class="card-actions"></div>
@@ -241,43 +196,84 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const tabs = document.querySelectorAll('.tab-btn');
-      const cards = document.querySelectorAll('.competitor-card');
+      const tabsContainer = document.querySelector('.tabs-nav');
+      const competitorCards = document.querySelectorAll('.competitor-card');
+
+      // filtro
+      tabsContainer.addEventListener('click', (event) => {
+        const btn = event.target.closest('.tab-btn');
+        if (!btn) return;
+        const active = tabsContainer.querySelector('.active');
+        if (active) active.classList.remove('active');
+        btn.classList.add('active');
+
+        const cat = btn.dataset.category;
+        competitorCards.forEach(card => {
+          const categories = (card.dataset.category || '');
+          if (cat === 'todos' || categories.includes(cat)) {
+            card.classList.remove('hidden');
+          } else {
+            card.classList.add('hidden');
+          }
+        });
+      });
+
+      // modal
+      const grid = document.getElementById('competitors-grid');
       const modal = document.getElementById('competitor-modal');
-      const modalHeader = document.getElementById('modal-header-content');
-      const modalLoc = document.getElementById('modal-location');
+      const modalCloseBtn = document.getElementById('modal-close-btn');
+      const modalHeaderContent = document.getElementById('modal-header-content');
+      const modalLocation = document.getElementById('modal-location');
       const modalFocus = document.getElementById('modal-focus');
       const modalAnalysis = document.getElementById('modal-analysis');
       const modalActions = document.getElementById('modal-actions');
-      const closeBtn = document.getElementById('modal-close-btn');
 
-      tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          document.querySelector('.tab-btn.active').classList.remove('active');
-          tab.classList.add('active');
-          const cat = tab.dataset.category;
-          cards.forEach(c => {
-            c.style.display = cat === 'todos' || c.dataset.category.includes(cat) ? '' : 'none';
-          });
-        });
+      const openModal = () => {
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden','false');
+        document.body.style.overflow='hidden';
+        modalCloseBtn.focus({preventScroll:true});
+      };
+      const closeModal = () => {
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden','true');
+        document.body.style.overflow='';
+      };
+
+      grid.addEventListener('click', (event) => {
+        const card = event.target.closest('.competitor-card');
+        if (!card) return;
+
+        const name = card.dataset.name || '';
+        const location = card.dataset.location || '';
+        const focus = card.dataset.focus || '';
+        const analysis = card.dataset.analysis || '';
+        const website = card.dataset.website || '';
+        const instagram = card.dataset.instagram || '';
+        const threatEl = card.querySelector('.threat-level');
+        const threatHTML = threatEl ? threatEl.outerHTML : '';
+
+        modalHeaderContent.innerHTML = `${threatHTML}<h3 style="margin:0">${name}</h3>`;
+        modalLocation.innerHTML = `<svg><use href="#icon-location"/></svg><span>${location}</span>`;
+        modalFocus.innerHTML = `<svg><use href="#icon-focus"/></svg><span>${focus}</span>`;
+        modalAnalysis.textContent = analysis;
+
+        let actions = '';
+        if (website) actions += `<a href="${website}" target="_blank" rel="noopener" class="action-btn btn-website"><svg><use href="#icon-website"/></svg>Website</a>`;
+        if (instagram) actions += `<a href="${instagram}" target="_blank" rel="noopener" class="action-btn btn-instagram"><svg><use href="#icon-instagram"/></svg>Instagram</a>`;
+        modalActions.innerHTML = actions;
+
+        openModal();
       });
 
-      cards.forEach(card => {
-        card.addEventListener('click', () => {
-          modal.classList.add('active');
-          modalHeader.innerHTML = `<span class="threat-level threat-high"></span><h3>${card.dataset.name}</h3>`;
-          modalLoc.innerHTML = `<svg><use href="#icon-location"/></svg><span>${card.dataset.location}</span>`;
-          modalFocus.innerHTML = `<svg><use href="#icon-focus"/></svg><span>${card.dataset.focus}</span>`;
-          modalAnalysis.textContent = card.dataset.analysis;
-          modalActions.innerHTML = `
-            <a href="${card.dataset.website}" target="_blank" class="action-btn btn-website"><svg><use href="#icon-website"/></svg>Website</a>
-            <a href="${card.dataset.instagram}" target="_blank" class="action-btn btn-instagram"><svg><use href="#icon-instagram"/></svg>Instagram</a>
-          `;
-        });
-      });
+      modalCloseBtn.addEventListener('click', closeModal);
+      modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && modal.classList.contains('active')) closeModal(); });
 
-      closeBtn.addEventListener('click', () => modal.classList.remove('active'));
-      modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('active'); });
+      // data
+      const today = new Date();
+      document.getElementById('last-updated').textContent =
+        today.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
     });
   </script>
 </body>
