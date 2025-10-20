@@ -34,15 +34,13 @@
         .tabs-nav::-webkit-scrollbar{display:none}
         .tab-btn{flex:0 0 auto;white-space:nowrap;font-weight:600;font-size:.95rem;padding:10px 14px;border:1px solid var(--border-color);background:#fff;color:var(--secondary-color);border-radius:999px;cursor:pointer;transition:.2s}
         .tab-btn:hover{background:#f1f3f5} .tab-btn.active{background:var(--primary-color);color:#fff;border-color:var(--primary-color)}
-        .legend{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px 16px;background:#f1f3f5;padding:12px;border-radius:12px;margin-bottom:clamp(16px,3vw,24px)}
-        .legend-item{display:flex;align-items:center;gap:8px}
-        .threat-level{width:14px;height:14px;border-radius:50%}
-        .threat-high{background:#dc3545}.threat-medium{background:#fd7e14}.threat-low{background:#ffc107}
-        #competitors-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:clamp(12px,2.2vw,20px)}
+        #competitors-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:clamp(12px,2.2vw,20px); margin-top: 1rem;}
         .competitor-card{cursor:pointer;background:#fff;border:1px solid var(--border-color);border-radius:12px;padding:clamp(14px,1.8vw,20px);box-shadow:var(--shadow);transition:.2s;display:flex;flex-direction:column;min-height:160px}
         .competitor-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover)}
         .competitor-card.hidden{display:none}
         .card-header{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+        .threat-level{width:14px;height:14px;border-radius:50%; flex-shrink: 0;}
+        .threat-high{background:#dc3545}.threat-medium{background:#fd7e14}.threat-low{background:#ffc107}
         .card-header h3{margin:0;font-size:clamp(1.05rem,1.2vw+.8rem,1.3rem);font-weight:700}
         .card-body{flex-grow:1}
         .info-item{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:0.9rem;color:var(--secondary-color)}
@@ -120,7 +118,6 @@
                     <p class="card-analysis-preview">Agressivos no marketing para franquias, oferecem um mix completo de produtos que atrai grandes redes...</p>
                 </div>
             </article>
-
             <article class="competitor-card"
                 data-category="potes-copos caixas-sorvete" data-threat="alta"
                 data-name="Soller Embalagens" data-location="Biguaçu - SC" data-focus="Especialista em potes de açaí e sorvetes."
@@ -132,7 +129,6 @@
                     <p class="card-analysis-preview">Concorrente 'espelho' direto no nicho principal da Nicopel. A comunicação visual é forte e focada na qualidade...</p>
                 </div>
             </article>
-            
             <article class="competitor-card"
                 data-category="potes-copos" data-threat="alta"
                 data-name="BoxBe" data-location="São Paulo - SP" data-focus="Foco absoluto em copos de papel."
@@ -144,7 +140,6 @@
                     <p class="card-analysis-preview">Ameaça forte para clientes que buscam especificamente por copos na internet, com marketing digital muito agressivo...</p>
                 </div>
             </article>
-
              <article class="competitor-card"
                 data-category="potes-copos" data-threat="alta"
                 data-name="Brazil Copos" data-location="São Paulo - SP" data-focus="Copos, potes e baldes de papel biodegradável."
@@ -156,7 +151,6 @@
                     <p class="card-analysis-preview">Focados em produtos de papel biodegradável e personalização, são concorrentes diretos no nicho de potes e copos...</p>
                 </div>
             </article>
-
             <article class="competitor-card"
                 data-category="potes-copos" data-threat="alta"
                 data-name="Natucopos" data-location="Brasil" data-focus="Potes, copos e tampas para delivery."
@@ -168,7 +162,6 @@
                     <p class="card-analysis-preview">Forte presença no segmento de delivery com um portfólio completo de embalagens de papel, incluindo tampas...</p>
                 </div>
             </article>
-
             <article class="competitor-card"
                 data-category="potes-copos" data-threat="alta"
                 data-name="Apolo Embalagens" data-location="Maringá - PR" data-focus="Potes premium, potes e copos de papel."
@@ -180,127 +173,6 @@
                     <p class="card-analysis-preview">Concorrente regional importante. O foco em 'potes premium' pode ser um diferencial a ser observado...</p>
                 </div>
             </article>
-
-            <article class="competitor-card"
-                data-category="caixas-sorvete embalagens-industriais" data-threat="media"
-                data-name="Nazapack" data-location="Jaraguá do Sul - SC" data-focus="Caixas de papel-cartão com foco em design."
-                data-analysis="Competem forte em projetos que exigem alto apelo visual. Ameaça para clientes que veem a embalagem como principal ferramenta de marketing no ponto de venda."
-                data-website="https://nazapack.com.br/" data-instagram="https://www.instagram.com/nazapack/?hl=en">
-                <div class="card-header"><span class="threat-level threat-medium"></span><h3>Nazapack</h3></div>
-                <div class="card-body">
-                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>Jaraguá do Sul - SC</span></div>
-                    <p class="card-analysis-preview">Competem forte em projetos que exigem alto apelo visual. Ameaça para clientes que veem a embalagem como principal ferramenta de marketing...</p>
-                </div>
-            </article>
-
-            <article class="competitor-card"
-                data-category="potes-copos" data-threat="media"
-                data-name="Papello Embalagens" data-location="Caxias do Sul - RS" data-focus="Copos, potes e baldes de papel."
-                data-analysis="Competem diretamente na linha de produtos. A distância pode ser um fator que a Nicopel pode explorar, oferecendo fretes mais competitivos e prazos de entrega menores."
-                data-website="https://www.papello.com.br/" data-instagram="https://www.instagram.com/papelloembalagens/">
-                <div class="card-header"><span class="threat-level threat-medium"></span><h3>Papello Embalagens</h3></div>
-                <div class="card-body">
-                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>Caxias do Sul - RS</span></div>
-                    <p class="card-analysis-preview">Competem diretamente na linha de produtos. A distância pode ser um fator que a Nicopel pode explorar...</p>
-                </div>
-            </article>
-
-            <article class="competitor-card"
-                data-category="caixas-sorvete embalagens-industriais caixas-pizza" data-threat="media"
-                data-name="Gráfica Tambosi" data-location="Blumenau - SC" data-focus="Gráfica industrial para grandes volumes."
-                data-analysis="Ameaça para grandes volumes devido à alta capacidade produtiva, podendo oferecer preços competitivos. Menos ágil para pedidos menores e nichados."
-                data-website="https://graficatambosi.com.br/embalagens" data-instagram="https://www.instagram.com/graficatambosi/">
-                <div class="card-header"><span class="threat-level threat-medium"></span><h3>Gráfica Tambosi</h3></div>
-                <div class="card-body">
-                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>Blumenau - SC</span></div>
-                    <p class="card-analysis-preview">Ameaça para grandes volumes devido à alta capacidade produtiva, podendo oferecer preços competitivos...</p>
-                </div>
-            </article>
-
-            <article class="competitor-card"
-                data-category="potes-copos" data-threat="media"
-                data-name="Biopapers" data-location="Brasil" data-focus="Copos e potes biodegradáveis."
-                data-analysis="Posicionamento forte em sustentabilidade com produtos biodegradáveis e recicláveis. Apelo para clientes com foco em marketing verde e consciência ambiental."
-                data-website="https://biopapers.com.br/" data-instagram="https://www.instagram.com/biopapers/">
-                <div class="card-header"><span class="threat-level threat-medium"></span><h3>Biopapers</h3></div>
-                <div class="card-body">
-                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>Brasil</span></div>
-                    <p class="card-analysis-preview">Posicionamento forte em sustentabilidade com produtos biodegradáveis. Apelo para clientes com foco em marketing verde...</p>
-                </div>
-            </article>
-
-            <article class="competitor-card"
-                data-category="potes-copos caixas-sorvete" data-threat="media"
-                data-name="Castagna" data-location="Brasil" data-focus="Copos de papel e potes térmicos."
-                data-analysis="O foco em potes térmicos os torna um concorrente direto para o mercado de sorvetes e açaí, oferecendo uma solução especializada para produtos que exigem isolamento térmico."
-                data-website="https://www.castagna.com.br/" data-instagram="https://www.instagram.com/castagnaembalagens/">
-                <div class="card-header"><span class="threat-level threat-medium"></span><h3>Castagna</h3></div>
-                <div class="card-body">
-                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>Brasil</span></div>
-                    <p class="card-analysis-preview">O foco em potes térmicos os torna um concorrente direto para o mercado de sorvetes e açaí...</p>
-                </div>
-            </article>
-
-             <article class="competitor-card"
-                data-category="potes-copos" data-threat="media"
-                data-name="BelloCopo" data-location="Brasil" data-focus="Descartáveis de papel e plástico."
-                data-analysis="Atuam tanto em papel quanto em plástico, o que pode diluir o foco, mas possuem grande escala de produção, podendo ser competitivos em preço para grandes volumes."
-                data-website="https://www.bellocopo.com.br/" data-instagram="https://www.instagram.com/bellocopo/">
-                <div class="card-header"><span class="threat-level threat-medium"></span><h3>BelloCopo</h3></div>
-                <div class="card-body">
-                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>Brasil</span></div>
-                    <p class="card-analysis-preview">Atuam tanto em papel quanto em plástico, o que pode diluir o foco, mas possuem grande escala de produção...</p>
-                </div>
-            </article>
-            
-            <article class="competitor-card"
-                data-category="caixas-pizza embalagens-industriais" data-threat="baixa"
-                data-name="DCX Embalagens" data-location="São Paulo - SP" data-focus="Caixas de papelão para e-commerce e delivery."
-                data-analysis="Competem no segmento de caixas de papelão para transporte e delivery. Ameaça indireta ao core business, mas direta para caixas de pizza mais simples."
-                data-website="https://www.dcxembalagens.com.br/" data-instagram="https://www.instagram.com/dcxembalagens/">
-                <div class="card-header"><span class="threat-level threat-low"></span><h3>DCX Embalagens</h3></div>
-                <div class="card-body">
-                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>São Paulo - SP</span></div>
-                    <p class="card-analysis-preview">Competem no segmento de caixas de papelão para transporte e delivery. Ameaça indireta ao core business...</p>
-                </div>
-            </article>
-
-            <article class="competitor-card"
-                data-category="" data-threat="baixa"
-                data-name="Altacoppo" data-location="Brasil" data-focus="Potes e tampas de plástico/PP."
-                data-analysis="Concorrente indireto, pois o foco é em plástico (PP). Podem competir por clientes que não têm preferência por papel ou buscam custos menores."
-                data-website="https://www.altacoppo.com.br/" data-instagram="https://www.instagram.com/altacoppo/">
-                <div class="card-header"><span class="threat-level threat-low"></span><h3>Altacoppo</h3></div>
-                <div class="card-body">
-                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>Brasil</span></div>
-                    <p class="card-analysis-preview">Concorrente indireto, pois o foco é em plástico (PP). Podem competir por clientes que não têm preferência por papel...</p>
-                </div>
-            </article>
-
-             <article class="competitor-card"
-                data-category="embalagens-industriais caixas-pizza" data-threat="media"
-                data-name="MultiCaixasNet" data-location="Atibaia - SP" data-focus="Maior e-commerce de embalagens do Brasil."
-                data-analysis="Grande variedade de produtos para food service e delivery. Competem em escala e variedade, sendo uma ameaça para clientes que buscam uma solução única para diversas necessidades."
-                data-website="https://www.multicaixasnet.com.br/" data-instagram="https://www.instagram.com/multicaixasnet/">
-                <div class="card-header"><span class="threat-level threat-medium"></span><h3>MultiCaixasNet</h3></div>
-                <div class="card-body">
-                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>Atibaia - SP</span></div>
-                    <p class="card-analysis-preview">Grande variedade de produtos para food service e delivery. Competem em escala e variedade...</p>
-                </div>
-            </article>
-
-            <article class="competitor-card"
-                data-category="embalagens-industriais" data-threat="media"
-                data-name="Perpacks" data-location="Brasil" data-focus="Embalagens para comida, caixas e delivery."
-                data-analysis="Foco em embalagens para delivery e food service em geral. Oferecem personalização e se posicionam como fabricantes, o que pode indicar preços competitivos."
-                data-website="https://www.perpacks.com.br/" data-instagram="https://www.instagram.com/perpacks/">
-                <div class="card-header"><span class="threat-level threat-medium"></span><h3>Perpacks</h3></div>
-                <div class="card-body">
-                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>Brasil</span></div>
-                    <p class="card-analysis-preview">Foco em embalagens para delivery e food service em geral. Oferecem personalização e se posicionam como fabricantes...</p>
-                </div>
-            </article>
-
             <article class="competitor-card"
                 data-category="potes-copos" data-threat="alta"
                 data-name="MX Copos & Potes" data-location="Brasil" data-focus="Fabricante de Copos e Potes Biodegradáveis."
@@ -312,7 +184,6 @@
                     <p class="card-analysis-preview">Concorrente direto e forte, pois são fabricantes de potes e copos biodegradáveis. Ameaça alta e relevante.</p>
                 </div>
             </article>
-
             <article class="competitor-card"
                 data-category="potes-copos" data-threat="alta"
                 data-name="Pixpel" data-location="Itupeva - SP" data-focus="Embalagens sustentáveis, potes e copos."
@@ -324,7 +195,94 @@
                     <p class="card-analysis-preview">Posicionam a embalagem como 'a sua melhor mídia'. Foco forte em personalização e sustentabilidade...</p>
                 </div>
             </article>
-
+            <article class="competitor-card"
+                data-category="caixas-sorvete embalagens-industriais" data-threat="media"
+                data-name="Nazapack" data-location="Jaraguá do Sul - SC" data-focus="Caixas de papel-cartão com foco em design."
+                data-analysis="Competem forte em projetos que exigem alto apelo visual. Ameaça para clientes que veem a embalagem como principal ferramenta de marketing no ponto de venda."
+                data-website="https://nazapack.com.br/" data-instagram="https://www.instagram.com/nazapack/?hl=en">
+                <div class="card-header"><span class="threat-level threat-medium"></span><h3>Nazapack</h3></div>
+                <div class="card-body">
+                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>Jaraguá do Sul - SC</span></div>
+                    <p class="card-analysis-preview">Competem forte em projetos que exigem alto apelo visual. Ameaça para clientes que veem a embalagem como principal ferramenta de marketing...</p>
+                </div>
+            </article>
+            <article class="competitor-card"
+                data-category="potes-copos" data-threat="media"
+                data-name="Papello Embalagens" data-location="Caxias do Sul - RS" data-focus="Copos, potes e baldes de papel."
+                data-analysis="Competem diretamente na linha de produtos. A distância pode ser um fator que a Nicopel pode explorar, oferecendo fretes mais competitivos e prazos de entrega menores."
+                data-website="https://www.papello.com.br/" data-instagram="https://www.instagram.com/papelloembalagens/">
+                <div class="card-header"><span class="threat-level threat-medium"></span><h3>Papello Embalagens</h3></div>
+                <div class="card-body">
+                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>Caxias do Sul - RS</span></div>
+                    <p class="card-analysis-preview">Competem diretamente na linha de produtos. A distância pode ser um fator que a Nicopel pode explorar...</p>
+                </div>
+            </article>
+            <article class="competitor-card"
+                data-category="caixas-sorvete embalagens-industriais caixas-pizza" data-threat="media"
+                data-name="Gráfica Tambosi" data-location="Blumenau - SC" data-focus="Gráfica industrial para grandes volumes."
+                data-analysis="Ameaça para grandes volumes devido à alta capacidade produtiva, podendo oferecer preços competitivos. Menos ágil para pedidos menores e nichados."
+                data-website="https://graficatambosi.com.br/embalagens" data-instagram="https://www.instagram.com/graficatambosi/">
+                <div class="card-header"><span class="threat-level threat-medium"></span><h3>Gráfica Tambosi</h3></div>
+                <div class="card-body">
+                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>Blumenau - SC</span></div>
+                    <p class="card-analysis-preview">Ameaça para grandes volumes devido à alta capacidade produtiva, podendo oferecer preços competitivos...</p>
+                </div>
+            </article>
+            <article class="competitor-card"
+                data-category="potes-copos" data-threat="media"
+                data-name="Biopapers" data-location="Brasil" data-focus="Copos e potes biodegradáveis."
+                data-analysis="Posicionamento forte em sustentabilidade com produtos biodegradáveis e recicláveis. Apelo para clientes com foco em marketing verde e consciência ambiental."
+                data-website="https://biopapers.com.br/" data-instagram="https://www.instagram.com/biopapers/">
+                <div class="card-header"><span class="threat-level threat-medium"></span><h3>Biopapers</h3></div>
+                <div class="card-body">
+                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>Brasil</span></div>
+                    <p class="card-analysis-preview">Posicionamento forte em sustentabilidade com produtos biodegradáveis. Apelo para clientes com foco em marketing verde...</p>
+                </div>
+            </article>
+            <article class="competitor-card"
+                data-category="potes-copos caixas-sorvete" data-threat="media"
+                data-name="Castagna" data-location="Brasil" data-focus="Copos de papel e potes térmicos."
+                data-analysis="O foco em potes térmicos os torna um concorrente direto para o mercado de sorvetes e açaí, oferecendo uma solução especializada para produtos que exigem isolamento térmico."
+                data-website="https://www.castagna.com.br/" data-instagram="https://www.instagram.com/castagnaembalagens/">
+                <div class="card-header"><span class="threat-level threat-medium"></span><h3>Castagna</h3></div>
+                <div class="card-body">
+                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>Brasil</span></div>
+                    <p class="card-analysis-preview">O foco em potes térmicos os torna um concorrente direto para o mercado de sorvetes e açaí...</p>
+                </div>
+            </article>
+             <article class="competitor-card"
+                data-category="potes-copos" data-threat="media"
+                data-name="BelloCopo" data-location="Brasil" data-focus="Descartáveis de papel e plástico."
+                data-analysis="Atuam tanto em papel quanto em plástico, o que pode diluir o foco, mas possuem grande escala de produção, podendo ser competitivos em preço para grandes volumes."
+                data-website="https://www.bellocopo.com.br/" data-instagram="https://www.instagram.com/bellocopo/">
+                <div class="card-header"><span class="threat-level threat-medium"></span><h3>BelloCopo</h3></div>
+                <div class="card-body">
+                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>Brasil</span></div>
+                    <p class="card-analysis-preview">Atuam tanto em papel quanto em plástico, o que pode diluir o foco, mas possuem grande escala de produção...</p>
+                </div>
+            </article>
+            <article class="competitor-card"
+                data-category="embalagens-industriais caixas-pizza" data-threat="media"
+                data-name="MultiCaixasNet" data-location="Atibaia - SP" data-focus="Maior e-commerce de embalagens do Brasil."
+                data-analysis="Grande variedade de produtos para food service e delivery. Competem em escala e variedade, sendo uma ameaça para clientes que buscam uma solução única para diversas necessidades."
+                data-website="https://www.multicaixasnet.com.br/" data-instagram="https://www.instagram.com/multicaixasnet/">
+                <div class="card-header"><span class="threat-level threat-medium"></span><h3>MultiCaixasNet</h3></div>
+                <div class="card-body">
+                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>Atibaia - SP</span></div>
+                    <p class="card-analysis-preview">Grande variedade de produtos para food service e delivery. Competem em escala e variedade...</p>
+                </div>
+            </article>
+            <article class="competitor-card"
+                data-category="embalagens-industriais" data-threat="media"
+                data-name="Perpacks" data-location="Brasil" data-focus="Embalagens para comida, caixas e delivery."
+                data-analysis="Foco em embalagens para delivery e food service em geral. Oferecem personalização e se posicionam como fabricantes, o que pode indicar preços competitivos."
+                data-website="https://www.perpacks.com.br/" data-instagram="https://www.instagram.com/perpacks/">
+                <div class="card-header"><span class="threat-level threat-medium"></span><h3>Perpacks</h3></div>
+                <div class="card-body">
+                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>Brasil</span></div>
+                    <p class="card-analysis-preview">Foco em embalagens para delivery e food service em geral. Oferecem personalização e se posicionam como fabricantes...</p>
+                </div>
+            </article>
             <article class="competitor-card"
                 data-category="potes-copos embalagens-industriais" data-threat="media"
                 data-name="Copack" data-location="Centro-Oeste" data-focus="Embalagens personalizadas e biodegradáveis de papel."
@@ -336,7 +294,6 @@
                     <p class="card-analysis-preview">Com visão de ser referência no Centro-Oeste, oferecem uma gama completa de embalagens de papel...</p>
                 </div>
             </article>
-
             <article class="competitor-card"
                 data-category="potes-copos embalagens-industriais" data-threat="media"
                 data-name="Ecofoodpack" data-location="Brasil" data-focus="Embalagens para alimentos, linha Kraft."
@@ -348,7 +305,28 @@
                     <p class="card-analysis-preview">Foco em embalagens para alimentos com destaque para a linha Kraft. Apelo visual rústico e sustentável...</p>
                 </div>
             </article>
-            
+            <article class="competitor-card"
+                data-category="caixas-pizza embalagens-industriais" data-threat="baixa"
+                data-name="DCX Embalagens" data-location="São Paulo - SP" data-focus="Caixas de papelão para e-commerce e delivery."
+                data-analysis="Competem no segmento de caixas de papelão para transporte e delivery. Ameaça indireta ao core business, mas direta para caixas de pizza mais simples."
+                data-website="https://www.dcxembalagens.com.br/" data-instagram="https://www.instagram.com/dcxembalagens/">
+                <div class="card-header"><span class="threat-level threat-low"></span><h3>DCX Embalagens</h3></div>
+                <div class="card-body">
+                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>São Paulo - SP</span></div>
+                    <p class="card-analysis-preview">Competem no segmento de caixas de papelão para transporte e delivery. Ameaça indireta ao core business...</p>
+                </div>
+            </article>
+            <article class="competitor-card"
+                data-category="" data-threat="baixa"
+                data-name="Altacoppo" data-location="Brasil" data-focus="Potes e tampas de plástico/PP."
+                data-analysis="Concorrente indireto, pois o foco é em plástico (PP). Podem competir por clientes que não têm preferência por papel ou buscam custos menores."
+                data-website="https://www.altacoppo.com.br/" data-instagram="https://www.instagram.com/altacoppo/">
+                <div class="card-header"><span class="threat-level threat-low"></span><h3>Altacoppo</h3></div>
+                <div class="card-body">
+                    <div class="info-item"><svg><use href="#icon-location"/></svg><span>Brasil</span></div>
+                    <p class="card-analysis-preview">Concorrente indireto, pois o foco é em plástico (PP). Podem competir por clientes que não têm preferência por papel...</p>
+                </div>
+            </article>
         </main>
 
         <footer style="text-align:center;margin-top:16px;color:var(--secondary-color)">
@@ -378,10 +356,8 @@
             const categoryNav = document.getElementById('category-nav');
             const threatNav = document.getElementById('threat-nav');
             const competitorCards = document.querySelectorAll('.competitor-card');
-
             let activeCategory = 'todos';
             let activeThreat = 'todos';
-
             function filterCompetitors() {
                 competitorCards.forEach(card => {
                     const cardCategory = card.dataset.category || '';
@@ -391,7 +367,6 @@
                     card.classList.toggle('hidden', !(categoryMatch && threatMatch));
                 });
             }
-
             categoryNav.addEventListener('click', (event) => {
                 const btn = event.target.closest('.tab-btn');
                 if (!btn) return;
@@ -400,7 +375,6 @@
                 activeCategory = btn.dataset.category;
                 filterCompetitors();
             });
-            
             threatNav.addEventListener('click', (event) => {
                 const btn = event.target.closest('.tab-btn');
                 if (!btn) return;
@@ -409,7 +383,6 @@
                 activeThreat = btn.dataset.threat;
                 filterCompetitors();
             });
-
             const grid = document.getElementById('competitors-grid');
             const modal = document.getElementById('competitor-modal');
             const modalCloseBtn = document.getElementById('modal-close-btn');
@@ -420,7 +393,6 @@
             const modalActions = document.getElementById('modal-actions');
             let firstFocusableEl = null;
             let lastFocusableEl = null;
-
             const openModal = (card) => {
                 const name = card.dataset.name || '';
                 const location = card.dataset.location || '';
