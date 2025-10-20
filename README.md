@@ -1,0 +1,1 @@
+# analise_concorrentes_nicopel
