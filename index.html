@@ -2,6 +2,290 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Dashboard de Concorrência - Nicopel Embalagens</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --primary-color: #0d6efd;
+      --secondary-color: #6c757d;
+      --background-color: #f8f9fa;
+      --card-background: #ffffff;
+      --text-color: #212529;
+      --border-color: #e9ecef;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+      --shadow-hover: 0 7px 14px rgba(0, 0, 0, 0.07);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      margin: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 16px; }
+
+    header { text-align: center; margin-bottom: 1.5rem; }
+    header h1 { font-size: 1.8rem; margin: 0; font-weight: 700; }
+    header p { color: var(--secondary-color); margin-top: 0.3rem; }
+
+    .tabs-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 1rem; }
+    .tab-btn {
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border-color);
+      background: #fff;
+      color: var(--secondary-color);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .tab-btn.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+    .tab-btn:hover { background: #f1f3f5; }
+
+    .legend {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      background: #f1f3f5;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .threat-level { width: 14px; height: 14px; border-radius: 50%; }
+    .threat-high { background: #dc3545; }
+    .threat-medium { background: #fd7e14; }
+    .threat-low { background: #ffc107; }
+
+    #competitors-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .competitor-card {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      transition: 0.2s;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+    .competitor-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+
+    .card-header { display: flex; align-items: center; gap: 10px; }
+    .card-header h3 { margin: 0; font-size: 1.2rem; }
+
+    .info-item { display: flex; align-items: center; gap: 8px; font-size: 0.95rem; margin-top: 6px; }
+    .info-item svg { width: 18px; height: 18px; color: var(--secondary-color); }
+
+    /* === Modal === */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: 0.3s;
+    }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    .modal-content {
+      background: #fff;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .modal-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      position: relative;
+    }
+    .modal-close-btn {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      background: #f1f3f5;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-size: 1.3rem;
+      cursor: pointer;
+      color: var(--secondary-color);
+    }
+    .modal-body {
+      padding: 16px;
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+    .modal-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border-color);
+      background: #f8f9fa;
+    }
+
+    /* === Botões compactos e limpos === */
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      line-height: 1;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: #fff;
+      color: var(--text-color);
+      font-weight: 600;
+      text-decoration: none;
+      transition: 0.15s;
+    }
+    .action-btn svg { width: 18px; height: 18px; color: var(--secondary-color); }
+    .action-btn:hover { background: #f8f9fa; }
+    .btn-website { color: var(--primary-color); border-color: #d0e3ff; }
+    .btn-website:hover { background: #f3f8ff; }
+    .btn-instagram { color: #d6336c; border-color: #f3d0db; }
+    .btn-instagram:hover { background: #fff5f7; }
+
+    @media (max-width: 767px) {
+      .modal-content { width: 100%; height: 100%; border-radius: 0; }
+    }
+  </style>
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+    <symbol id="icon-location" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></symbol>
+    <symbol id="icon-focus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></symbol>
+    <symbol id="icon-website" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></symbol>
+    <symbol id="icon-instagram" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></symbol>
+  </svg>
+
+  <div class="container">
+    <header>
+      <h1>Dashboard de Concorrência</h1>
+      <p>Análise de Mercado para Nicopel Embalagens</p>
+    </header>
+
+    <nav class="tabs-nav">
+      <button class="tab-btn active" data-category="todos">Todos</button>
+      <button class="tab-btn" data-category="potes-copos">Potes e Copos</button>
+      <button class="tab-btn" data-category="caixas-sorvete">Caixas de Sorvete</button>
+      <button class="tab-btn" data-category="caixas-pizza">Caixas de Pizza</button>
+      <button class="tab-btn" data-category="embalagens-industriais">Embalagens Industriais</button>
+    </nav>
+
+    <div class="legend">
+      <div class="legend-item"><span class="threat-level threat-high"></span><span>Ameaça Alta</span></div>
+      <div class="legend-item"><span class="threat-level threat-medium"></span><span>Ameaça Média</span></div>
+      <div class="legend-item"><span class="threat-level threat-low"></span><span>Ameaça Baixa</span></div>
+    </div>
+
+    <main id="competitors-grid">
+      <article class="competitor-card"
+        data-category="potes-copos embalagens-industriais"
+        data-name="Soluplex Brasil"
+        data-location="São Paulo - SP"
+        data-focus="Solução completa para fast-food."
+        data-analysis="Agressivos no marketing para franquias, oferecem um mix completo de produtos que atrai grandes redes."
+        data-website="https://www.soluplex.com.br/"
+        data-instagram="https://www.instagram.com/soluplex.brasil/">
+        <div class="card-header"><span class="threat-level threat-high"></span><h3>Soluplex Brasil</h3></div>
+        <div class="info-item"><svg><use href="#icon-location"/></svg><span>São Paulo - SP</span></div>
+        <div class="info-item"><svg><use href="#icon-focus"/></svg><span>Solução completa para fast-food.</span></div>
+      </article>
+    </main>
+  </div>
+
+  <div id="competitor-modal" class="modal-overlay">
+    <div class="modal-content">
+      <header class="modal-header">
+        <div id="modal-header-content" class="card-header"></div>
+        <button id="modal-close-btn" class="modal-close-btn">&times;</button>
+      </header>
+      <div class="modal-body">
+        <div id="modal-location" class="info-item"></div>
+        <div id="modal-focus" class="info-item"></div>
+        <p id="modal-analysis"></p>
+      </div>
+      <footer class="modal-footer">
+        <div id="modal-actions" class="card-actions"></div>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabs = document.querySelectorAll('.tab-btn');
+      const cards = document.querySelectorAll('.competitor-card');
+      const modal = document.getElementById('competitor-modal');
+      const modalHeader = document.getElementById('modal-header-content');
+      const modalLoc = document.getElementById('modal-location');
+      const modalFocus = document.getElementById('modal-focus');
+      const modalAnalysis = document.getElementById('modal-analysis');
+      const modalActions = document.getElementById('modal-actions');
+      const closeBtn = document.getElementById('modal-close-btn');
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelector('.tab-btn.active').classList.remove('active');
+          tab.classList.add('active');
+          const cat = tab.dataset.category;
+          cards.forEach(c => {
+            c.style.display = cat === 'todos' || c.dataset.category.includes(cat) ? '' : 'none';
+          });
+        });
+      });
+
+      cards.forEach(card => {
+        card.addEventListener('click', () => {
+          modal.classList.add('active');
+          modalHeader.innerHTML = `<span class="threat-level threat-high"></span><h3>${card.dataset.name}</h3>`;
+          modalLoc.innerHTML = `<svg><use href="#icon-location"/></svg><span>${card.dataset.location}</span>`;
+          modalFocus.innerHTML = `<svg><use href="#icon-focus"/></svg><span>${card.dataset.focus}</span>`;
+          modalAnalysis.textContent = card.dataset.analysis;
+          modalActions.innerHTML = `
+            <a href="${card.dataset.website}" target="_blank" class="action-btn btn-website"><svg><use href="#icon-website"/></svg>Website</a>
+            <a href="${card.dataset.instagram}" target="_blank" class="action-btn btn-instagram"><svg><use href="#icon-instagram"/></svg>Instagram</a>
+          `;
+        });
+      });
+
+      closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+      modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('active'); });
+    });
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1, viewport-fit=cover"
