@@ -41,6 +41,17 @@ class Utils {
         document.body.appendChild(notification);
         setTimeout(() => notification.remove(), 4000);
     }
+    
+    static extractDomain(url) {
+        if (!url) return null;
+        try {
+            // Remove protocol and www, then extract domain
+            const domain = url.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0];
+            return domain;
+        } catch {
+            return null;
+        }
+    }
 }
 
 // ===== GERENCIAMENTO DE ESTADO =====
@@ -362,6 +373,15 @@ class UIManager {
             level === 'media' ? 'threat-medium' : 'threat-low';
     }
 
+    threatText(level) {
+        const texts = {
+            'alta': 'Alta (Direto)',
+            'media': 'Média (Indireto)',
+            'baixa': 'Baixa (Indireto)'
+        };
+        return texts[level] || level;
+    }
+
     tagsToChipsHTML(tags) {
         const arr = Utils.nl(tags).split(',').map(s => Utils.nl(s)).filter(Boolean);
         if (!arr.length) return '';
@@ -413,44 +433,72 @@ class UIManager {
         });
     }
 
-    // ===== MODAL =====
+    // ===== MODAL - NOVO DESIGN =====
     openModal(id) {
         const competitor = this.state.data.find(x => x.id === id);
         if (!competitor) return;
 
-        // Preenche o modal com os dados
+        // Header do modal
         Utils.$('#modal-header-content').innerHTML = `
             <span class="threat-level ${this.threatClass(competitor.threat)}"></span>
-            <h3>${competitor.name}</h3>
+            <h3 style="margin:0">${competitor.name}</h3>
         `;
 
-        Utils.$('#modal-location').innerHTML = `
-            <svg><use href="#icon-location"/></svg>
-            <span>${competitor.location || '—'}</span>
-        `;
+        // Informações básicas
+        Utils.$('#modal-location').textContent = competitor.location || '—';
+        Utils.$('#modal-focus').textContent = competitor.focus || '—';
+        Utils.$('#modal-category').textContent = competitor.category || '—';
+        Utils.$('#modal-threat').textContent = this.threatText(competitor.threat);
 
-        Utils.$('#modal-focus').innerHTML = `
-            <svg><use href="#icon-focus"/></svg>
-            <span>${competitor.focus || '—'}</span>
-        `;
-
+        // Análise estratégica
         Utils.$('#modal-analysis').textContent = competitor.analysis || '—';
         Utils.$('#modal-tags').innerHTML = this.tagsToChipsHTML(competitor.tags);
 
-        // Ações
-        let actions = '';
+        // Links básicos
+        const basicLinksContainer = Utils.$('#modal-basic-links');
+        basicLinksContainer.innerHTML = '';
+        
         if (competitor.website) {
-            actions += `<a href="${competitor.website}" target="_blank" rel="noopener" class="btn">
-                <svg><use href="#icon-website"/></svg>Website
-            </a>`;
+            basicLinksContainer.innerHTML += `
+                <a href="${competitor.website}" target="_blank" rel="noopener" class="basic-link">
+                    <svg><use href="#icon-website"/></svg>Website
+                </a>
+            `;
         }
+        
         if (competitor.instagram) {
-            actions += `<a href="${competitor.instagram}" target="_blank" rel="noopener" class="btn">
-                <svg><use href="#icon-instagram"/></svg>Instagram
-            </a>`;
+            basicLinksContainer.innerHTML += `
+                <a href="${competitor.instagram}" target="_blank" rel="noopener" class="basic-link">
+                    <svg><use href="#icon-instagram"/></svg>Instagram
+                </a>
+            `;
+        }
+        
+        if (!competitor.website && !competitor.instagram) {
+            basicLinksContainer.innerHTML = '<span style="color:var(--text-muted)">Sem links cadastrados</span>';
         }
 
-        Utils.$('#modal-actions').innerHTML = actions || '<span style="color:var(--text-muted)">Sem links cadastrados</span>';
+        // Botões de análise de marketing
+        const domain = Utils.extractDomain(competitor.website);
+        
+        // Meta Ads
+        Utils.$('#meta-ads-btn').href = `https://www.facebook.com/ads/library/?q=${encodeURIComponent(competitor.name)}`;
+        
+        // Google Ads
+        Utils.$('#google-ads-btn').href = `https://adstransparency.google.com/?q=${encodeURIComponent(competitor.name)}`;
+        
+        // SimilarWeb
+        if (domain) {
+            Utils.$('#traffic-analysis-btn').href = `https://similarweb.com/website/${domain}`;
+            Utils.$('#traffic-analysis-btn').style.display = 'flex';
+        } else {
+            Utils.$('#traffic-analysis-btn').style.display = 'none';
+        }
+
+        // Informações adicionais
+        Utils.$('#modal-phone').textContent = competitor.phone || '—';
+        Utils.$('#modal-cnpj').textContent = competitor.cnpj || '—';
+        Utils.$('#modal-ticket').textContent = competitor.ticket ? `R$ ${parseFloat(competitor.ticket).toLocaleString('pt-BR', {minimumFractionDigits: 2})}` : '—';
 
         // Mostra o modal
         this.modal.classList.add('active');
@@ -875,53 +923,3 @@ class App {
 document.addEventListener('DOMContentLoaded', () => {
     new App();
 });
-
-// Adiciona alguns estilos para as notificações
-const notificationStyles = `
-    .notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 12px 20px;
-        border-radius: 8px;
-        color: white;
-        font-weight: 500;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        z-index: 10000;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        animation: slideIn 0.3s ease;
-    }
-    
-    .notification.success {
-        background: #10b981;
-    }
-    
-    .notification.error {
-        background: #ef4444;
-    }
-    
-    .notification button {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 18px;
-        cursor: pointer;
-        padding: 0;
-        width: 20px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-`;
-
-const styleSheet = document.createElement('style');
-styleSheet.textContent = notificationStyles;
-document.head.appendChild(styleSheet);
