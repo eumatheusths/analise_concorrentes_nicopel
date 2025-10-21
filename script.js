@@ -1,536 +1,927 @@
-document.addEventListener('DOMContentLoaded', () => {
-  /* ===== UTIL ===== */
-  const $ = (sel, el=document) => el.querySelector(sel);
-  const $$ = (sel, el=document) => Array.from(el.querySelectorAll(sel));
-  const uid = () => Math.random().toString(36).slice(2, 10);
-  const nl = s => (s||'').trim();
+// ===== CONFIGURAÇÕES E CONSTANTES =====
+const CONFIG = {
+    STORAGE_KEY: 'nicopel_concorrentes_v3',
+    THREAT_ORDER: { alta: 0, media: 1, baixa: 2 },
+    KNOWN_PATCH: {
+        'Soluplex Brasil': { instagram: 'https://www.instagram.com/soluplex.brasil/', location: 'Cajamar - SP' },
+        'Soller Embalagens': { instagram: 'https://www.instagram.com/sollerembalagens/', location: 'Morro da Fumaça - SC' },
+        'BoxBe': { instagram: 'https://www.instagram.com/boxbeecoembalagens/' },
+        'Nazapack': { instagram: 'https://www.instagram.com/nazapack/', location: 'São Paulo - SP' },
+        'Gráfica Tambosi': { instagram: 'https://www.instagram.com/tambosiindustriagrafica/', location: 'Taió - SC' },
+        'Biopapers': { instagram: 'https://www.instagram.com/biopapersbrasil/' },
+        'Castagna': { instagram: 'https://www.instagram.com/castagna_comercio/', location: 'Canoas - RS' },
+        'BelloCopo': { instagram: 'https://www.instagram.com/bellocopo/' },
+        'MultiCaixasNet': { instagram: 'https://www.instagram.com/multicaixasnet/', location: 'Atibaia - SP' },
+        'Perpacks': { instagram: 'https://www.instagram.com/perpacksembalagens/' },
+        'Pixpel': { instagram: 'https://www.instagram.com/pixpel_sustentavel/', location: 'Itupeva - SP' },
+        'DCX Embalagens': { location: 'Carapicuíba - SP' },
+        'Altacoppo': { location: 'Carapicuíba - SP' },
+        'Brazil Copos': { instagram: 'https://www.instagram.com/brazilcopos/' },
+        'Natucopos': { instagram: 'https://www.instagram.com/natucopos/' },
+        'Apolo Embalagens': { instagram: 'https://www.instagram.com/apoloembalagens/' },
+        'MX Copos & Potes': { instagram: 'https://www.instagram.com/mxcopos/' },
+        'Copack': { instagram: 'https://www.instagram.com/copackembalagens/' },
+        'Ecofoodpack': { instagram: 'https://www.instagram.com/ecofoodpack/' },
+    }
+};
 
-  /* ===== Layout / Navegação ===== */
-  const sidebar = $('#sidebar');
-  const content = $('#content');
-  const sidebarToggle = $('#sidebarToggle');
-  const appNav = $('#app-nav');
-  const views = {
-    dashboard: $('#view-dashboard'),
-    add: $('#view-add'),
-    edit: $('#view-edit'),
-    io: $('#view-io'),
-    report: $('#view-report'),
-  };
-  function setView(view) {
-    $$('#app-nav [data-view]').forEach(b=>b.classList.remove('active'));
-    const btn = $(`#app-nav [data-view="${view}"]`);
-    if (btn) btn.classList.add('active');
-    Object.entries(views).forEach(([k,sec]) => sec.style.display = (k===view?'':'none'));
-    sidebar.classList.remove('open'); content.classList.remove('dim');
-    if (view==='edit') renderEditTable();
-    if (view==='report') buildReport();
-  }
-  appNav.addEventListener('click', (e) => {
-    const b = e.target.closest('button[data-view]'); if(!b) return;
-    setView(b.dataset.view);
-  });
-  sidebarToggle.addEventListener('click', () => {
-    const open = !sidebar.classList.contains('open');
-    sidebar.classList.toggle('open', open);
-    content.classList.toggle('dim', open);
-  });
+// ===== UTILITÁRIOS =====
+class Utils {
+    static $(sel, el = document) { return el.querySelector(sel); }
+    static $$(sel, el = document) { return Array.from(el.querySelectorAll(sel)); }
+    static uid() { return Math.random().toString(36).slice(2, 10); }
+    static nl(s) { return (s || '').trim(); }
+    static showNotification(message, type = 'success') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <span>${message}</span>
+            <button onclick="this.parentElement.remove()">&times;</button>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 4000);
+    }
+}
 
-  /* ===== Datas ===== */
-  const today = new Date();
-  const fmt = today.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
-  $('#last-updated').textContent = fmt; $('#last-updated-side').textContent = fmt;
+// ===== GERENCIAMENTO DE ESTADO =====
+class StateManager {
+    constructor() {
+        this.data = [];
+        this.filters = {
+            category: 'todos',
+            threat: 'todos',
+            search: '',
+            tag: '',
+            sort: 'az'
+        };
+        this.init();
+    }
 
-  /* ===== Data Model & Storage ===== */
-  const STORAGE_KEY = 'nicopel_concorrentes_v3';
+    init() {
+        this.data = this.migrateFromOldIfNeeded();
+        this.updateDates();
+    }
 
-  /** shape:
-   * { id, name, location, threat, category, website, instagram,
-   *   phone, cnpj, tags, ticket, focus, analysis, builtIn:boolean, archived:boolean }
-   */
-  const THREAT_ORDER = { alta: 0, media: 1, baixa: 2 }; // ordenar por ameaça
-
-  function readStore(){
-    try{ const raw = localStorage.getItem(STORAGE_KEY); return raw? JSON.parse(raw): null; }catch{ return null; }
-  }
-  function writeStore(list){ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }
-
-  // Correções conhecidas: instagram + cidade
-  const KNOWN_PATCH = {
-    'Soluplex Brasil': { instagram:'https://www.instagram.com/soluplex.brasil/', location:'Cajamar - SP' },
-    'Soller Embalagens': { instagram:'https://www.instagram.com/sollerembalagens/', location:'Morro da Fumaça - SC' },
-    'BoxBe': { instagram:'https://www.instagram.com/boxbeecoembalagens/' },
-    'Nazapack': { instagram:'https://www.instagram.com/nazapack/', location:'São Paulo - SP' },
-    'Gráfica Tambosi': { instagram:'https://www.instagram.com/tambosiindustriagrafica/', location:'Taió - SC' },
-    'Biopapers': { instagram:'https://www.instagram.com/biopapersbrasil/' },
-    'Castagna': { instagram:'https://www.instagram.com/castagna_comercio/', location:'Canoas - RS' },
-    'BelloCopo': { instagram:'https://www.instagram.com/bellocopo/' },
-    'MultiCaixasNet': { instagram:'https://www.instagram.com/multicaixasnet/', location:'Atibaia - SP' },
-    'Perpacks': { instagram:'https://www.instagram.com/perpacksembalagens/' },
-    'Pixpel': { instagram:'https://www.instagram.com/pixpel_sustentavel/', location:'Itupeva - SP' },
-    'DCX Embalagens': { location:'Carapicuíba - SP' },
-    'Altacoppo': { location:'Carapicuíba - SP' },
-    'Brazil Copos': { instagram:'https://www.instagram.com/brazilcopos/' },
-    'Natucopos': { instagram:'https://www.instagram.com/natucopos/' },
-    'Apolo Embalagens': { instagram:'https://www.instagram.com/apoloembalagens/' },
-    'MX Copos & Potes': { instagram:'https://www.instagram.com/mxcopos/' },
-    'Copack': { instagram:'https://www.instagram.com/copackembalagens/' },
-    'Ecofoodpack': { instagram:'https://www.instagram.com/ecofoodpack/' },
-  };
-
-  function migrateFromOldIfNeeded() {
-    let data = readStore();
-    if (data) return data;
-    // tenta migrar da v2, se existir
-    let v2 = null;
-    try { v2 = JSON.parse(localStorage.getItem('nicopel_concorrentes_v2')||'null'); } catch {}
-    if (Array.isArray(v2) && v2.length) {
-      // aplica patch nos built-ins
-      v2 = v2.map(o => {
-        const fix = KNOWN_PATCH[o.name];
-        if (o.builtIn && fix) {
-          return { ...o,
-            instagram: fix.instagram || o.instagram,
-            location: fix.location || o.location
-          };
+    readStore() {
+        try {
+            const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
+            return raw ? JSON.parse(raw) : null;
+        } catch {
+            return null;
         }
-        return o;
-      });
-      writeStore(v2);
-      return v2;
     }
-    // Sem v2: migrar do HTML estático (primeiro carregamento)
-    const seed = $$('#competitors-grid .competitor-card').map(card => {
-      const name = nl(card.dataset.name);
-      const fix = KNOWN_PATCH[name] || {};
-      return {
-        id: uid(),
-        name,
-        location: fix.location || nl(card.dataset.location),
-        threat: nl(card.dataset.threat) || 'media',
-        category: nl(card.dataset.category),
-        website: nl(card.dataset.website),
-        instagram: fix.instagram || nl(card.dataset.instagram),
-        phone: '', cnpj: '', tags: '', ticket: '',
-        focus: nl(card.dataset.focus),
-        analysis: nl(card.dataset.analysis),
-        builtIn: true, archived: false,
-      };
-    });
-    writeStore(seed);
-    return seed;
-  }
-  let DATA = migrateFromOldIfNeeded();
 
-  /* ===== Render ===== */
-  const grid = $('#competitors-grid');
-
-  function threatClass(level){ return level==='alta'?'threat-high': level==='media'?'threat-medium':'threat-low'; }
-
-  function tagsToChipsHTML(tags){
-    const arr = (nl(tags).split(',').map(s=>nl(s)).filter(Boolean));
-    if (!arr.length) return '';
-    return `<div class="tag-chips">${arr.map(t=>`<span class="chip" data-chip="${t}">${t}</span>`).join('')}</div>`;
-  }
-
-  function cardHTML(d){
-    const preview = (d.analysis || d.focus || '').trim();
-    const prev = preview? (preview.length>140? preview.slice(0,140)+'...': preview): '';
-    return `
-      <article class="competitor-card" data-id="${d.id}" data-category="${d.category}" data-threat="${d.threat}">
-        <div class="card-header"><span class="threat-level ${threatClass(d.threat)}"></span><h3>${d.name}</h3></div>
-        <div class="card-body">
-          <div class="info-item"><svg><use href="#icon-location"/></svg><span>${d.location||'—'}</span></div>
-          ${prev? `<p class="card-analysis-preview">${prev}</p>`:''}
-          ${tagsToChipsHTML(d.tags)}
-        </div>
-      </article>
-    `;
-  }
-
-  function renderGrid(list){
-    grid.innerHTML = list.filter(d=>!d.archived).map(cardHTML).join('');
-  }
-
-  /* ===== Filtros / Busca / Ordenação (Dashboard) ===== */
-  const categoryNav = $('#category-nav');
-  const threatNav = $('#threat-nav');
-  const searchInput = $('#search-input');
-  const sortSelect = $('#sort-select');
-
-  let activeCategory = 'todos';
-  let activeThreat = 'todos';
-  let searchTerm = '';
-  let sortMode = 'az';
-  let tagFilter = ''; // novo: filtro por tag
-
-  function applyFilters(){
-    let list = DATA.slice();
-    // categoria
-    if (activeCategory!=='todos') {
-      list = list.filter(d => (d.category || '').split(' ').includes(activeCategory));
+    writeStore(list) {
+        localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(list));
     }
-    // ameaça ('direto' = alta; 'indireto' = media/baixa)
-    if (activeThreat==='direto') list = list.filter(d => d.threat==='alta');
-    else if (activeThreat==='indireto') list = list.filter(d => d.threat==='media'||d.threat==='baixa');
-    // busca
-    if (nl(searchTerm)) {
-      const q = searchTerm.toLowerCase();
-      list = list.filter(d =>
-        (d.name||'').toLowerCase().includes(q) ||
-        (d.location||'').toLowerCase().includes(q)
-      );
+
+    migrateFromOldIfNeeded() {
+        let data = this.readStore();
+        if (data) return data;
+
+        // Tenta migrar da v2
+        let v2 = null;
+        try {
+            v2 = JSON.parse(localStorage.getItem('nicopel_concorrentes_v2') || 'null');
+        } catch { }
+
+        if (Array.isArray(v2) && v2.length) {
+            v2 = v2.map(o => {
+                const fix = CONFIG.KNOWN_PATCH[o.name];
+                if (o.builtIn && fix) {
+                    return {
+                        ...o,
+                        instagram: fix.instagram || o.instagram,
+                        location: fix.location || o.location
+                    };
+                }
+                return o;
+            });
+            this.writeStore(v2);
+            return v2;
+        }
+
+        // Migra do HTML estático
+        const seed = Utils.$$('#competitors-grid .competitor-card').map(card => {
+            const name = Utils.nl(card.dataset.name);
+            const fix = CONFIG.KNOWN_PATCH[name] || {};
+            return {
+                id: Utils.uid(),
+                name,
+                location: fix.location || Utils.nl(card.dataset.location),
+                threat: Utils.nl(card.dataset.threat) || 'media',
+                category: Utils.nl(card.dataset.category),
+                website: Utils.nl(card.dataset.website),
+                instagram: fix.instagram || Utils.nl(card.dataset.instagram),
+                phone: '', cnpj: '', tags: '', ticket: '',
+                focus: Utils.nl(card.dataset.focus),
+                analysis: Utils.nl(card.dataset.analysis),
+                builtIn: true, archived: false,
+            };
+        });
+        this.writeStore(seed);
+        return seed;
     }
-    // tag
-    if (nl(tagFilter)) {
-      const tg = tagFilter.toLowerCase();
-      list = list.filter(d => (d.tags||'').toLowerCase().split(',').map(s=>nl(s)).includes(tg));
+
+    updateDates() {
+        const today = new Date();
+        const fmt = today.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+        Utils.$('#last-updated').textContent = fmt;
+        Utils.$('#last-updated-side').textContent = fmt;
     }
-    // ordenação
-    if (sortMode==='az') list.sort((a,b)=>a.name.localeCompare(b.name));
-    else if (sortMode==='za') list.sort((a,b)=>b.name.localeCompare(a.name));
-    else if (sortMode==='cidade') list.sort((a,b)=>(a.location||'').localeCompare(b.location||''));
-    else if (sortMode==='ameaca') list.sort((a,b)=>(THREAT_ORDER[a.threat]??9)-(THREAT_ORDER[b.threat]??9));
 
-    renderGrid(list);
-  }
-
-  categoryNav.addEventListener('click', (e)=>{
-    const btn = e.target.closest('.tab-btn'); if(!btn) return;
-    categoryNav.querySelector('.active').classList.remove('active');
-    btn.classList.add('active'); activeCategory = btn.dataset.category; tagFilter=''; applyFilters();
-  });
-  threatNav.addEventListener('click', (e)=>{
-    const btn = e.target.closest('.tab-btn'); if(!btn) return;
-    threatNav.querySelector('.active').classList.remove('active');
-    btn.classList.add('active'); activeThreat = btn.dataset.threat; tagFilter=''; applyFilters();
-  });
-  searchInput.addEventListener('input', (e)=>{ searchTerm = e.target.value; applyFilters(); });
-  sortSelect.addEventListener('change', (e)=>{ sortMode = e.target.value; applyFilters(); });
-
-  // clique em chip (tags)
-  grid.addEventListener('click', (e)=>{
-    const chip = e.target.closest('.chip'); 
-    if (chip){ tagFilter = chip.dataset.chip||''; applyFilters(); }
-  });
-
-  /* ===== Modal (detalhes) ===== */
-  const modal = $('#competitor-modal');
-  const modalCloseBtn = $('#modal-close-btn');
-  const modalHeaderContent = $('#modal-header-content');
-  const modalLocation = $('#modal-location');
-  const modalFocus = $('#modal-focus');
-  const modalAnalysis = $('#modal-analysis');
-  const modalActions = $('#modal-actions');
-  const modalTags = $('#modal-tags');
-  let firstFocusableEl = null; let lastFocusableEl = null;
-
-  function openModalById(id){
-    const d = DATA.find(x=>x.id===id); if(!d) return;
-    const dot = `<span class="threat-level ${threatClass(d.threat)}"></span>`;
-    modalHeaderContent.innerHTML = `${dot}<h3 style="margin:0">${d.name}</h3>`;
-    modalLocation.innerHTML = `<svg><use href="#icon-location"/></svg><span>${d.location||'—'}</span>`;
-    modalFocus.innerHTML = `<svg><use href="#icon-focus"/></svg><span>${d.focus||'—'}</span>`;
-    modalAnalysis.textContent = d.analysis || '—';
-    modalTags.innerHTML = tagsToChipsHTML(d.tags);
-
-    let actions = '';
-    if (d.website) actions += `<a href="${d.website}" target="_blank" rel="noopener" class="action-btn btn-website"><svg><use href="#icon-website"/></svg>Website</a>`;
-    if (d.instagram) actions += `<a href="${d.instagram}" target="_blank" rel="noopener" class="action-btn btn-instagram"><svg><use href="#icon-instagram"/></svg>Instagram</a>`;
-    modalActions.innerHTML = actions || '<span style="color:#6c757d">Sem links cadastrados</span>';
-
-    modal.classList.add('active'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
-    const focusable = modal.querySelectorAll('a[href],button'); firstFocusableEl = focusable[0]; lastFocusableEl = focusable[focusable.length-1]||modalCloseBtn;
-    (firstFocusableEl||modalCloseBtn).focus();
-  }
-  function closeModal(){ modal.classList.remove('active'); modal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
-
-  grid.addEventListener('click', (e)=>{ const card = e.target.closest('.competitor-card'); if(card){ openModalById(card.dataset.id); }});
-  modalCloseBtn.addEventListener('click', closeModal);
-  modal.addEventListener('click', (e)=>{ if(e.target===modal) closeModal(); });
-  document.addEventListener('keydown', (e)=>{
-    if(e.key==='Escape' && modal.classList.contains('active')) closeModal();
-    if(e.key==='Tab' && modal.classList.contains('active')){
-      if(e.shiftKey){ if(document.activeElement===firstFocusableEl){ lastFocusableEl.focus(); e.preventDefault(); } }
-      else { if(document.activeElement===lastFocusableEl){ firstFocusableEl.focus(); e.preventDefault(); } }
+    addCompetitor(competitor) {
+        this.data.unshift(competitor);
+        this.writeStore(this.data);
     }
-  });
 
-  /* ===== Inicialização: render ===== */
-  applyFilters(); // renderiza dashboard
-
-  /* ===== Adicionar ===== */
-  const addForm = $('#add-form');
-  addForm?.addEventListener('submit', (e)=>{
-    e.preventDefault();
-    const data = {
-      id: uid(),
-      name: nl($('#f-name').value),
-      location: nl($('#f-city').value),
-      threat: $('#f-threat').value,
-      category: $('#f-category').value,
-      website: nl($('#f-website').value),
-      instagram: nl($('#f-instagram').value),
-      phone: nl($('#f-phone').value),
-      cnpj: nl($('#f-cnpj').value),
-      tags: nl($('#f-tags').value),
-      ticket: nl($('#f-ticket').value),
-      focus: nl($('#f-focus').value),
-      analysis: nl($('#f-analysis').value),
-      builtIn: false, archived: false,
-    };
-    if(!data.name || !data.location || !data.threat || !data.category){
-      alert('Preencha Nome, Cidade/UF, Nível de Ameaça e Categoria.'); return;
+    updateCompetitor(id, updates) {
+        const index = this.data.findIndex(x => x.id === id);
+        if (index !== -1) {
+            this.data[index] = { ...this.data[index], ...updates };
+            this.writeStore(this.data);
+            return true;
+        }
+        return false;
     }
-    DATA.unshift(data); writeStore(DATA); addForm.reset();
-    alert('Concorrente adicionado com sucesso!'); setView('dashboard'); applyFilters();
-  });
 
-  /* ===== Editar / Excluir ===== */
-  const editTableBody = $('#edit-table tbody');
-  const editSearch = $('#edit-search');
-  const editSort = $('#edit-sort');
-  const bulkAll = $('#bulk-all');
-  const bulkArchive = $('#bulk-archive');
-  const bulkUnarchive = $('#bulk-unarchive');
-  const bulkDelete = $('#bulk-delete');
-
-  function listForEdit(){
-    let list = DATA.slice();
-    const term = (editSearch.value||'').toLowerCase();
-    if (term) list = list.filter(d => (d.name||'').toLowerCase().includes(term) || (d.location||'').toLowerCase().includes(term));
-    const mode = editSort.value;
-    if (mode==='az') list.sort((a,b)=>a.name.localeCompare(b.name));
-    else if (mode==='za') list.sort((a,b)=>b.name.localeCompare(a.name));
-    else if (mode==='cidade') list.sort((a,b)=>(a.location||'').localeCompare(b.location||''));
-    else if (mode==='ameaca') list.sort((a,b)=>(THREAT_ORDER[a.threat]??9)-(THREAT_ORDER[b.threat]??9));
-    return list;
-  }
-  function renderEditTable(){
-    const rows = listForEdit().map(d=>`
-      <tr data-id="${d.id}">
-        <td><input type="checkbox" class="row-check" /></td>
-        <td>${d.name}</td>
-        <td>${d.location||'—'}</td>
-        <td>${d.threat}</td>
-        <td>${d.category}</td>
-        <td>${d.archived? 'Arquivado': (d.builtIn?'Original':'Custom')}</td>
-        <td>
-          <div class="table-actions">
-            <button class="btn" data-action="load">Editar</button>
-            <button class="btn" data-action="toggle-archive">${d.archived?'Desarquivar':'Arquivar'}</button>
-            <button class="btn btn-danger" data-action="delete">Excluir</button>
-          </div>
-        </td>
-      </tr>
-    `).join('');
-    editTableBody.innerHTML = rows || `<tr><td colspan="7" style="color:#6c757d">Nenhum item encontrado.</td></tr>`;
-    bulkAll.checked = false;
-  }
-  editSearch.addEventListener('input', renderEditTable);
-  editSort.addEventListener('change', renderEditTable);
-
-  // Form Edit
-  const eForm = $('#edit-form');
-  const eId = $('#e-id'); const eName = $('#e-name'); const eCity = $('#e-city');
-  const eThreat = $('#e-threat'); const eCategory = $('#e-category');
-  const eWebsite = $('#e-website'); const eInstagram = $('#e-instagram');
-  const ePhone = $('#e-phone'); const eCnpj = $('#e-cnpj'); const eTags = $('#e-tags'); const eTicket = $('#e-ticket');
-  const eFocus = $('#e-focus'); const eAnalysis = $('#e-analysis');
-  const btnArchive = $('#e-archive'); const btnDelete = $('#e-delete');
-
-  function loadIntoForm(id){
-    const d = DATA.find(x=>x.id===id); if(!d) return;
-    eId.value = d.id; eName.value = d.name; eCity.value = d.location||'';
-    eThreat.value = d.threat; eCategory.value = d.category||'';
-    eWebsite.value = d.website||''; eInstagram.value = d.instagram||'';
-    ePhone.value = d.phone||''; eCnpj.value = d.cnpj||''; eTags.value = d.tags||'';
-    eTicket.value = d.ticket||''; eFocus.value = d.focus||''; eAnalysis.value = d.analysis||'';
-    btnArchive.textContent = d.archived? 'Desarquivar':'Arquivar';
-    setView('edit');
-  }
-
-  editTableBody.addEventListener('click', (e)=>{
-    const btn = e.target.closest('button[data-action]'); if(!btn) return;
-    const tr = e.target.closest('tr'); const id = tr.dataset.id;
-    const action = btn.dataset.action;
-    const idx = DATA.findIndex(x=>x.id===id);
-    if (idx===-1) return;
-
-    if (action==='load'){ loadIntoForm(id); }
-    else if (action==='toggle-archive'){
-      DATA[idx].archived = !DATA[idx].archived; writeStore(DATA); renderEditTable(); applyFilters();
+    deleteCompetitor(id) {
+        const index = this.data.findIndex(x => x.id === id);
+        if (index !== -1) {
+            this.data.splice(index, 1);
+            this.writeStore(this.data);
+            return true;
+        }
+        return false;
     }
-    else if (action==='delete'){
-      if (!confirm('Tem certeza que deseja excluir definitivamente?')) return;
-      DATA.splice(idx,1); writeStore(DATA); renderEditTable(); applyFilters();
-      if (eId.value===id) eForm.reset();
+
+    toggleArchive(id) {
+        const index = this.data.findIndex(x => x.id === id);
+        if (index !== -1) {
+            this.data[index].archived = !this.data[index].archived;
+            this.writeStore(this.data);
+            return true;
+        }
+        return false;
     }
-  });
 
-  eForm.addEventListener('submit', (ev)=>{
-    ev.preventDefault();
-    const id = eId.value; if(!id) return;
-    const idx = DATA.findIndex(x=>x.id===id); if(idx===-1) return;
-    const d = DATA[idx];
-    const updated = {
-      ...d,
-      name: nl(eName.value),
-      location: nl(eCity.value),
-      threat: eThreat.value,
-      category: eCategory.value,
-      website: nl(eWebsite.value),
-      instagram: nl(eInstagram.value),
-      phone: nl(ePhone.value),
-      cnpj: nl(eCnpj.value),
-      tags: nl(eTags.value),
-      ticket: nl(eTicket.value),
-      focus: nl(eFocus.value),
-      analysis: nl(eAnalysis.value)
-    };
-    DATA[idx] = updated; writeStore(DATA);
-    alert('Alterações salvas!');
-    renderEditTable(); applyFilters();
-  });
+    getFilteredData() {
+        let filtered = this.data.filter(d => !d.archived);
 
-  btnArchive.addEventListener('click', ()=>{
-    const id = eId.value; if(!id) return;
-    const idx = DATA.findIndex(x=>x.id===id); if(idx===-1) return;
-    DATA[idx].archived = !DATA[idx].archived; writeStore(DATA);
-    btnArchive.textContent = DATA[idx].archived? 'Desarquivar':'Arquivar';
-    renderEditTable(); applyFilters();
-  });
-  btnDelete.addEventListener('click', ()=>{
-    const id = eId.value; if(!id) return;
-    if (!confirm('Excluir definitivamente este concorrente?')) return;
-    const idx = DATA.findIndex(x=>x.id===id); if(idx===-1) return;
-    DATA.splice(idx,1); writeStore(DATA);
-    eForm.reset();
-    renderEditTable(); applyFilters();
-  });
+        // Filtro por categoria
+        if (this.filters.category !== 'todos') {
+            filtered = filtered.filter(d => d.category === this.filters.category);
+        }
 
-  // Ações em lote
-  function selectedIds(){
-    return $$('.row-check', editTableBody)
-      .map((c,i)=> c.checked ? c.closest('tr').dataset.id : null)
-      .filter(Boolean);
-  }
-  bulkAll.addEventListener('change', ()=>{
-    $$('.row-check', editTableBody).forEach(ch => ch.checked = bulkAll.checked);
-  });
-  bulkArchive.addEventListener('click', ()=>{
-    const ids = selectedIds(); if (!ids.length) return alert('Selecione ao menos um item.');
-    DATA = DATA.map(d => ids.includes(d.id)? {...d, archived:true}: d); writeStore(DATA);
-    renderEditTable(); applyFilters();
-  });
-  bulkUnarchive.addEventListener('click', ()=>{
-    const ids = selectedIds(); if (!ids.length) return alert('Selecione ao menos um item.');
-    DATA = DATA.map(d => ids.includes(d.id)? {...d, archived:false}: d); writeStore(DATA);
-    renderEditTable(); applyFilters();
-  });
-  bulkDelete.addEventListener('click', ()=>{
-    const ids = selectedIds(); if (!ids.length) return alert('Selecione ao menos um item.');
-    if (!confirm(`Excluir ${ids.length} item(ns)?`)) return;
-    DATA = DATA.filter(d => !ids.includes(d.id)); writeStore(DATA);
-    renderEditTable(); applyFilters();
-  });
+        // Filtro por ameaça
+        if (this.filters.threat === 'direto') {
+            filtered = filtered.filter(d => d.threat === 'alta');
+        } else if (this.filters.threat === 'indireto') {
+            filtered = filtered.filter(d => d.threat === 'media' || d.threat === 'baixa');
+        }
 
-  // Observa troca de tela para atualizar edição
-  const obs = new MutationObserver(()=>{ if (views.edit.style.display!=='none') renderEditTable(); });
-  obs.observe(views.edit, {attributes:true, attributeFilter:['style']});
+        // Filtro por busca
+        if (this.filters.search) {
+            const q = this.filters.search.toLowerCase();
+            filtered = filtered.filter(d =>
+                (d.name || '').toLowerCase().includes(q) ||
+                (d.location || '').toLowerCase().includes(q)
+            );
+        }
 
-  /* ===== Import / Export ===== */
-  const ioPreview = $('#io-preview');
-  const btnExport = $('#btn-export');
-  const fileImport = $('#file-import');
-  const btnImport = $('#btn-import');
+        // Filtro por tag
+        if (this.filters.tag) {
+            const tg = this.filters.tag.toLowerCase();
+            filtered = filtered.filter(d =>
+                (d.tags || '').toLowerCase().split(',').map(s => Utils.nl(s)).includes(tg)
+            );
+        }
 
-  function refreshPreview(){ if (ioPreview) ioPreview.value = JSON.stringify(DATA, null, 2); }
-  refreshPreview();
+        // Ordenação
+        switch (this.filters.sort) {
+            case 'az':
+                filtered.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+            case 'za':
+                filtered.sort((a, b) => b.name.localeCompare(a.name));
+                break;
+            case 'cidade':
+                filtered.sort((a, b) => (a.location || '').localeCompare(b.location || ''));
+                break;
+            case 'ameaca':
+                filtered.sort((a, b) =>
+                    (CONFIG.THREAT_ORDER[a.threat] ?? 9) - (CONFIG.THREAT_ORDER[b.threat] ?? 9)
+                );
+                break;
+        }
 
-  btnExport?.addEventListener('click', ()=>{
-    const blob = new Blob([JSON.stringify(DATA,null,2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `concorrentes_nicopel_${new Date().toISOString().slice(0,10)}.json`;
-    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-  });
+        return filtered;
+    }
+}
 
-  btnImport?.addEventListener('click', ()=>{
-    const file = fileImport.files?.[0];
-    if (!file) { alert('Selecione um arquivo JSON para importar.'); return; }
-    const reader = new FileReader();
-    reader.onload = () => {
-      try{
-        const parsed = JSON.parse(reader.result);
-        if (!Array.isArray(parsed)) throw new Error('Formato inválido');
-        const cleaned = parsed.map(o=>({
-          id: o.id || uid(),
-          name: nl(o.name),
-          location: nl(o.location),
-          threat: o.threat||'media',
-          category: nl(o.category),
-          website: nl(o.website),
-          instagram: nl(o.instagram),
-          phone: nl(o.phone),
-          cnpj: nl(o.cnpj),
-          tags: nl(o.tags),
-          ticket: nl(o.ticket),
-          focus: nl(o.focus),
-          analysis: nl(o.analysis),
-          builtIn: !!o.builtIn,
-          archived: !!o.archived
-        }));
-        DATA = cleaned; writeStore(DATA);
-        alert('Importação concluída!');
-        refreshPreview(); applyFilters(); renderEditTable();
-      }catch(err){
-        alert('Falha ao importar: ' + err.message);
-      }
-    };
-    reader.readAsText(file, 'utf-8');
-  });
+// ===== GERENCIAMENTO DE INTERFACE =====
+class UIManager {
+    constructor(stateManager) {
+        this.state = stateManager;
+        this.modal = Utils.$('#competitor-modal');
+        this.init();
+    }
 
-  // Sincroniza preview quando abrir a tela de IO
-  const sync = new MutationObserver(refreshPreview);
-  sync.observe($('#view-io'), {attributes:true, attributeFilter:['style']});
+    init() {
+        this.setupEventListeners();
+        this.renderDashboard();
+    }
 
-  /* ===== Relatórios / Impressão ===== */
-  const reportDate = $('#report-date');
-  const reportTableBody = $('#report-table tbody');
-  const reportCat = $('#report-cat');
-  const reportThreat = $('#report-threat');
-  const reportSort = $('#report-sort');
-  const reportRefresh = $('#report-refresh');
-  const reportPrint = $('#report-print');
+    setupEventListeners() {
+        // Navegação
+        Utils.$('#app-nav').addEventListener('click', (e) => this.handleNavigation(e));
+        Utils.$('#sidebarToggle').addEventListener('click', () => this.toggleSidebar());
 
-  function filteredForReport(){
-    let list = DATA.filter(d=>!d.archived);
-    if (reportCat.value!=='todos') list = list.filter(d => (d.category||'').split(' ').includes(reportCat.value));
-    if (reportThreat.value!=='todos') list = list.filter(d => d.threat===reportThreat.value);
-    if (reportSort.value==='az') list.sort((a,b)=>a.name.localeCompare(b.name));
-    else if (reportSort.value==='cidade') list.sort((a,b)=>(a.location||'').localeCompare(b.location||'')); 
-    else if (reportSort.value==='ameaca') list.sort((a,b)=>(THREAT_ORDER[a.threat]??9)-(THREAT_ORDER[b.threat]??9));
-    return list;
-  }
-  function buildReport(){
-    if (reportDate) reportDate.textContent = new Date().toLocaleString('pt-BR');
-    const rows = filteredForReport().map(d=>`
-      <tr>
-        <td>${d.name}</td>
-        <td>${d.location||'—'}</td>
-        <td>${d.threat}</td>
-        <td>${d.category}</td>
-        <td>${d.focus||'—'}</td>
-        <td>${d.instagram? `<a href="${d.instagram}">Instagram</a>`:''} ${d.website? (d.instagram?' • ':'')+`<a href="${d.website}">Site</a>`:''}</td>
-        <td>${nl(d.tags)}</td>
-      </tr>
-    `).join('');
-    reportTableBody.innerHTML = rows || `<tr><td colspan="7" style="color:#6c757d">Sem resultados.</td></tr>`;
-  }
-  reportRefresh?.addEventListener('click', buildReport);
-  reportCat?.addEventListener('change', buildReport);
-  reportThreat?.addEventListener('change', buildReport);
-  reportSort?.addEventListener('change', buildReport);
-  reportPrint?.addEventListener('click', ()=> window.print());
+        // Filtros do Dashboard
+        Utils.$('#category-nav').addEventListener('click', (e) => this.handleCategoryFilter(e));
+        Utils.$('#threat-nav').addEventListener('click', (e) => this.handleThreatFilter(e));
+        Utils.$('#search-input').addEventListener('input', (e) => this.handleSearch(e));
+        Utils.$('#sort-select').addEventListener('change', (e) => this.handleSort(e));
+
+        // Modal
+        Utils.$('#modal-close-btn').addEventListener('click', () => this.closeModal());
+        this.modal.addEventListener('click', (e) => {
+            if (e.target === this.modal) this.closeModal();
+        });
+        document.addEventListener('keydown', (e) => this.handleKeyboard(e));
+
+        // Formulários
+        Utils.$('#add-form').addEventListener('submit', (e) => this.handleAddSubmit(e));
+        Utils.$('#edit-form').addEventListener('submit', (e) => this.handleEditSubmit(e));
+
+        // Ações de edição
+        Utils.$('#edit-table tbody').addEventListener('click', (e) => this.handleTableActions(e));
+        Utils.$('#edit-search').addEventListener('input', () => this.renderEditTable());
+        Utils.$('#edit-sort').addEventListener('change', () => this.renderEditTable());
+
+        // Ações em lote
+        Utils.$('#bulk-all').addEventListener('change', (e) => this.toggleBulkSelectAll(e));
+        Utils.$('#bulk-archive').addEventListener('click', () => this.handleBulkArchive());
+        Utils.$('#bulk-unarchive').addEventListener('click', () => this.handleBulkUnarchive());
+        Utils.$('#bulk-delete').addEventListener('click', () => this.handleBulkDelete());
+
+        // Import/Export
+        Utils.$('#btn-export').addEventListener('click', () => this.exportData());
+        Utils.$('#btn-import').addEventListener('click', () => this.importData());
+
+        // Relatórios
+        Utils.$('#report-refresh').addEventListener('click', () => this.buildReport());
+        Utils.$('#report-print').addEventListener('click', () => window.print());
+        Utils.$('#report-cat').addEventListener('change', () => this.buildReport());
+        Utils.$('#report-threat').addEventListener('change', () => this.buildReport());
+        Utils.$('#report-sort').addEventListener('change', () => this.buildReport());
+    }
+
+    // ===== NAVEGAÇÃO E LAYOUT =====
+    handleNavigation(e) {
+        const button = e.target.closest('button[data-view]');
+        if (!button) return;
+
+        const view = button.dataset.view;
+        this.setView(view);
+    }
+
+    setView(view) {
+        // Atualiza botões de navegação
+        Utils.$$('#app-nav [data-view]').forEach(btn => btn.classList.remove('active'));
+        Utils.$(`#app-nav [data-view="${view}"]`).classList.add('active');
+
+        // Mostra a view correspondente
+        const views = {
+            dashboard: Utils.$('#view-dashboard'),
+            add: Utils.$('#view-add'),
+            edit: Utils.$('#view-edit'),
+            io: Utils.$('#view-io'),
+            report: Utils.$('#view-report')
+        };
+
+        Object.values(views).forEach(section => section.style.display = 'none');
+        views[view].style.display = 'block';
+
+        // Fecha sidebar no mobile
+        Utils.$('#sidebar').classList.remove('open');
+        Utils.$('#content').classList.remove('dim');
+
+        // Ações específicas por view
+        if (view === 'edit') this.renderEditTable();
+        if (view === 'report') this.buildReport();
+        if (view === 'io') this.refreshIOPreview();
+    }
+
+    toggleSidebar() {
+        const sidebar = Utils.$('#sidebar');
+        const content = Utils.$('#content');
+        const isOpen = !sidebar.classList.contains('open');
+
+        sidebar.classList.toggle('open', isOpen);
+        content.classList.toggle('dim', isOpen);
+    }
+
+    // ===== DASHBOARD =====
+    handleCategoryFilter(e) {
+        const button = e.target.closest('.tab-btn');
+        if (!button) return;
+
+        Utils.$('#category-nav .active').classList.remove('active');
+        button.classList.add('active');
+
+        this.state.filters.category = button.dataset.category;
+        this.state.filters.tag = '';
+        this.renderDashboard();
+    }
+
+    handleThreatFilter(e) {
+        const button = e.target.closest('.tab-btn');
+        if (!button) return;
+
+        Utils.$('#threat-nav .active').classList.remove('active');
+        button.classList.add('active');
+
+        this.state.filters.threat = button.dataset.threat;
+        this.state.filters.tag = '';
+        this.renderDashboard();
+    }
+
+    handleSearch(e) {
+        this.state.filters.search = e.target.value;
+        this.renderDashboard();
+    }
+
+    handleSort(e) {
+        this.state.filters.sort = e.target.value;
+        this.renderDashboard();
+    }
+
+    threatClass(level) {
+        return level === 'alta' ? 'threat-high' :
+            level === 'media' ? 'threat-medium' : 'threat-low';
+    }
+
+    tagsToChipsHTML(tags) {
+        const arr = Utils.nl(tags).split(',').map(s => Utils.nl(s)).filter(Boolean);
+        if (!arr.length) return '';
+
+        return `
+            <div class="tag-chips">
+                ${arr.map(t => `<span class="chip" data-chip="${t}">${t}</span>`).join('')}
+            </div>
+        `;
+    }
+
+    cardHTML(competitor) {
+        const preview = (competitor.analysis || competitor.focus || '').trim();
+        const truncatedPreview = preview && preview.length > 140 ?
+            preview.slice(0, 140) + '...' : preview;
+
+        return `
+            <article class="competitor-card" data-id="${competitor.id}" 
+                     data-category="${competitor.category}" data-threat="${competitor.threat}">
+                <div class="card-header">
+                    <span class="threat-level ${this.threatClass(competitor.threat)}"></span>
+                    <h3>${competitor.name}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="info-item">
+                        <svg><use href="#icon-location"/></svg>
+                        <span>${competitor.location || '—'}</span>
+                    </div>
+                    ${truncatedPreview ? `<p class="card-analysis-preview">${truncatedPreview}</p>` : ''}
+                    ${this.tagsToChipsHTML(competitor.tags)}
+                </div>
+            </article>
+        `;
+    }
+
+    renderDashboard() {
+        const grid = Utils.$('#competitors-grid');
+        const filteredData = this.state.getFilteredData();
+
+        grid.innerHTML = filteredData.map(competitor => this.cardHTML(competitor)).join('');
+
+        // Adiciona event listener para chips de tags
+        grid.addEventListener('click', (e) => {
+            const chip = e.target.closest('.chip');
+            if (chip) {
+                this.state.filters.tag = chip.dataset.chip || '';
+                this.renderDashboard();
+            }
+        });
+    }
+
+    // ===== MODAL =====
+    openModal(id) {
+        const competitor = this.state.data.find(x => x.id === id);
+        if (!competitor) return;
+
+        // Preenche o modal com os dados
+        Utils.$('#modal-header-content').innerHTML = `
+            <span class="threat-level ${this.threatClass(competitor.threat)}"></span>
+            <h3>${competitor.name}</h3>
+        `;
+
+        Utils.$('#modal-location').innerHTML = `
+            <svg><use href="#icon-location"/></svg>
+            <span>${competitor.location || '—'}</span>
+        `;
+
+        Utils.$('#modal-focus').innerHTML = `
+            <svg><use href="#icon-focus"/></svg>
+            <span>${competitor.focus || '—'}</span>
+        `;
+
+        Utils.$('#modal-analysis').textContent = competitor.analysis || '—';
+        Utils.$('#modal-tags').innerHTML = this.tagsToChipsHTML(competitor.tags);
+
+        // Ações
+        let actions = '';
+        if (competitor.website) {
+            actions += `<a href="${competitor.website}" target="_blank" rel="noopener" class="btn">
+                <svg><use href="#icon-website"/></svg>Website
+            </a>`;
+        }
+        if (competitor.instagram) {
+            actions += `<a href="${competitor.instagram}" target="_blank" rel="noopener" class="btn">
+                <svg><use href="#icon-instagram"/></svg>Instagram
+            </a>`;
+        }
+
+        Utils.$('#modal-actions').innerHTML = actions || '<span style="color:var(--text-muted)">Sem links cadastrados</span>';
+
+        // Mostra o modal
+        this.modal.classList.add('active');
+        this.modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+
+        // Foco no modal para acessibilidade
+        const focusable = this.modal.querySelectorAll('a[href], button');
+        if (focusable.length > 0) {
+            focusable[0].focus();
+        }
+    }
+
+    closeModal() {
+        this.modal.classList.remove('active');
+        this.modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
+
+    handleKeyboard(e) {
+        if (e.key === 'Escape' && this.modal.classList.contains('active')) {
+            this.closeModal();
+        }
+    }
+
+    // ===== FORMULÁRIOS =====
+    handleAddSubmit(e) {
+        e.preventDefault();
+
+        const formData = {
+            id: Utils.uid(),
+            name: Utils.nl(Utils.$('#f-name').value),
+            location: Utils.nl(Utils.$('#f-city').value),
+            threat: Utils.$('#f-threat').value,
+            category: Utils.$('#f-category').value,
+            website: Utils.nl(Utils.$('#f-website').value),
+            instagram: Utils.nl(Utils.$('#f-instagram').value),
+            phone: Utils.nl(Utils.$('#f-phone').value),
+            cnpj: Utils.nl(Utils.$('#f-cnpj').value),
+            tags: Utils.nl(Utils.$('#f-tags').value),
+            ticket: Utils.nl(Utils.$('#f-ticket').value),
+            focus: Utils.nl(Utils.$('#f-focus').value),
+            analysis: Utils.nl(Utils.$('#f-analysis').value),
+            builtIn: false,
+            archived: false
+        };
+
+        // Validação
+        if (!formData.name || !formData.location || !formData.threat || !formData.category) {
+            Utils.showNotification('Preencha Nome, Cidade/UF, Nível de Ameaça e Categoria.', 'error');
+            return;
+        }
+
+        this.state.addCompetitor(formData);
+        Utils.$('#add-form').reset();
+        Utils.showNotification('Concorrente adicionado com sucesso!');
+        this.setView('dashboard');
+        this.renderDashboard();
+    }
+
+    // ===== EDIÇÃO =====
+    renderEditTable() {
+        const tbody = Utils.$('#edit-table tbody');
+        const searchTerm = (Utils.$('#edit-search').value || '').toLowerCase();
+        const sortMode = Utils.$('#edit-sort').value;
+
+        let filteredData = this.state.data.filter(competitor =>
+            (competitor.name || '').toLowerCase().includes(searchTerm) ||
+            (competitor.location || '').toLowerCase().includes(searchTerm)
+        );
+
+        // Ordenação
+        switch (sortMode) {
+            case 'az':
+                filteredData.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+            case 'za':
+                filteredData.sort((a, b) => b.name.localeCompare(a.name));
+                break;
+            case 'cidade':
+                filteredData.sort((a, b) => (a.location || '').localeCompare(b.location || ''));
+                break;
+            case 'ameaca':
+                filteredData.sort((a, b) =>
+                    (CONFIG.THREAT_ORDER[a.threat] ?? 9) - (CONFIG.THREAT_ORDER[b.threat] ?? 9)
+                );
+                break;
+        }
+
+        tbody.innerHTML = filteredData.map(competitor => `
+            <tr data-id="${competitor.id}">
+                <td><input type="checkbox" class="row-check" /></td>
+                <td>${competitor.name}</td>
+                <td>${competitor.location || '—'}</td>
+                <td>${competitor.threat}</td>
+                <td>${competitor.category}</td>
+                <td>${competitor.archived ? 'Arquivado' : (competitor.builtIn ? 'Original' : 'Custom')}</td>
+                <td>
+                    <div class="table-actions">
+                        <button class="btn" data-action="load">Editar</button>
+                        <button class="btn" data-action="toggle-archive">
+                            ${competitor.archived ? 'Desarquivar' : 'Arquivar'}
+                        </button>
+                        <button class="btn btn-danger" data-action="delete">Excluir</button>
+                    </div>
+                </td>
+            </tr>
+        `).join('') || `<tr><td colspan="7" style="color:var(--text-muted)">Nenhum item encontrado.</td></tr>`;
+
+        Utils.$('#bulk-all').checked = false;
+    }
+
+    handleTableActions(e) {
+        const button = e.target.closest('button[data-action]');
+        if (!button) return;
+
+        const row = e.target.closest('tr');
+        const id = row.dataset.id;
+        const action = button.dataset.action;
+
+        switch (action) {
+            case 'load':
+                this.loadCompetitorIntoForm(id);
+                break;
+            case 'toggle-archive':
+                this.state.toggleArchive(id);
+                this.renderEditTable();
+                this.renderDashboard();
+                Utils.showNotification('Status alterado com sucesso!');
+                break;
+            case 'delete':
+                if (confirm('Tem certeza que deseja excluir definitivamente?')) {
+                    this.state.deleteCompetitor(id);
+                    this.renderEditTable();
+                    this.renderDashboard();
+                    Utils.showNotification('Concorrente excluído!');
+                    // Se estava editando este item, limpa o form
+                    if (Utils.$('#e-id').value === id) {
+                        Utils.$('#edit-form').reset();
+                    }
+                }
+                break;
+        }
+    }
+
+    loadCompetitorIntoForm(id) {
+        const competitor = this.state.data.find(x => x.id === id);
+        if (!competitor) return;
+
+        // Preenche o formulário
+        Utils.$('#e-id').value = competitor.id;
+        Utils.$('#e-name').value = competitor.name;
+        Utils.$('#e-city').value = competitor.location || '';
+        Utils.$('#e-threat').value = competitor.threat;
+        Utils.$('#e-category').value = competitor.category || '';
+        Utils.$('#e-website').value = competitor.website || '';
+        Utils.$('#e-instagram').value = competitor.instagram || '';
+        Utils.$('#e-phone').value = competitor.phone || '';
+        Utils.$('#e-cnpj').value = competitor.cnpj || '';
+        Utils.$('#e-tags').value = competitor.tags || '';
+        Utils.$('#e-ticket').value = competitor.ticket || '';
+        Utils.$('#e-focus').value = competitor.focus || '';
+        Utils.$('#e-analysis').value = competitor.analysis || '';
+
+        Utils.$('#e-archive').textContent = competitor.archived ? 'Desarquivar' : 'Arquivar';
+        this.setView('edit');
+    }
+
+    handleEditSubmit(e) {
+        e.preventDefault();
+
+        const id = Utils.$('#e-id').value;
+        if (!id) return;
+
+        const updates = {
+            name: Utils.nl(Utils.$('#e-name').value),
+            location: Utils.nl(Utils.$('#e-city').value),
+            threat: Utils.$('#e-threat').value,
+            category: Utils.$('#e-category').value,
+            website: Utils.nl(Utils.$('#e-website').value),
+            instagram: Utils.nl(Utils.$('#e-instagram').value),
+            phone: Utils.nl(Utils.$('#e-phone').value),
+            cnpj: Utils.nl(Utils.$('#e-cnpj').value),
+            tags: Utils.nl(Utils.$('#e-tags').value),
+            ticket: Utils.nl(Utils.$('#e-ticket').value),
+            focus: Utils.nl(Utils.$('#e-focus').value),
+            analysis: Utils.nl(Utils.$('#e-analysis').value)
+        };
+
+        if (this.state.updateCompetitor(id, updates)) {
+            Utils.showNotification('Alterações salvas com sucesso!');
+            this.renderEditTable();
+            this.renderDashboard();
+        }
+    }
+
+    // ===== AÇÕES EM LOTE =====
+    getSelectedIds() {
+        return Utils.$$('.row-check', Utils.$('#edit-table tbody'))
+            .map(checkbox => checkbox.checked ? checkbox.closest('tr').dataset.id : null)
+            .filter(Boolean);
+    }
+
+    toggleBulkSelectAll(e) {
+        Utils.$$('.row-check', Utils.$('#edit-table tbody'))
+            .forEach(checkbox => checkbox.checked = e.target.checked);
+    }
+
+    handleBulkArchive() {
+        const ids = this.getSelectedIds();
+        if (!ids.length) {
+            Utils.showNotification('Selecione ao menos um item.', 'error');
+            return;
+        }
+
+        ids.forEach(id => {
+            const competitor = this.state.data.find(x => x.id === id);
+            if (competitor && !competitor.archived) {
+                competitor.archived = true;
+            }
+        });
+
+        this.state.writeStore(this.state.data);
+        this.renderEditTable();
+        this.renderDashboard();
+        Utils.showNotification(`${ids.length} item(ns) arquivado(s)!`);
+    }
+
+    handleBulkUnarchive() {
+        const ids = this.getSelectedIds();
+        if (!ids.length) {
+            Utils.showNotification('Selecione ao menos um item.', 'error');
+            return;
+        }
+
+        ids.forEach(id => {
+            const competitor = this.state.data.find(x => x.id === id);
+            if (competitor && competitor.archived) {
+                competitor.archived = false;
+            }
+        });
+
+        this.state.writeStore(this.state.data);
+        this.renderEditTable();
+        this.renderDashboard();
+        Utils.showNotification(`${ids.length} item(ns) desarquivado(s)!`);
+    }
+
+    handleBulkDelete() {
+        const ids = this.getSelectedIds();
+        if (!ids.length) {
+            Utils.showNotification('Selecione ao menos um item.', 'error');
+            return;
+        }
+
+        if (!confirm(`Excluir ${ids.length} item(ns) definitivamente?`)) return;
+
+        this.state.data = this.state.data.filter(competitor => !ids.includes(competitor.id));
+        this.state.writeStore(this.state.data);
+        this.renderEditTable();
+        this.renderDashboard();
+        Utils.showNotification(`${ids.length} item(ns) excluído(s)!`);
+    }
+
+    // ===== IMPORT/EXPORT =====
+    refreshIOPreview() {
+        Utils.$('#io-preview').value = JSON.stringify(this.state.data, null, 2);
+    }
+
+    exportData() {
+        const blob = new Blob([JSON.stringify(this.state.data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+
+        a.href = url;
+        a.download = `concorrentes_nicopel_${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        Utils.showNotification('Dados exportados com sucesso!');
+    }
+
+    importData() {
+        const fileInput = Utils.$('#file-import');
+        const file = fileInput.files[0];
+
+        if (!file) {
+            Utils.showNotification('Selecione um arquivo JSON para importar.', 'error');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const parsed = JSON.parse(e.target.result);
+                if (!Array.isArray(parsed)) throw new Error('Formato inválido');
+
+                // Limpa e valida os dados
+                const cleaned = parsed.map(item => ({
+                    id: item.id || Utils.uid(),
+                    name: Utils.nl(item.name),
+                    location: Utils.nl(item.location),
+                    threat: item.threat || 'media',
+                    category: Utils.nl(item.category),
+                    website: Utils.nl(item.website),
+                    instagram: Utils.nl(item.instagram),
+                    phone: Utils.nl(item.phone),
+                    cnpj: Utils.nl(item.cnpj),
+                    tags: Utils.nl(item.tags),
+                    ticket: Utils.nl(item.ticket),
+                    focus: Utils.nl(item.focus),
+                    analysis: Utils.nl(item.analysis),
+                    builtIn: !!item.builtIn,
+                    archived: !!item.archived
+                }));
+
+                this.state.data = cleaned;
+                this.state.writeStore(this.state.data);
+
+                Utils.showNotification('Importação concluída com sucesso!');
+                this.refreshIOPreview();
+                this.renderDashboard();
+                this.renderEditTable();
+
+                // Limpa o input de arquivo
+                fileInput.value = '';
+
+            } catch (err) {
+                Utils.showNotification('Falha ao importar: ' + err.message, 'error');
+            }
+        };
+        reader.readAsText(file, 'utf-8');
+    }
+
+    // ===== RELATÓRIOS =====
+    buildReport() {
+        const reportDate = Utils.$('#report-date');
+        const tableBody = Utils.$('#report-table tbody');
+
+        if (reportDate) {
+            reportDate.textContent = new Date().toLocaleString('pt-BR');
+        }
+
+        const categoryFilter = Utils.$('#report-cat').value;
+        const threatFilter = Utils.$('#report-threat').value;
+        const sortMode = Utils.$('#report-sort').value;
+
+        let filteredData = this.state.data.filter(competitor => !competitor.archived);
+
+        // Aplica filtros
+        if (categoryFilter !== 'todos') {
+            filteredData = filteredData.filter(competitor => competitor.category === categoryFilter);
+        }
+
+        if (threatFilter !== 'todos') {
+            filteredData = filteredData.filter(competitor => competitor.threat === threatFilter);
+        }
+
+        // Aplica ordenação
+        switch (sortMode) {
+            case 'az':
+                filteredData.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+            case 'cidade':
+                filteredData.sort((a, b) => (a.location || '').localeCompare(b.location || ''));
+                break;
+            case 'ameaca':
+                filteredData.sort((a, b) =>
+                    (CONFIG.THREAT_ORDER[a.threat] ?? 9) - (CONFIG.THREAT_ORDER[b.threat] ?? 9)
+                );
+                break;
+        }
+
+        tableBody.innerHTML = filteredData.map(competitor => `
+            <tr>
+                <td>${competitor.name}</td>
+                <td>${competitor.location || '—'}</td>
+                <td>${competitor.threat}</td>
+                <td>${competitor.category}</td>
+                <td>${competitor.focus || '—'}</td>
+                <td>
+                    ${competitor.instagram ? `<a href="${competitor.instagram}">Instagram</a>` : ''}
+                    ${competitor.website ? (competitor.instagram ? ' • ' : '') + `<a href="${competitor.website}">Site</a>` : ''}
+                </td>
+                <td>${Utils.nl(competitor.tags)}</td>
+            </tr>
+        `).join('') || `<tr><td colspan="7" style="color:var(--text-muted)">Sem resultados.</td></tr>`;
+    }
+}
+
+// ===== INICIALIZAÇÃO DA APLICAÇÃO =====
+class App {
+    constructor() {
+        this.stateManager = new StateManager();
+        this.uiManager = new UIManager(this.stateManager);
+        this.init();
+    }
+
+    init() {
+        console.log('🚀 Aplicação Nicopel Concorrência inicializada!');
+        
+        // Event listener global para abrir modal via cards
+        Utils.$('#competitors-grid').addEventListener('click', (e) => {
+            const card = e.target.closest('.competitor-card');
+            if (card) {
+                this.uiManager.openModal(card.dataset.id);
+            }
+        });
+
+        // Observador para atualizar preview de IO quando a view for aberta
+        new MutationObserver(() => {
+            if (Utils.$('#view-io').style.display !== 'none') {
+                this.uiManager.refreshIOPreview();
+            }
+        }).observe(Utils.$('#view-io'), { attributes: true, attributeFilter: ['style'] });
+    }
+}
+
+// Inicializa a aplicação quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', () => {
+    new App();
 });
+
+// Adiciona alguns estilos para as notificações
+const notificationStyles = `
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: slideIn 0.3s ease;
+    }
+    
+    .notification.success {
+        background: #10b981;
+    }
+    
+    .notification.error {
+        background: #ef4444;
+    }
+    
+    .notification button {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 0;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+`;
+
+const styleSheet = document.createElement('style');
+styleSheet.textContent = notificationStyles;
+document.head.appendChild(styleSheet);
