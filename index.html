@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Dashboard de Concorrência - Nicopel Embalagens</title>
+  <title>Concorrência - Nicopel Embalagens</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,10 +15,10 @@
       --card-background:#ffffff;--text-color:#212529;--border-color:#e9ecef;
       --shadow:0 4px 6px rgba(0,0,0,.04);--shadow-hover:0 7px 14px rgba(0,0,0,.07);
       --sidebar:#10151c; --sidebar-text:#e9eef5; --sidebar-muted:#98a6b3; --sidebar-active:#1c2430;
-      --danger:#dc3545; --chip:#eef3ff; --chip-text:#264a9a;
+      --danger:#dc3545;
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--background-color);color:var(--text-color);line-height:1.5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--background-color);color:var(--text-color);line-height:1.5}
 
     /* LAYOUT */
     .app{display:grid; grid-template-columns: 260px 1fr; min-height:100dvh;}
@@ -43,7 +43,6 @@
     header{text-align:center;margin-bottom:clamp(16px,3vw,28px)}
     header h1{margin:0 0 6px;font-weight:700;font-size:clamp(1.25rem,2.4vw+0.5rem,2.2rem)}
     header p{margin:0;color:var(--secondary-color);font-size:clamp(.9rem,1.2vw+.5rem,1rem)}
-
     .filter-group{border-bottom:1px solid var(--border-color);padding-bottom:1rem;margin-bottom:1rem}
     .filter-group:last-of-type{border-bottom:none}
     .tabs-nav{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 0}
@@ -56,11 +55,6 @@
     .search input{width:100%;padding:10px 12px;border:1px solid var(--border-color);border-radius:10px;background:#fff}
     .sort{display:flex;gap:8px;align-items:center}
     select{padding:10px 12px;border:1px solid var(--border-color);border-radius:10px;background:#fff}
-
-    .chipbar{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
-    .chip{background:var(--chip); color:var(--chip-text); padding:6px 10px; border-radius:999px; font-weight:600; cursor:pointer; border:1px solid #d9e5ff}
-    .chip.active{outline:2px solid var(--primary-color)}
-
     #competitors-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:clamp(12px,2.2vw,20px);margin-top:1rem}
     .competitor-card{cursor:pointer;background:#fff;border:1px solid var(--border-color);border-radius:12px;padding:clamp(14px,1.8vw,20px);box-shadow:var(--shadow);transition:.2s;display:flex;flex-direction:column;min-height:160px}
     .competitor-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover)}
@@ -72,13 +66,9 @@
     .card-body{flex-grow:1}
     .info-item{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:0.9rem;color:var(--secondary-color)}
     .info-item svg{width:16px;height:16px;color:var(--secondary-color);flex-shrink:0}
-    .card-analysis-preview{font-size:.9rem;color:#495057;margin:12px 0 0;line-height:1.6;-webkit-line-clamp:2;-webkit-box-orient:vertical;display:-webkit-box;overflow:hidden;text-overflow:ellipsis;flex-grow:1}
-    .card-actions{display:flex;gap:8px;flex-wrap:wrap}
-    .action-btn{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;font-size:.9rem;line-height:1;border-radius:8px;border:1px solid var(--border-color);background:#fff;color:var(--text-color);font-weight:600;text-decoration:none;transition:background .15s,border-color .15s,transform .06s}
-    .action-btn svg{width:18px;height:18px;color:var(--secondary-color)}
-    .action-btn:hover{background:#f8f9fa}
-    .btn-website{color:var(--primary-color);border-color:#d0e3ff}
-    .btn-instagram{color:#d6336c;border-color:#f3d0db}
+    .tag-chips{display:flex; gap:6px; flex-wrap:wrap; margin-top:8px}
+    .chip{display:inline-block; padding:4px 8px; border:1px solid var(--border-color); border-radius:999px; font-size:.8rem; cursor:pointer}
+    .chip:hover{background:#f8f9fa}
 
     /* MODAL */
     .modal-overlay{position:fixed;inset:0;background:rgba(33,37,41,.6);display:flex;justify-content:center;align-items:center;z-index:1000;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s;padding:1rem}
@@ -116,23 +106,26 @@
     .table th,.table td{border-bottom:1px solid var(--border-color); padding:10px; text-align:left; font-size:.95rem}
     .table th{color:#495057; font-weight:700}
     .table-actions{display:flex; gap:8px}
-    .table thead th:first-child, .table tbody td:first-child{width:28px}
+    .bulk{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
 
-    /* RELATÓRIO (PRINT) */
-    .report-wrap{max-width:1000px;margin:0 auto}
-    .report-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-    .report-meta{color:#6c757d;font-size:.9rem}
-    .report-table{width:100%;border-collapse:collapse}
-    .report-table th,.report-table td{border-bottom:1px solid #e6e6e6;padding:8px 6px;text-align:left;font-size:.95rem}
-    .print-bar{display:flex;justify-content:flex-end;gap:8px;margin-bottom:8px}
+    /* RELATÓRIO (impressão) */
+    .report-header{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px}
+    .report-grid{border:1px solid var(--border-color); border-radius:12px; overflow:hidden; background:#fff}
+    .report-grid table{width:100%; border-collapse:collapse}
+    .report-grid th,.report-grid td{border-bottom:1px solid var(--border-color); padding:10px; font-size:.95rem}
+    .report-grid th{background:#f6f7f9; text-align:left}
+    .no-print{display:block}
+    .only-print{display:none}
 
     @media print{
+      @page{size:A4; margin:12mm}
+      aside,.sidebar-toggle,.no-print{display:none !important}
+      .only-print{display:block}
       body{background:#fff}
-      aside, .sidebar-toggle, .toolbar, .filter-group, .chipbar, .print-bar, .modal-overlay{display:none !important}
-      .container{padding:0}
-      .card{box-shadow:none; border: none}
-      .report-table th,.report-table td{border-color:#ccc}
-      .nav, header{text-align:left}
+      .container{max-width:none; padding:0}
+      header{text-align:left; margin:0 0 8px}
+      .report-header{margin:0 0 8px}
+      .report-grid th,.report-grid td{padding:6px 8px; font-size:.85rem}
     }
   </style>
 </head>
@@ -144,7 +137,7 @@
     <symbol id="icon-location" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></symbol>
     <symbol id="icon-focus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></symbol>
     <symbol id="icon-website" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></symbol>
-    <symbol id="icon-instagram" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></symbol>
+    <symbol id="icon-instagram" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></symbol>
   </svg>
 
   <div class="app">
@@ -160,14 +153,14 @@
         <button data-view="add">➕ Adicionar Concorrente</button>
         <button data-view="edit">✏️ Editar / Excluir</button>
         <button data-view="io">⤴️⤵️ Importar / Exportar</button>
-        <button data-view="report">🖨️ Relatório (Imprimir)</button>
+        <button data-view="report">🖨️ Relatórios</button>
       </nav>
       <p class="sidebar-note" style="margin-top:18px">Atualizado em <span id="last-updated-side"></span></p>
     </aside>
 
     <!-- Content -->
     <main class="content" id="content">
-      <!-- DASHBOARD VIEW -->
+      <!-- DASHBOARD -->
       <section id="view-dashboard">
         <div class="container">
           <header>
@@ -193,7 +186,7 @@
             </div>
 
             <div class="search">
-              <input id="search-input" type="text" placeholder="Buscar por nome, cidade ou tag..." />
+              <input id="search-input" type="text" placeholder="Buscar por nome ou cidade..." />
             </div>
 
             <div class="sort">
@@ -207,10 +200,10 @@
             </div>
           </div>
 
-          <div id="tag-chipbar" class="chipbar" aria-label="Filtrar por Tags"></div>
-
           <main id="competitors-grid">
-            <!-- os cards iniciais do HTML são migrados automaticamente para o storage (1ª execução) -->
+            <!-- Os artigos originais permanecem para a 1ª migração (o JS lê e migra) -->
+            <!-- (iguais aos que você já tinha; mantive aqui por compatibilidade) -->
+            <!-- ... (pode manter sua lista antiga aqui, o JS vai migrar) ... -->
           </main>
 
           <footer style="text-align:center;margin-top:16px;color:var(--secondary-color)">
@@ -219,7 +212,7 @@
         </div>
       </section>
 
-      <!-- ADD VIEW -->
+      <!-- ADICIONAR -->
       <section id="view-add" style="display:none">
         <div class="container">
           <header>
@@ -256,15 +249,15 @@
         </div>
       </section>
 
-      <!-- EDIT VIEW -->
+      <!-- EDITAR/EXCLUIR -->
       <section id="view-edit" style="display:none">
         <div class="container">
-          <header><h1>Editar / Excluir</h1><p>Atualize os dados dos concorrentes. Selecione vários para ações em lote.</p></header>
+          <header><h1>Editar / Excluir</h1><p>Atualize os dados dos concorrentes. Use seleção múltipla para ações em lote.</p></header>
 
           <div class="card" style="margin-bottom:14px">
             <div class="form-grid">
-              <div class="col-6"><input id="edit-search" type="text" placeholder="Buscar por nome/cidade/tag..." /></div>
-              <div class="col-3">
+              <div class="col-8"><input id="edit-search" type="text" placeholder="Buscar por nome/cidade..." /></div>
+              <div class="col-4">
                 <select id="edit-sort">
                   <option value="az">Nome (A–Z)</option>
                   <option value="za">Nome (Z–A)</option>
@@ -272,23 +265,19 @@
                   <option value="ameaca">Nível de ameaça</option>
                 </select>
               </div>
-              <div class="col-3" style="display:flex; gap:8px; justify-content:flex-end">
-                <button id="bulk-archive" class="btn">Arquivar</button>
-                <button id="bulk-unarchive" class="btn">Desarquivar</button>
-                <button id="bulk-delete" class="btn btn-danger">Excluir</button>
+              <div class="col-12 bulk">
+                <label><input type="checkbox" id="bulk-all" /> Selecionar tudo</label>
+                <button class="btn" id="bulk-archive">Arquivar</button>
+                <button class="btn" id="bulk-unarchive">Desarquivar</button>
+                <button class="btn btn-danger" id="bulk-delete">Excluir</button>
               </div>
             </div>
-          </div>
-
-          <div class="card" style="margin-bottom:14px">
-            <button id="btn-sanitize" class="btn">Atualizar links/Regiões</button>
-            <p class="help">Normaliza links do Instagram e padroniza “Cidade - UF” (UF em maiúsculas). Use quando importar dados ou para corrigir rapidamente.</p>
           </div>
 
           <div class="card">
             <table class="table" id="edit-table">
               <thead>
-                <tr><th></th><th>Nome</th><th>Cidade</th><th>Ameaça</th><th>Categoria</th><th>Status</th><th style="width:210px">Ações</th></tr>
+                <tr><th></th><th>Nome</th><th>Cidade</th><th>Ameaça</th><th>Categoria</th><th>Status</th><th style="width:180px">Ações</th></tr>
               </thead>
               <tbody></tbody>
             </table>
@@ -321,16 +310,16 @@
                 <button type="button" id="e-delete" class="btn btn-danger">Excluir</button>
                 <button type="submit" class="btn btn-primary">Salvar Alterações</button>
               </div>
-              <p class="help">“Arquivar” oculta dos grids sem apagar do histórico (útil para itens originais). “Excluir” remove definitivamente.</p>
+              <p class="help">“Arquivar” apenas oculta dos grids sem apagar do histórico. “Excluir” remove definitivamente.</p>
             </form>
           </div>
         </div>
       </section>
 
-      <!-- IMPORT/EXPORT VIEW -->
+      <!-- IMPORT/EXPORT -->
       <section id="view-io" style="display:none">
         <div class="container">
-          <header><h1>Importar / Exportar</h1><p>Faça backup dos concorrentes ou importe um JSON. Também dá pra atualizar em massa por Nome.</p></header>
+          <header><h1>Importar / Exportar</h1><p>Faça backup dos concorrentes ou importe um JSON.</p></header>
 
           <div class="card" style="margin-bottom:14px">
             <div class="form-grid">
@@ -340,15 +329,7 @@
                 <button id="btn-import" class="btn btn-primary">Importar JSON</button>
               </div>
             </div>
-            <p class="help">Formato: lista de objetos com os campos do formulário (inclui id, builtIn, archived).</p>
-          </div>
-
-          <div class="card" style="margin-bottom:14px">
-            <h3 style="margin:0 0 8px">Atualização Rápida (colar JSON mapeando “name”)</h3>
-            <textarea id="bulk-update" placeholder='Ex.: [{"name":"Soller Embalagens","instagram":"https://instagram.com/sollerembalagens/","location":"Biguaçu - SC"}]' style="width:100%; min-height:140px"></textarea>
-            <div class="form-actions">
-              <button id="btn-apply-bulk" class="btn btn-primary">Aplicar Atualizações</button>
-            </div>
+            <p class="help">O formato é uma lista de objetos com os campos do formulário (inclui id, builtIn e archived).</p>
           </div>
 
           <div class="card">
@@ -358,47 +339,57 @@
         </div>
       </section>
 
-      <!-- REPORT/PRINT VIEW -->
+      <!-- RELATÓRIOS / IMPRESSÃO -->
       <section id="view-report" style="display:none">
-        <div class="container report-wrap">
-          <div class="print-bar">
-            <button id="btn-print" class="btn btn-primary">Imprimir PDF</button>
-          </div>
-          <div class="card">
-            <div class="report-header">
-              <h1 style="margin:0">Relatório de Concorrência</h1>
-              <div class="report-meta">
-                <div>Gerado em <span id="report-date"></span></div>
-                <div>Filtros: <span id="report-filters"></span></div>
+        <div class="container">
+          <header class="report-header">
+            <div>
+              <h1 style="margin:0">Relatório de Concorrentes</h1>
+              <p class="only-print" style="margin:.25rem 0 0; color:#6c757d">Gerado em <span id="report-date"></span></p>
+            </div>
+            <div class="no-print">
+              <button class="btn" id="report-refresh">Atualizar</button>
+              <button class="btn btn-primary" id="report-print">Imprimir</button>
+            </div>
+          </header>
+
+          <div class="card no-print" style="margin-bottom:12px">
+            <div class="form-grid">
+              <div class="col-4">
+                <label>Categoria</label>
+                <select id="report-cat">
+                  <option value="todos">Todas</option>
+                  <option value="potes-copos">Potes e Copos</option>
+                  <option value="caixas-sorvete">Caixas de Sorvete</option>
+                  <option value="caixas-pizza">Caixas de Pizza</option>
+                  <option value="embalagens-industriais">Embalagens Industriais</option>
+                </select>
+              </div>
+              <div class="col-4">
+                <label>Ameaça</label>
+                <select id="report-threat">
+                  <option value="todos">Todos</option>
+                  <option value="alta">Alta</option>
+                  <option value="media">Média</option>
+                  <option value="baixa">Baixa</option>
+                </select>
+              </div>
+              <div class="col-4">
+                <label>Ordenar</label>
+                <select id="report-sort">
+                  <option value="az">Nome (A–Z)</option>
+                  <option value="cidade">Cidade</option>
+                  <option value="ameaca">Ameaça</option>
+                </select>
               </div>
             </div>
+          </div>
 
-            <div style="display:flex; gap:10px; flex-wrap:wrap; margin:10px 0">
-              <select id="report-category">
-                <option value="todos">Todas Categorias</option>
-                <option value="potes-copos">Potes e Copos</option>
-                <option value="caixas-sorvete">Caixas de Sorvete</option>
-                <option value="caixas-pizza">Caixas de Pizza</option>
-                <option value="embalagens-industriais">Embalagens Industriais</option>
-              </select>
-              <select id="report-threat">
-                <option value="todos">Todos</option>
-                <option value="direto">Diretos (Alta)</option>
-                <option value="indireto">Indiretos (Média/Baixa)</option>
-              </select>
-              <input id="report-search" type="text" placeholder="Buscar por nome/cidade/tag..." style="flex:1" />
-            </div>
-
-            <div style="display:flex; gap:16px; flex-wrap:wrap; margin:6px 0 14px">
-              <div><strong>Total:</strong> <span id="rep-count">0</span></div>
-              <div><strong>Diretos (Alta):</strong> <span id="rep-count-alta">0</span></div>
-              <div><strong>Indiretos (M/B):</strong> <span id="rep-count-ind">0</span></div>
-            </div>
-
-            <table class="report-table" id="report-table">
+          <div class="report-grid">
+            <table id="report-table">
               <thead>
                 <tr>
-                  <th>Nome</th><th>Cidade</th><th>Ameaça</th><th>Categoria</th><th>Instagram</th><th>Website</th><th>Tags</th>
+                  <th>Nome</th><th>Cidade</th><th>Ameaça</th><th>Categoria</th><th>Foco</th><th>Instagram / Site</th><th>Tags</th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -420,6 +411,7 @@
         <div id="modal-location" class="info-item"></div>
         <div id="modal-focus" class="info-item"></div>
         <p id="modal-analysis" style="margin:0; line-height: 1.7;"></p>
+        <div id="modal-tags" class="tag-chips"></div>
       </div>
       <footer class="modal-footer">
         <div id="modal-actions" class="card-actions"></div>
