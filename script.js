@@ -52,6 +52,11 @@ class Utils {
             return null;
         }
     }
+    
+    static formatCurrency(value) {
+        if (!value) return '—';
+        return `R$ ${parseFloat(value).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+    }
 }
 
 // ===== GERENCIAMENTO DE ESTADO =====
@@ -487,6 +492,9 @@ class UIManager {
         // Google Ads
         Utils.$('#google-ads-btn').href = `https://adstransparency.google.com/?q=${encodeURIComponent(competitor.name)}`;
         
+        // Google Search
+        Utils.$('#google-search-btn').href = `https://www.google.com/search?q=${encodeURIComponent(competitor.name + ' embalagens')}`;
+        
         // SimilarWeb
         if (domain) {
             Utils.$('#traffic-analysis-btn').href = `https://similarweb.com/website/${domain}`;
@@ -498,7 +506,7 @@ class UIManager {
         // Informações adicionais
         Utils.$('#modal-phone').textContent = competitor.phone || '—';
         Utils.$('#modal-cnpj').textContent = competitor.cnpj || '—';
-        Utils.$('#modal-ticket').textContent = competitor.ticket ? `R$ ${parseFloat(competitor.ticket).toLocaleString('pt-BR', {minimumFractionDigits: 2})}` : '—';
+        Utils.$('#modal-ticket').textContent = Utils.formatCurrency(competitor.ticket);
 
         // Mostra o modal
         this.modal.classList.add('active');
