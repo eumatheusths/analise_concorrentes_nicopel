@@ -15,7 +15,7 @@
       --card-background:#ffffff;--text-color:#212529;--border-color:#e9ecef;
       --shadow:0 4px 6px rgba(0,0,0,.04);--shadow-hover:0 7px 14px rgba(0,0,0,.07);
       --sidebar:#10151c; --sidebar-text:#e9eef5; --sidebar-muted:#98a6b3; --sidebar-active:#1c2430;
-      --danger:#dc3545;
+      --danger:#dc3545; --chip:#eef3ff; --chip-text:#264a9a;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--background-color);color:var(--text-color);line-height:1.5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
@@ -43,6 +43,7 @@
     header{text-align:center;margin-bottom:clamp(16px,3vw,28px)}
     header h1{margin:0 0 6px;font-weight:700;font-size:clamp(1.25rem,2.4vw+0.5rem,2.2rem)}
     header p{margin:0;color:var(--secondary-color);font-size:clamp(.9rem,1.2vw+.5rem,1rem)}
+
     .filter-group{border-bottom:1px solid var(--border-color);padding-bottom:1rem;margin-bottom:1rem}
     .filter-group:last-of-type{border-bottom:none}
     .tabs-nav{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 0}
@@ -55,6 +56,11 @@
     .search input{width:100%;padding:10px 12px;border:1px solid var(--border-color);border-radius:10px;background:#fff}
     .sort{display:flex;gap:8px;align-items:center}
     select{padding:10px 12px;border:1px solid var(--border-color);border-radius:10px;background:#fff}
+
+    .chipbar{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+    .chip{background:var(--chip); color:var(--chip-text); padding:6px 10px; border-radius:999px; font-weight:600; cursor:pointer; border:1px solid #d9e5ff}
+    .chip.active{outline:2px solid var(--primary-color)}
+
     #competitors-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:clamp(12px,2.2vw,20px);margin-top:1rem}
     .competitor-card{cursor:pointer;background:#fff;border:1px solid var(--border-color);border-radius:12px;padding:clamp(14px,1.8vw,20px);box-shadow:var(--shadow);transition:.2s;display:flex;flex-direction:column;min-height:160px}
     .competitor-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover)}
@@ -110,6 +116,24 @@
     .table th,.table td{border-bottom:1px solid var(--border-color); padding:10px; text-align:left; font-size:.95rem}
     .table th{color:#495057; font-weight:700}
     .table-actions{display:flex; gap:8px}
+    .table thead th:first-child, .table tbody td:first-child{width:28px}
+
+    /* RELATÓRIO (PRINT) */
+    .report-wrap{max-width:1000px;margin:0 auto}
+    .report-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .report-meta{color:#6c757d;font-size:.9rem}
+    .report-table{width:100%;border-collapse:collapse}
+    .report-table th,.report-table td{border-bottom:1px solid #e6e6e6;padding:8px 6px;text-align:left;font-size:.95rem}
+    .print-bar{display:flex;justify-content:flex-end;gap:8px;margin-bottom:8px}
+
+    @media print{
+      body{background:#fff}
+      aside, .sidebar-toggle, .toolbar, .filter-group, .chipbar, .print-bar, .modal-overlay{display:none !important}
+      .container{padding:0}
+      .card{box-shadow:none; border: none}
+      .report-table th,.report-table td{border-color:#ccc}
+      .nav, header{text-align:left}
+    }
   </style>
 </head>
 <body>
@@ -136,6 +160,7 @@
         <button data-view="add">➕ Adicionar Concorrente</button>
         <button data-view="edit">✏️ Editar / Excluir</button>
         <button data-view="io">⤴️⤵️ Importar / Exportar</button>
+        <button data-view="report">🖨️ Relatório (Imprimir)</button>
       </nav>
       <p class="sidebar-note" style="margin-top:18px">Atualizado em <span id="last-updated-side"></span></p>
     </aside>
@@ -168,7 +193,7 @@
             </div>
 
             <div class="search">
-              <input id="search-input" type="text" placeholder="Buscar por nome ou cidade..." />
+              <input id="search-input" type="text" placeholder="Buscar por nome, cidade ou tag..." />
             </div>
 
             <div class="sort">
@@ -182,29 +207,10 @@
             </div>
           </div>
 
+          <div id="tag-chipbar" class="chipbar" aria-label="Filtrar por Tags"></div>
+
           <main id="competitors-grid">
-            <!-- === CARDS ORIGINAIS (só para 1ª migração; depois o JS renderiza tudo) === -->
-            <!-- Colei todos os seus <article> originais aqui, iguais ao seu arquivo anterior -->
-            <article class="competitor-card" data-category="potes-copos embalagens-industriais" data-threat="alta" data-name="Soluplex Brasil" data-location="São Paulo - SP" data-focus="Solução completa para fast-food." data-analysis="Agressivos no marketing para franquias, oferecem um mix completo de produtos que atrai grandes redes. Ponto fraco pode ser a menor flexibilidade para clientes menores." data-website="https://www.soluplex.com.br/" data-instagram="https://www.instagram.com/soluplex.brasil/"><div class="card-header"><span class="threat-level threat-high"></span><h3>Soluplex Brasil</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>São Paulo - SP</span></div><p class="card-analysis-preview">Agressivos no marketing para franquias, oferecem um mix completo de produtos que atrai grandes redes...</p></div></article>
-            <article class="competitor-card" data-category="potes-copos caixas-sorvete" data-threat="alta" data-name="Soller Embalagens" data-location="Biguaçu - SC" data-focus="Especialista em potes de açaí e sorvetes." data-analysis="Concorrente 'espelho' direto no nicho principal da Nicopel. A comunicação visual é forte e focada na qualidade. A disputa é direta por preço, qualidade de impressão e agilidade na entrega." data-website="https://www.sollerembalagens.com.br/" data-instagram="https://www.instagram.com/sollerembalagens/"><div class="card-header"><span class="threat-level threat-high"></span><h3>Soller Embalagens</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>Biguaçu - SC</span></div><p class="card-analysis-preview">Concorrente 'espelho' direto no nicho principal da Nicopel. A comunicação visual é forte e focada na qualidade...</p></div></article>
-            <article class="competitor-card" data-category="potes-copos" data-threat="alta" data-name="BoxBe" data-location="São Paulo - SP" data-focus="Foco absoluto em copos de papel." data-analysis="Ameaça forte para clientes que buscam especificamente por copos na internet, com marketing digital muito agressivo para captura de leads online." data-website="https://boxbe.com.br/" data-instagram="https://www.instagram.com/boxbeembalagens/"><div class="card-header"><span class="threat-level threat-high"></span><h3>BoxBe</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>São Paulo - SP</span></div><p class="card-analysis-preview">Ameaça forte para clientes que buscam especificamente por copos na internet, com marketing digital muito agressivo...</p></div></article>
-            <article class="competitor-card" data-category="potes-copos" data-threat="alta" data-name="Brazil Copos" data-location="São Paulo - SP" data-focus="Copos, potes e baldes de papel biodegradável." data-analysis="Focados em produtos de papel biodegradável e personalização, são concorrentes diretos no nicho de potes e copos, com forte apelo à sustentabilidade." data-website="https://brazilcopos.com.br/" data-instagram="https://www.instagram.com/brazilcopos/"><div class="card-header"><span class="threat-level threat-high"></span><h3>Brazil Copos</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>São Paulo - SP</span></div><p class="card-analysis-preview">Focados em produtos de papel biodegradável e personalização, são concorrentes diretos...</p></div></article>
-            <article class="competitor-card" data-category="potes-copos" data-threat="alta" data-name="Natucopos" data-location="Brasil" data-focus="Potes, copos e tampas para delivery." data-analysis="Forte presença no segmento de delivery com um portfólio completo de embalagens de papel, incluindo tampas, o que pode ser um diferencial para clientes de food service." data-website="https://natucopos.com.br/" data-instagram="https://www.instagram.com/natucopos/"><div class="card-header"><span class="threat-level threat-high"></span><h3>Natucopos</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>Brasil</span></div><p class="card-analysis-preview">Forte presença no segmento de delivery...</p></div></article>
-            <article class="competitor-card" data-category="potes-copos" data-threat="alta" data-name="Apolo Embalagens" data-location="Maringá - PR" data-focus="Potes premium, potes e copos de papel." data-analysis="Concorrente regional importante (Maringá-PR). O foco em 'potes premium' pode ser um diferencial a ser observado, visando um mercado de maior valor agregado." data-website="https://www.apoloembalagens.com.br/" data-instagram="https://www.instagram.com/apoloembalagens/"><div class="card-header"><span class="threat-level threat-high"></span><h3>Apolo Embalagens</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>Maringá - PR</span></div><p class="card-analysis-preview">Concorrente regional importante...</p></div></article>
-            <article class="competitor-card" data-category="potes-copos" data-threat="alta" data-name="MX Copos & Potes" data-location="Brasil" data-focus="Fabricante de Copos e Potes Biodegradáveis." data-analysis="Concorrente direto e forte, pois são fabricantes de potes e copos biodegradáveis. O foco total neste segmento os torna uma ameaça alta e relevante." data-website="https://www.mxcopos.com.br/" data-instagram="https://www.instagram.com/mxcoposepotes/"><div class="card-header"><span class="threat-level threat-high"></span><h3>MX Copos & Potes</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>Brasil</span></div><p class="card-analysis-preview">Concorrente direto e forte...</p></div></article>
-            <article class="competitor-card" data-category="potes-copos" data-threat="alta" data-name="Pixpel" data-location="Itupeva - SP" data-focus="Embalagens sustentáveis, potes e copos." data-analysis="Posicionam a embalagem como 'a sua melhor mídia'. Foco forte em personalização e sustentabilidade, concorrendo diretamente no segmento de potes e copos de papel." data-website="https://www.pixpel.com.br/" data-instagram="https://www.instagram.com/pixpel/"><div class="card-header"><span class="threat-level threat-high"></span><h3>Pixpel</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>Itupeva - SP</span></div><p class="card-analysis-preview">Posicionam a embalagem como 'a sua melhor mídia'...</p></div></article>
-            <article class="competitor-card" data-category="caixas-sorvete embalagens-industriais" data-threat="media" data-name="Nazapack" data-location="Jaraguá do Sul - SC" data-focus="Caixas de papel-cartão com foco em design." data-analysis="Competem forte em projetos que exigem alto apelo visual. Ameaça para clientes que veem a embalagem como principal ferramenta de marketing no ponto de venda." data-website="https://nazapack.com.br/" data-instagram="https://www.instagram.com/nazapack/?hl=en"><div class="card-header"><span class="threat-level threat-medium"></span><h3>Nazapack</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>Jaraguá do Sul - SC</span></div><p class="card-analysis-preview">Competem forte em projetos que exigem alto apelo visual...</p></div></article>
-            <article class="competitor-card" data-category="potes-copos" data-threat="media" data-name="Papello Embalagens" data-location="Caxias do Sul - RS" data-focus="Copos, potes e baldes de papel." data-analysis="Competem diretamente na linha de produtos. A distância pode ser um fator que a Nicopel pode explorar, oferecendo fretes mais competitivos e prazos de entrega menores." data-website="https://www.papello.com.br/" data-instagram="https://www.instagram.com/papelloembalagens/"><div class="card-header"><span class="threat-level threat-medium"></span><h3>Papello Embalagens</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>Caxias do Sul - RS</span></div><p class="card-analysis-preview">Competem diretamente na linha de produtos...</p></div></article>
-            <article class="competitor-card" data-category="caixas-sorvete embalagens-industriais caixas-pizza" data-threat="media" data-name="Gráfica Tambosi" data-location="Blumenau - SC" data-focus="Gráfica industrial para grandes volumes." data-analysis="Ameaça para grandes volumes devido à alta capacidade produtiva, podendo oferecer preços competitivos. Menos ágil para pedidos menores e nichados." data-website="https://graficatambosi.com.br/embalagens" data-instagram="https://www.instagram.com/graficatambosi/"><div class="card-header"><span class="threat-level threat-medium"></span><h3>Gráfica Tambosi</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>Blumenau - SC</span></div><p class="card-analysis-preview">Ameaça para grandes volumes...</p></div></article>
-            <article class="competitor-card" data-category="potes-copos" data-threat="media" data-name="Biopapers" data-location="Brasil" data-focus="Copos e potes biodegradáveis." data-analysis="Posicionamento forte em sustentabilidade com produtos biodegradáveis e recicláveis. Apelo para clientes com foco em marketing verde e consciência ambiental." data-website="https://biopapers.com.br/" data-instagram="https://www.instagram.com/biopapers/"><div class="card-header"><span class="threat-level threat-medium"></span><h3>Biopapers</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>Brasil</span></div><p class="card-analysis-preview">Posicionamento forte em sustentabilidade...</p></div></article>
-            <article class="competitor-card" data-category="potes-copos caixas-sorvete" data-threat="media" data-name="Castagna" data-location="Brasil" data-focus="Copos de papel e potes térmicos." data-analysis="O foco em potes térmicos os torna um concorrente direto para o mercado de sorvetes e açaí, oferecendo uma solução especializada para produtos que exigem isolamento térmico." data-website="https://www.castagna.com.br/" data-instagram="https://www.instagram.com/castagnaembalagens/"><div class="card-header"><span class="threat-level threat-medium"></span><h3>Castagna</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>Brasil</span></div><p class="card-analysis-preview">O foco em potes térmicos...</p></div></article>
-            <article class="competitor-card" data-category="potes-copos" data-threat="media" data-name="BelloCopo" data-location="Brasil" data-focus="Descartáveis de papel e plástico." data-analysis="Atuam tanto em papel quanto em plástico, o que pode diluir o foco, mas possuem grande escala de produção, podendo ser competitivos em preço para grandes volumes." data-website="https://www.bellocopo.com.br/" data-instagram="https://www.instagram.com/bellocopo/"><div class="card-header"><span class="threat-level threat-medium"></span><h3>BelloCopo</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>Brasil</span></div><p class="card-analysis-preview">Atuam tanto em papel quanto em plástico...</p></div></article>
-            <article class="competitor-card" data-category="embalagens-industriais caixas-pizza" data-threat="media" data-name="MultiCaixasNet" data-location="Atibaia - SP" data-focus="Maior e-commerce de embalagens do Brasil." data-analysis="Grande variedade de produtos para food service e delivery. Competem em escala e variedade, sendo uma ameaça para clientes que buscam uma solução única para diversas necessidades." data-website="https://www.multicaixasnet.com.br/" data-instagram="https://www.instagram.com/multicaixasnet/"><div class="card-header"><span class="threat-level threat-medium"></span><h3>MultiCaixasNet</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>Atibaia - SP</span></div><p class="card-analysis-preview">Grande variedade de produtos...</p></div></article>
-            <article class="competitor-card" data-category="embalagens-industriais" data-threat="media" data-name="Perpacks" data-location="Brasil" data-focus="Embalagens para comida, caixas e delivery." data-analysis="Foco em embalagens para delivery e food service em geral. Oferecem personalização e se posicionam como fabricantes, o que pode indicar preços competitivos." data-website="https://www.perpacks.com.br/" data-instagram="https://www.instagram.com/perpacks/"><div class="card-header"><span class="threat-level threat-medium"></span><h3>Perpacks</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>Brasil</span></div><p class="card-analysis-preview">Foco em embalagens para delivery...</p></div></article>
-            <article class="competitor-card" data-category="potes-copos embalagens-industriais" data-threat="media" data-name="Copack" data-location="Centro-Oeste" data-focus="Embalagens personalizadas e biodegradáveis de papel." data-analysis="Com visão de ser referência no Centro-Oeste, oferecem uma gama completa de embalagens de papel (copos, potes, bandejas). Concorrente regional importante." data-website="https://embalagens.copack.com.br/" data-instagram="https://www.instagram.com/copackembalagens/"><div class="card-header"><span class="threat-level threat-medium"></span><h3>Copack</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>Centro-Oeste</span></div><p class="card-analysis-preview">Com visão de ser referência no Centro-Oeste...</p></div></article>
-            <article class="competitor-card" data-category="potes-copos embalagens-industriais" data-threat="media" data-name="Ecofoodpack" data-location="Brasil" data-focus="Embalagens para alimentos, linha Kraft." data-analysis="Foco em embalagens para alimentos com destaque para a linha Kraft. Apelo visual rústico e sustentável. Competem em potes, copos e embalagens para delivery." data-website="https://www.ecofoodpack.com.br/" data-instagram="https://www.instagram.com/ecofoodpack/"><div class="card-header"><span class="threat-level threat-medium"></span><h3>Ecofoodpack</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>Brasil</span></div><p class="card-analysis-preview">Foco em embalagens para alimentos...</p></div></article>
-            <article class="competitor-card" data-category="caixas-pizza embalagens-industriais" data-threat="baixa" data-name="DCX Embalagens" data-location="São Paulo - SP" data-focus="Caixas de papelão para e-commerce e delivery." data-analysis="Competem no segmento de caixas de papelão para transporte e delivery. Ameaça indireta ao core business, mas direta para caixas de pizza mais simples." data-website="https://www.dcxembalagens.com.br/" data-instagram="https://www.instagram.com/dcxembalagens/"><div class="card-header"><span class="threat-level threat-low"></span><h3>DCX Embalagens</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>São Paulo - SP</span></div><p class="card-analysis-preview">Competem no segmento de caixas de papelão...</p></div></article>
-            <article class="competitor-card" data-category="" data-threat="baixa" data-name="Altacoppo" data-location="Brasil" data-focus="Potes e tampas de plástico/PP." data-analysis="Concorrente indireto, pois o foco é em plástico (PP). Podem competir por clientes que não têm preferência por papel ou buscam custos menores." data-website="https://www.altacoppo.com.br/" data-instagram="https://www.instagram.com/altacoppo/"><div class="card-header"><span class="threat-level threat-low"></span><h3>Altacoppo</h3></div><div class="card-body"><div class="info-item"><svg><use href="#icon-location"/></svg><span>Brasil</span></div><p class="card-analysis-preview">Concorrente indireto, pois o foco é em plástico...</p></div></article>
+            <!-- os cards iniciais do HTML são migrados automaticamente para o storage (1ª execução) -->
           </main>
 
           <footer style="text-align:center;margin-top:16px;color:var(--secondary-color)">
@@ -253,12 +259,12 @@
       <!-- EDIT VIEW -->
       <section id="view-edit" style="display:none">
         <div class="container">
-          <header><h1>Editar / Excluir</h1><p>Atualize os dados dos concorrentes. Os “originais” podem ser arquivados.</p></header>
+          <header><h1>Editar / Excluir</h1><p>Atualize os dados dos concorrentes. Selecione vários para ações em lote.</p></header>
 
           <div class="card" style="margin-bottom:14px">
             <div class="form-grid">
-              <div class="col-8"><input id="edit-search" type="text" placeholder="Buscar por nome/cidade..." /></div>
-              <div class="col-4">
+              <div class="col-6"><input id="edit-search" type="text" placeholder="Buscar por nome/cidade/tag..." /></div>
+              <div class="col-3">
                 <select id="edit-sort">
                   <option value="az">Nome (A–Z)</option>
                   <option value="za">Nome (Z–A)</option>
@@ -266,13 +272,23 @@
                   <option value="ameaca">Nível de ameaça</option>
                 </select>
               </div>
+              <div class="col-3" style="display:flex; gap:8px; justify-content:flex-end">
+                <button id="bulk-archive" class="btn">Arquivar</button>
+                <button id="bulk-unarchive" class="btn">Desarquivar</button>
+                <button id="bulk-delete" class="btn btn-danger">Excluir</button>
+              </div>
             </div>
+          </div>
+
+          <div class="card" style="margin-bottom:14px">
+            <button id="btn-sanitize" class="btn">Atualizar links/Regiões</button>
+            <p class="help">Normaliza links do Instagram e padroniza “Cidade - UF” (UF em maiúsculas). Use quando importar dados ou para corrigir rapidamente.</p>
           </div>
 
           <div class="card">
             <table class="table" id="edit-table">
               <thead>
-                <tr><th>Nome</th><th>Cidade</th><th>Ameaça</th><th>Categoria</th><th>Status</th><th style="width:180px">Ações</th></tr>
+                <tr><th></th><th>Nome</th><th>Cidade</th><th>Ameaça</th><th>Categoria</th><th>Status</th><th style="width:210px">Ações</th></tr>
               </thead>
               <tbody></tbody>
             </table>
@@ -305,7 +321,7 @@
                 <button type="button" id="e-delete" class="btn btn-danger">Excluir</button>
                 <button type="submit" class="btn btn-primary">Salvar Alterações</button>
               </div>
-              <p class="help">“Arquivar” apenas oculta dos grids sem apagar do histórico (útil para itens originais). “Excluir” remove definitivamente.</p>
+              <p class="help">“Arquivar” oculta dos grids sem apagar do histórico (útil para itens originais). “Excluir” remove definitivamente.</p>
             </form>
           </div>
         </div>
@@ -314,7 +330,7 @@
       <!-- IMPORT/EXPORT VIEW -->
       <section id="view-io" style="display:none">
         <div class="container">
-          <header><h1>Importar / Exportar</h1><p>Faça backup dos concorrentes ou importe um JSON.</p></header>
+          <header><h1>Importar / Exportar</h1><p>Faça backup dos concorrentes ou importe um JSON. Também dá pra atualizar em massa por Nome.</p></header>
 
           <div class="card" style="margin-bottom:14px">
             <div class="form-grid">
@@ -324,12 +340,69 @@
                 <button id="btn-import" class="btn btn-primary">Importar JSON</button>
               </div>
             </div>
-            <p class="help">O formato é uma lista de objetos com os campos do formulário (inclui id, builtIn e archived).</p>
+            <p class="help">Formato: lista de objetos com os campos do formulário (inclui id, builtIn, archived).</p>
+          </div>
+
+          <div class="card" style="margin-bottom:14px">
+            <h3 style="margin:0 0 8px">Atualização Rápida (colar JSON mapeando “name”)</h3>
+            <textarea id="bulk-update" placeholder='Ex.: [{"name":"Soller Embalagens","instagram":"https://instagram.com/sollerembalagens/","location":"Biguaçu - SC"}]' style="width:100%; min-height:140px"></textarea>
+            <div class="form-actions">
+              <button id="btn-apply-bulk" class="btn btn-primary">Aplicar Atualizações</button>
+            </div>
           </div>
 
           <div class="card">
             <h3 style="margin:0 0 8px">Preview do JSON (somente leitura)</h3>
             <textarea id="io-preview" style="width:100%; min-height:260px" readonly></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- REPORT/PRINT VIEW -->
+      <section id="view-report" style="display:none">
+        <div class="container report-wrap">
+          <div class="print-bar">
+            <button id="btn-print" class="btn btn-primary">Imprimir PDF</button>
+          </div>
+          <div class="card">
+            <div class="report-header">
+              <h1 style="margin:0">Relatório de Concorrência</h1>
+              <div class="report-meta">
+                <div>Gerado em <span id="report-date"></span></div>
+                <div>Filtros: <span id="report-filters"></span></div>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin:10px 0">
+              <select id="report-category">
+                <option value="todos">Todas Categorias</option>
+                <option value="potes-copos">Potes e Copos</option>
+                <option value="caixas-sorvete">Caixas de Sorvete</option>
+                <option value="caixas-pizza">Caixas de Pizza</option>
+                <option value="embalagens-industriais">Embalagens Industriais</option>
+              </select>
+              <select id="report-threat">
+                <option value="todos">Todos</option>
+                <option value="direto">Diretos (Alta)</option>
+                <option value="indireto">Indiretos (Média/Baixa)</option>
+              </select>
+              <input id="report-search" type="text" placeholder="Buscar por nome/cidade/tag..." style="flex:1" />
+            </div>
+
+            <div style="display:flex; gap:16px; flex-wrap:wrap; margin:6px 0 14px">
+              <div><strong>Total:</strong> <span id="rep-count">0</span></div>
+              <div><strong>Diretos (Alta):</strong> <span id="rep-count-alta">0</span></div>
+              <div><strong>Indiretos (M/B):</strong> <span id="rep-count-ind">0</span></div>
+            </div>
+
+            <table class="report-table" id="report-table">
+              <thead>
+                <tr>
+                  <th>Nome</th><th>Cidade</th><th>Ameaça</th><th>Categoria</th><th>Instagram</th><th>Website</th><th>Tags</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
           </div>
         </div>
       </section>
