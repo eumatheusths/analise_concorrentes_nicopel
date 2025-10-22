@@ -1,39 +1,39 @@
 // ===== CONFIGURAÇÕES E CONSTANTES =====
 const CONFIG = {
-    STORAGE_KEY: 'nicopel_concorrentes_v4',
+    STORAGE_KEY: 'nicopel_concorrentes_v5',
     THREAT_ORDER: { alta: 0, media: 1, baixa: 2 },
     INITIAL_DATA: [
         {
             id: '1',
             name: 'Soluplex Brasil',
-            location: 'Cajamar - SP',
+            location: 'São Paulo - SP',
             threat: 'alta',
             category: 'potes-copos',
-            website: '',
+            website: 'https://www.soluplex.com.br/',
             instagram: 'https://www.instagram.com/soluplex.brasil/',
             phone: '',
             cnpj: '',
-            tags: 'plástico,injetora,embalagens',
+            tags: 'plástico,injetora,embalagens,fast-food',
             ticket: '',
-            focus: 'Embalagens plásticas',
-            analysis: 'Concorrente direto com capacidade produtiva similar à Nicopel. Foco em potes e copos plásticos.',
+            focus: 'Solução completa para fast-food',
+            analysis: 'Agressivos no marketing para franquias, oferecem um mix completo de produtos que atrai grandes redes. Ponto fraco pode ser a menor flexibilidade para clientes menores.',
             builtIn: true,
             archived: false
         },
         {
             id: '2',
             name: 'Soller Embalagens',
-            location: 'Morro da Fumaça - SC',
+            location: 'Biguaçu - SC',
             threat: 'alta',
             category: 'potes-copos',
-            website: '',
+            website: 'https://www.sollerembalagens.com.br/',
             instagram: 'https://www.instagram.com/sollerembalagens/',
             phone: '',
             cnpj: '',
-            tags: 'plástico,termoformagem,copos',
+            tags: 'plástico,termoformagem,copos,açaí,sorvete',
             ticket: '',
-            focus: 'Potes e copos plásticos',
-            analysis: 'Forte atuação na região sul com preços competitivos.',
+            focus: 'Especialista em potes de açaí e sorvetes',
+            analysis: 'Concorrente espelho direto no nicho principal da Nicopel. A comunicação visual é forte e focada na qualidade. A disputa é direta por preço, qualidade de impressão e agilidade na entrega.',
             builtIn: true,
             archived: false
         },
@@ -41,50 +41,305 @@ const CONFIG = {
             id: '3',
             name: 'BoxBe',
             location: 'São Paulo - SP',
-            threat: 'media',
-            category: 'caixas-sorvete',
-            website: '',
-            instagram: 'https://www.instagram.com/boxbeecoembalagens/',
+            threat: 'alta',
+            category: 'potes-copos',
+            website: 'https://boxbe.com.br/',
+            instagram: 'https://www.instagram.com/boxbeembalagens/',
             phone: '',
             cnpj: '',
-            tags: 'papelão,sustentável,eco',
+            tags: 'copos,papel,e-commerce,marketing-digital',
             ticket: '',
-            focus: 'Embalagens sustentáveis',
-            analysis: 'Diferencial ecológico, preço competitivo no segmento de embalagens paper.',
+            focus: 'Foco absoluto em copos de papel',
+            analysis: 'Ameaça forte para clientes que buscam especificamente por copos na internet, com marketing digital muito agressivo para captura de leads online.',
             builtIn: true,
             archived: false
         },
         {
             id: '4',
-            name: 'Nazapack',
+            name: 'Brazil Copos',
             location: 'São Paulo - SP',
-            threat: 'media',
-            category: 'embalagens-industriais',
-            website: '',
-            instagram: 'https://www.instagram.com/nazapack/',
+            threat: 'alta',
+            category: 'potes-copos',
+            website: 'https://brazilcopos.com.br/',
+            instagram: 'https://www.instagram.com/brazilcopos/',
             phone: '',
             cnpj: '',
-            tags: 'industrial,plástico,logística',
+            tags: 'biodegradável,papel,sustentável,personalização',
             ticket: '',
-            focus: 'Embalagens industriais',
-            analysis: 'Atua no segmento industrial com foco em grandes volumes.',
+            focus: 'Copos, potes e baldes de papel biodegradável',
+            analysis: 'Focados em produtos de papel biodegradável e personalização, são concorrentes diretos no nicho de potes e copos, com forte apelo à sustentabilidade.',
             builtIn: true,
             archived: false
         },
         {
             id: '5',
-            name: 'Gráfica Tambosi',
-            location: 'Taió - SC',
-            threat: 'baixa',
-            category: 'caixas-pizza',
-            website: '',
-            instagram: 'https://www.instagram.com/tambosiindustriagrafica/',
+            name: 'Natucopos',
+            location: 'Brasil',
+            threat: 'alta',
+            category: 'potes-copos',
+            website: 'https://natucopos.com.br/',
+            instagram: 'https://www.instagram.com/natucopos/',
             phone: '',
             cnpj: '',
-            tags: 'papelão,pizza,gráfica',
+            tags: 'delivery,tampas,papel,embalagens',
             ticket: '',
-            focus: 'Caixas de pizza personalizadas',
-            analysis: 'Concorrente regional com foco em personalização.',
+            focus: 'Potes, copos e tampas para delivery',
+            analysis: 'Forte presença no segmento de delivery com um portfólio completo de embalagens de papel, incluindo tampas, o que pode ser um diferencial para clientes de food service.',
+            builtIn: true,
+            archived: false
+        },
+        {
+            id: '6',
+            name: 'Apolo Embalagens',
+            location: 'Maringá - PR',
+            threat: 'alta',
+            category: 'potes-copos',
+            website: 'https://www.apoloembalagens.com.br/',
+            instagram: 'https://www.instagram.com/apoloembalagens/',
+            phone: '',
+            cnpj: '',
+            tags: 'premium,copos,potes,regional',
+            ticket: '',
+            focus: 'Potes premium, potes e copos de papel',
+            analysis: 'Concorrente regional importante (Maringá-PR). O foco em potes premium pode ser um diferencial a ser observado, visando um mercado de maior valor agregado.',
+            builtIn: true,
+            archived: false
+        },
+        {
+            id: '7',
+            name: 'MX Copos & Potes',
+            location: 'Brasil',
+            threat: 'alta',
+            category: 'potes-copos',
+            website: 'https://www.mxcopos.com.br/',
+            instagram: 'https://www.instagram.com/mxcoposepotes/',
+            phone: '',
+            cnpj: '',
+            tags: 'biodegradável,fabricante,direto',
+            ticket: '',
+            focus: 'Fabricante de Copos e Potes Biodegradáveis',
+            analysis: 'Concorrente direto e forte, pois são fabricantes de potes e copos biodegradáveis. O foco total neste segmento os torna uma ameaça alta e relevante.',
+            builtIn: true,
+            archived: false
+        },
+        {
+            id: '8',
+            name: 'Pixpel',
+            location: 'Itupeva - SP',
+            threat: 'alta',
+            category: 'potes-copos',
+            website: 'https://www.pixpel.com.br/',
+            instagram: 'https://www.instagram.com/pixpel/',
+            phone: '',
+            cnpj: '',
+            tags: 'sustentável,personalização,midia',
+            ticket: '',
+            focus: 'Embalagens sustentáveis, potes e copos',
+            analysis: 'Posicionam a embalagem como sua melhor mídia. Foco forte em personalização e sustentabilidade, concorrendo diretamente no segmento de potes e copos de papel.',
+            builtIn: true,
+            archived: false
+        },
+        {
+            id: '9',
+            name: 'Nazapack',
+            location: 'Jaraguá do Sul - SC',
+            threat: 'media',
+            category: 'caixas-sorvete',
+            website: 'https://nazapack.com.br/',
+            instagram: 'https://www.instagram.com/nazapack/?hl=en',
+            phone: '',
+            cnpj: '',
+            tags: 'design,papel-cartão,visual,e-commerce',
+            ticket: '',
+            focus: 'Caixas de papel-cartão com foco em design',
+            analysis: 'Competem forte em projetos que exigem alto apelo visual. Ameaça para clientes que veem a embalagem como principal ferramenta de marketing no ponto de venda.',
+            builtIn: true,
+            archived: false
+        },
+        {
+            id: '10',
+            name: 'Papello Embalagens',
+            location: 'Caxias do Sul - RS',
+            threat: 'media',
+            category: 'potes-copos',
+            website: 'https://www.papello.com.br/',
+            instagram: 'https://www.instagram.com/papelloembalagens/',
+            phone: '',
+            cnpj: '',
+            tags: 'copos,potes,baldes,regional',
+            ticket: '',
+            focus: 'Copos, potes e baldes de papel',
+            analysis: 'Competem diretamente na linha de produtos. A distância pode ser um fator que a Nicopel pode explorar, oferecendo fretes mais competitivos e prazos de entrega menores.',
+            builtIn: true,
+            archived: false
+        },
+        {
+            id: '11',
+            name: 'Gráfica Tambosi',
+            location: 'Blumenau - SC',
+            threat: 'media',
+            category: 'caixas-sorvete',
+            website: 'https://graficatambosi.com.br/embalagens',
+            instagram: 'https://www.instagram.com/graficatambosi/',
+            phone: '',
+            cnpj: '',
+            tags: 'gráfica,industrial,volumes,e-commerce',
+            ticket: '',
+            focus: 'Gráfica industrial para grandes volumes',
+            analysis: 'Ameaça para grandes volumes devido à alta capacidade produtiva, podendo oferecer preços competitivos. Menos ágil para pedidos menores e nichados.',
+            builtIn: true,
+            archived: false
+        },
+        {
+            id: '12',
+            name: 'Biopapers',
+            location: 'Brasil',
+            threat: 'media',
+            category: 'potes-copos',
+            website: 'https://biopapers.com.br/',
+            instagram: 'https://www.instagram.com/biopapers/',
+            phone: '',
+            cnpj: '',
+            tags: 'biodegradável,reciclável,sustentável',
+            ticket: '',
+            focus: 'Copos e potes biodegradáveis',
+            analysis: 'Posicionamento forte em sustentabilidade com produtos biodegradáveis e recicláveis. Apelo para clientes com foco em marketing verde e consciência ambiental.',
+            builtIn: true,
+            archived: false
+        },
+        {
+            id: '13',
+            name: 'Castagna',
+            location: 'Brasil',
+            threat: 'media',
+            category: 'potes-copos',
+            website: 'https://www.castagna.com.br/',
+            instagram: 'https://www.instagram.com/castagnaembalagens/',
+            phone: '',
+            cnpj: '',
+            tags: 'térmico,sorvete,açaí,especializado',
+            ticket: '',
+            focus: 'Copos de papel e potes térmicos',
+            analysis: 'O foco em potes térmicos os torna um concorrente direto para o mercado de sorvetes e açaí, oferecendo uma solução especializada para produtos que exigem isolamento térmico.',
+            builtIn: true,
+            archived: false
+        },
+        {
+            id: '14',
+            name: 'BelloCopo',
+            location: 'Brasil',
+            threat: 'media',
+            category: 'potes-copos',
+            website: 'https://www.bellocopo.com.br/',
+            instagram: 'https://www.instagram.com/bellocopo/',
+            phone: '',
+            cnpj: '',
+            tags: 'plástico,papel,descartáveis,escala',
+            ticket: '',
+            focus: 'Descartáveis de papel e plástico',
+            analysis: 'Atuam tanto em papel quanto em plástico, o que pode diluir o foco, mas possuem grande escala de produção, podendo ser competitivos em preço para grandes volumes.',
+            builtIn: true,
+            archived: false
+        },
+        {
+            id: '15',
+            name: 'MultiCaixasNet',
+            location: 'Atibaia - SP',
+            threat: 'media',
+            category: 'embalagens-industriais',
+            website: 'https://www.multicaixasnet.com.br/',
+            instagram: 'https://www.instagram.com/multicaixasnet/',
+            phone: '',
+            cnpj: '',
+            tags: 'e-commerce,variedade,food-service,delivery',
+            ticket: '',
+            focus: 'Maior e-commerce de embalagens do Brasil',
+            analysis: 'Grande variedade de produtos para food service e delivery. Competem em escala e variedade, sendo uma ameaça para clientes que buscam uma solução única para diversas necessidades.',
+            builtIn: true,
+            archived: false
+        },
+        {
+            id: '16',
+            name: 'Perpacks',
+            location: 'Brasil',
+            threat: 'media',
+            category: 'embalagens-industriais',
+            website: 'https://www.perpacks.com.br/',
+            instagram: 'https://www.instagram.com/perpacks/',
+            phone: '',
+            cnpj: '',
+            tags: 'delivery,food-service,personalização,fabricante',
+            ticket: '',
+            focus: 'Embalagens para comida, caixas e delivery',
+            analysis: 'Foco em embalagens para delivery e food service em geral. Oferecem personalização e se posicionam como fabricantes, o que pode indicar preços competitivos.',
+            builtIn: true,
+            archived: false
+        },
+        {
+            id: '17',
+            name: 'Copack',
+            location: 'Centro-Oeste',
+            threat: 'media',
+            category: 'potes-copos',
+            website: 'https://embalagens.copack.com.br/',
+            instagram: 'https://www.instagram.com/copackembalagens/',
+            phone: '',
+            cnpj: '',
+            tags: 'personalizado,biodegradável,regional,centro-oeste',
+            ticket: '',
+            focus: 'Embalagens personalizadas e biodegradáveis de papel',
+            analysis: 'Com visão de ser referência no Centro-Oeste, oferecem uma gama completa de embalagens de papel (copos, potes, bandejas). Concorrente regional importante.',
+            builtIn: true,
+            archived: false
+        },
+        {
+            id: '18',
+            name: 'Ecofoodpack',
+            location: 'Brasil',
+            threat: 'media',
+            category: 'potes-copos',
+            website: 'https://www.ecofoodpack.com.br/',
+            instagram: 'https://www.instagram.com/ecofoodpack/',
+            phone: '',
+            cnpj: '',
+            tags: 'kraft,rústico,sustentável,delivery',
+            ticket: '',
+            focus: 'Embalagens para alimentos, linha Kraft',
+            analysis: 'Foco em embalagens para alimentos com destaque para a linha Kraft. Apelo visual rústico e sustentável. Competem em potes, copos e embalagens para delivery.',
+            builtIn: true,
+            archived: false
+        },
+        {
+            id: '19',
+            name: 'DCX Embalagens',
+            location: 'São Paulo - SP',
+            threat: 'baixa',
+            category: 'caixas-pizza',
+            website: 'https://www.dcxembalagens.com.br/',
+            instagram: 'https://www.instagram.com/dcxembalagens/',
+            phone: '',
+            cnpj: '',
+            tags: 'papelão,transporte,delivery,e-commerce',
+            ticket: '',
+            focus: 'Caixas de papelão para e-commerce e delivery',
+            analysis: 'Competem no segmento de caixas de papelão para transporte e delivery. Ameaça indireta ao core business, mas direta para caixas de pizza mais simples.',
+            builtIn: true,
+            archived: false
+        },
+        {
+            id: '20',
+            name: 'Altacoppo',
+            location: 'Brasil',
+            threat: 'baixa',
+            category: 'potes-copos',
+            website: 'https://www.altacoppo.com.br/',
+            instagram: 'https://www.instagram.com/altacoppo/',
+            phone: '',
+            cnpj: '',
+            tags: 'plástico,pp,custo,indireto',
+            ticket: '',
+            focus: 'Potes e tampas de plástico/PP',
+            analysis: 'Concorrente indireto, pois o foco é em plástico (PP). Podem competir por clientes que não têm preferência por papel ou buscam custos menores.',
             builtIn: true,
             archived: false
         }
@@ -97,6 +352,7 @@ class Utils {
     static $$(sel, el = document) { return Array.from(el.querySelectorAll(sel)); }
     static uid() { return Math.random().toString(36).slice(2, 10); }
     static nl(s) { return (s || '').trim(); }
+    
     static showNotification(message, type = 'success') {
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
@@ -106,6 +362,18 @@ class Utils {
         `;
         document.body.appendChild(notification);
         setTimeout(() => notification.remove(), 4000);
+    }
+
+    static downloadFile(content, filename, type = 'text/plain') {
+        const blob = new Blob([content], { type });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 }
 
@@ -131,13 +399,11 @@ class StateManager {
 
     loadData() {
         try {
-            // Tenta carregar dados existentes
             const existing = localStorage.getItem(CONFIG.STORAGE_KEY);
             if (existing) {
                 return JSON.parse(existing);
             }
             
-            // Se não existir, usa dados iniciais
             console.log('Criando dados iniciais...');
             this.saveData(CONFIG.INITIAL_DATA);
             return CONFIG.INITIAL_DATA;
@@ -317,12 +583,18 @@ class UIManager {
         Utils.$('#bulk-delete').addEventListener('click', () => this.handleBulkDelete());
 
         // Import/Export
-        Utils.$('#btn-export').addEventListener('click', () => this.exportData());
-        Utils.$('#btn-import').addEventListener('click', () => this.importData());
+        Utils.$('#btn-export-json').addEventListener('click', () => this.exportJSON());
+        Utils.$('#btn-export-csv').addEventListener('click', () => this.exportCSV());
+        Utils.$('#btn-export-excel').addEventListener('click', () => this.exportExcel());
+        
+        Utils.$('#file-import-json').addEventListener('change', (e) => this.importJSON(e));
+        Utils.$('#file-import-csv').addEventListener('change', (e) => this.importCSV(e));
+        Utils.$('#file-import-excel').addEventListener('change', (e) => this.importExcel(e));
 
         // Relatórios
         Utils.$('#report-refresh').addEventListener('click', () => this.buildReport());
         Utils.$('#report-print').addEventListener('click', () => window.print());
+        Utils.$('#report-export').addEventListener('click', () => this.exportReport());
         Utils.$('#report-cat').addEventListener('change', () => this.buildReport());
         Utils.$('#report-threat').addEventListener('change', () => this.buildReport());
         Utils.$('#report-sort').addEventListener('change', () => this.buildReport());
@@ -352,11 +624,9 @@ class UIManager {
     }
 
     setView(view) {
-        // Atualiza botões de navegação
         Utils.$$('#app-nav [data-view]').forEach(btn => btn.classList.remove('active'));
         Utils.$(`#app-nav [data-view="${view}"]`).classList.add('active');
 
-        // Mostra a view correspondente
         const views = {
             dashboard: Utils.$('#view-dashboard'),
             add: Utils.$('#view-add'),
@@ -818,38 +1088,93 @@ class UIManager {
         }
     }
 
-    exportData() {
-        const blob = new Blob([JSON.stringify(this.state.data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-
-        a.href = url;
-        a.download = `concorrentes_nicopel_${new Date().toISOString().slice(0, 10)}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        Utils.showNotification('Dados exportados com sucesso!');
+    exportJSON() {
+        const data = {
+            version: '1.0',
+            exportDate: new Date().toISOString(),
+            count: this.state.data.length,
+            data: this.state.data
+        };
+        
+        Utils.downloadFile(
+            JSON.stringify(data, null, 2),
+            `concorrentes_nicopel_${new Date().toISOString().slice(0, 10)}.json`,
+            'application/json'
+        );
+        Utils.showNotification('Dados exportados em JSON com sucesso!');
     }
 
-    importData() {
-        const fileInput = Utils.$('#file-import');
-        const file = fileInput.files[0];
+    exportCSV() {
+        const headers = ['Nome', 'Cidade', 'Ameaça', 'Categoria', 'Website', 'Instagram', 'Telefone', 'CNPJ', 'Tags', 'Ticket', 'Foco', 'Análise'];
+        
+        const csvContent = [
+            headers.join(','),
+            ...this.state.data.map(competitor => [
+                `"${(competitor.name || '').replace(/"/g, '""')}"`,
+                `"${(competitor.location || '').replace(/"/g, '""')}"`,
+                `"${(competitor.threat || '').replace(/"/g, '""')}"`,
+                `"${(competitor.category || '').replace(/"/g, '""')}"`,
+                `"${(competitor.website || '').replace(/"/g, '""')}"`,
+                `"${(competitor.instagram || '').replace(/"/g, '""')}"`,
+                `"${(competitor.phone || '').replace(/"/g, '""')}"`,
+                `"${(competitor.cnpj || '').replace(/"/g, '""')}"`,
+                `"${(competitor.tags || '').replace(/"/g, '""')}"`,
+                `"${(competitor.ticket || '').replace(/"/g, '""')}"`,
+                `"${(competitor.focus || '').replace(/"/g, '""')}"`,
+                `"${(competitor.analysis || '').replace(/"/g, '""')}"`
+            ].join(','))
+        ].join('\n');
 
-        if (!file) {
-            Utils.showNotification('Selecione um arquivo JSON para importar.', 'error');
-            return;
+        Utils.downloadFile(
+            '\uFEFF' + csvContent, // BOM para Excel
+            `concorrentes_nicopel_${new Date().toISOString().slice(0, 10)}.csv`,
+            'text/csv;charset=utf-8;'
+        );
+        Utils.showNotification('Dados exportados em CSV com sucesso!');
+    }
+
+    exportExcel() {
+        try {
+            const ws = XLSX.utils.json_to_sheet(this.state.data.map(competitor => ({
+                'Nome': competitor.name,
+                'Cidade/UF': competitor.location,
+                'Nível de Ameaça': competitor.threat,
+                'Categoria': competitor.category,
+                'Website': competitor.website,
+                'Instagram': competitor.instagram,
+                'Telefone': competitor.phone,
+                'CNPJ': competitor.cnpj,
+                'Tags': competitor.tags,
+                'Ticket Médio (R$)': competitor.ticket,
+                'Foco de Atuação': competitor.focus,
+                'Análise Estratégica': competitor.analysis,
+                'Status': competitor.archived ? 'Arquivado' : 'Ativo'
+            })));
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Concorrentes');
+            
+            XLSX.writeFile(wb, `concorrentes_nicopel_${new Date().toISOString().slice(0, 10)}.xlsx`);
+            Utils.showNotification('Dados exportados em Excel com sucesso!');
+        } catch (error) {
+            console.error('Erro ao exportar Excel:', error);
+            Utils.showNotification('Erro ao exportar Excel', 'error');
         }
+    }
+
+    importJSON(e) {
+        const file = e.target.files[0];
+        if (!file) return;
 
         const reader = new FileReader();
         reader.onload = (e) => {
             try {
                 const parsed = JSON.parse(e.target.result);
-                if (!Array.isArray(parsed)) throw new Error('Formato inválido');
+                const data = parsed.data || parsed;
+                
+                if (!Array.isArray(data)) throw new Error('Formato inválido');
 
-                // Limpa e valida os dados
-                const cleaned = parsed.map(item => ({
+                const cleaned = data.map(item => ({
                     id: item.id || Utils.uid(),
                     name: Utils.nl(item.name),
                     location: Utils.nl(item.location),
@@ -870,19 +1195,120 @@ class UIManager {
                 this.state.data = cleaned;
                 this.state.saveData(this.state.data);
 
-                Utils.showNotification('Importação concluída com sucesso!');
+                Utils.showNotification('Importação JSON concluída com sucesso!');
                 this.refreshIOPreview();
                 this.renderDashboard();
                 this.renderEditTable();
 
-                // Limpa o input de arquivo
-                fileInput.value = '';
-
+                e.target.value = '';
             } catch (err) {
-                Utils.showNotification('Falha ao importar: ' + err.message, 'error');
+                Utils.showNotification('Falha ao importar JSON: ' + err.message, 'error');
             }
         };
         reader.readAsText(file, 'utf-8');
+    }
+
+    importCSV(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const csv = e.target.result;
+                const lines = csv.split('\n').filter(line => line.trim());
+                const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+                
+                const competitors = [];
+                for (let i = 1; i < lines.length; i++) {
+                    const values = lines[i].split(',').map(v => v.replace(/^"|"$/g, '').trim());
+                    const competitor = {};
+                    
+                    headers.forEach((header, index) => {
+                        competitor[header.toLowerCase()] = values[index] || '';
+                    });
+
+                    if (competitor.nome && competitor.cidade) {
+                        competitors.push({
+                            id: Utils.uid(),
+                            name: competitor.nome,
+                            location: competitor.cidade,
+                            threat: competitor.ameaça || competitor['nível de ameaça'] || 'media',
+                            category: competitor.categoria || 'potes-copos',
+                            website: competitor.website || '',
+                            instagram: competitor.instagram || '',
+                            phone: competitor.telefone || '',
+                            cnpj: competitor.cnpj || '',
+                            tags: competitor.tags || '',
+                            ticket: competitor.ticket || competitor['ticket médio'] || '',
+                            focus: competitor.foco || competitor['foco de atuação'] || '',
+                            analysis: competitor.análise || competitor['análise estratégica'] || '',
+                            builtIn: false,
+                            archived: false
+                        });
+                    }
+                }
+
+                this.state.data = [...this.state.data, ...competitors];
+                this.state.saveData(this.state.data);
+
+                Utils.showNotification('Importação CSV concluída com sucesso!');
+                this.refreshIOPreview();
+                this.renderDashboard();
+                this.renderEditTable();
+
+                e.target.value = '';
+            } catch (err) {
+                Utils.showNotification('Falha ao importar CSV: ' + err.message, 'error');
+            }
+        };
+        reader.readAsText(file, 'utf-8');
+    }
+
+    importExcel(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                const competitors = jsonData.map(row => ({
+                    id: Utils.uid(),
+                    name: row['Nome'] || '',
+                    location: row['Cidade/UF'] || row['Cidade'] || '',
+                    threat: row['Nível de Ameaça'] || row['Ameaça'] || 'media',
+                    category: row['Categoria'] || 'potes-copos',
+                    website: row['Website'] || '',
+                    instagram: row['Instagram'] || '',
+                    phone: row['Telefone'] || '',
+                    cnpj: row['CNPJ'] || '',
+                    tags: row['Tags'] || '',
+                    ticket: row['Ticket Médio (R$)'] || row['Ticket'] || '',
+                    focus: row['Foco de Atuação'] || row['Foco'] || '',
+                    analysis: row['Análise Estratégica'] || row['Análise'] || '',
+                    builtIn: false,
+                    archived: false
+                })).filter(comp => comp.name && comp.location);
+
+                this.state.data = [...this.state.data, ...competitors];
+                this.state.saveData(this.state.data);
+
+                Utils.showNotification('Importação Excel concluída com sucesso!');
+                this.refreshIOPreview();
+                this.renderDashboard();
+                this.renderEditTable();
+
+                e.target.value = '';
+            } catch (err) {
+                Utils.showNotification('Falha ao importar Excel: ' + err.message, 'error');
+            }
+        };
+        reader.readAsArrayBuffer(file);
     }
 
     // ===== RELATÓRIOS =====
@@ -940,6 +1366,10 @@ class UIManager {
                 </tr>
             `).join('') || `<tr><td colspan="7" style="color:var(--text-muted)">Sem resultados.</td></tr>`;
         }
+    }
+
+    exportReport() {
+        this.exportExcel();
     }
 }
 
