@@ -1,933 +1,687 @@
-// ===== CONFIGURAÇÕES E CONSTANTES =====
-const CONFIG = {
-    STORAGE_KEY: 'nicopel_concorrentes_v3',
-    THREAT_ORDER: { alta: 0, media: 1, baixa: 2 },
-    KNOWN_PATCH: {
-        'Soluplex Brasil': { instagram: 'https://www.instagram.com/soluplex.brasil/', location: 'Cajamar - SP' },
-        'Soller Embalagens': { instagram: 'https://www.instagram.com/sollerembalagens/', location: 'Morro da Fumaça - SC' },
-        'BoxBe': { instagram: 'https://www.instagram.com/boxbeecoembalagens/' },
-        'Nazapack': { instagram: 'https://www.instagram.com/nazapack/', location: 'São Paulo - SP' },
-        'Gráfica Tambosi': { instagram: 'https://www.instagram.com/tambosiindustriagrafica/', location: 'Taió - SC' },
-        'Biopapers': { instagram: 'https://www.instagram.com/biopapersbrasil/' },
-        'Castagna': { instagram: 'https://www.instagram.com/castagna_comercio/', location: 'Canoas - RS' },
-        'BelloCopo': { instagram: 'https://www.instagram.com/bellocopo/' },
-        'MultiCaixasNet': { instagram: 'https://www.instagram.com/multicaixasnet/', location: 'Atibaia - SP' },
-        'Perpacks': { instagram: 'https://www.instagram.com/perpacksembalagens/' },
-        'Pixpel': { instagram: 'https://www.instagram.com/pixpel_sustentavel/', location: 'Itupeva - SP' },
-        'DCX Embalagens': { location: 'Carapicuíba - SP' },
-        'Altacoppo': { location: 'Carapicuíba - SP' },
-        'Brazil Copos': { instagram: 'https://www.instagram.com/brazilcopos/' },
-        'Natucopos': { instagram: 'https://www.instagram.com/natucopos/' },
-        'Apolo Embalagens': { instagram: 'https://www.instagram.com/apoloembalagens/' },
-        'MX Copos & Potes': { instagram: 'https://www.instagram.com/mxcopos/' },
-        'Copack': { instagram: 'https://www.instagram.com/copackembalagens/' },
-        'Ecofoodpack': { instagram: 'https://www.instagram.com/ecofoodpack/' },
-    }
+// Constantes e configurações
+const MAPEAMENTO_DE_COLUNAS = {
+    origem_geral: 'Onde nos encontrou?',
+    origem_crm: 'Origem',
+    status_qualificado: 'Qualificado',
+    status_venda: 'Venda fechada?',
+    valor: 'Valor do pedido',
+    segmento: 'Seguimento',
+    delegado: 'Delegado para',
+    motivo_nao: 'Motivo caso (NÂO)'
 };
 
-// ===== UTILITÁRIOS =====
-class Utils {
-    static $(sel, el = document) { return el.querySelector(sel); }
-    static $$(sel, el = document) { return Array.from(el.querySelectorAll(sel)); }
-    static uid() { return Math.random().toString(36).slice(2, 10); }
-    static nl(s) { return (s || '').trim(); }
-    static showNotification(message, type = 'success') {
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.innerHTML = `
-            <span>${message}</span>
-            <button onclick="this.parentElement.remove()">&times;</button>
-        `;
-        document.body.appendChild(notification);
-        setTimeout(() => notification.remove(), 4000);
-    }
-    
-    static extractDomain(url) {
-        if (!url) return null;
-        try {
-            // Remove protocol and www, then extract domain
-            const domain = url.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0];
-            return domain;
-        } catch {
-            return null;
-        }
-    }
-    
-    static formatCurrency(value) {
-        if (!value) return '—';
-        return `R$ ${parseFloat(value).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-    }
-}
-
-// ===== GERENCIAMENTO DE ESTADO =====
-class StateManager {
-    constructor() {
-        this.data = [];
-        this.filters = {
-            category: 'todos',
-            threat: 'todos',
-            search: '',
-            tag: '',
-            sort: 'az'
-        };
-        this.init();
-    }
-
-    init() {
-        this.data = this.migrateFromOldIfNeeded();
-        this.updateDates();
-    }
-
-    readStore() {
-        try {
-            const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
-            return raw ? JSON.parse(raw) : null;
-        } catch {
-            return null;
-        }
-    }
-
-    writeStore(list) {
-        localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(list));
-    }
-
-    migrateFromOldIfNeeded() {
-        let data = this.readStore();
-        if (data) return data;
-
-        // Tenta migrar da v2
-        let v2 = null;
-        try {
-            v2 = JSON.parse(localStorage.getItem('nicopel_concorrentes_v2') || 'null');
-        } catch { }
-
-        if (Array.isArray(v2) && v2.length) {
-            v2 = v2.map(o => {
-                const fix = CONFIG.KNOWN_PATCH[o.name];
-                if (o.builtIn && fix) {
-                    return {
-                        ...o,
-                        instagram: fix.instagram || o.instagram,
-                        location: fix.location || o.location
-                    };
-                }
-                return o;
-            });
-            this.writeStore(v2);
-            return v2;
-        }
-
-        // Migra do HTML estático
-        const seed = Utils.$$('#competitors-grid .competitor-card').map(card => {
-            const name = Utils.nl(card.dataset.name);
-            const fix = CONFIG.KNOWN_PATCH[name] || {};
-            return {
-                id: Utils.uid(),
-                name,
-                location: fix.location || Utils.nl(card.dataset.location),
-                threat: Utils.nl(card.dataset.threat) || 'media',
-                category: Utils.nl(card.dataset.category),
-                website: Utils.nl(card.dataset.website),
-                instagram: fix.instagram || Utils.nl(card.dataset.instagram),
-                phone: '', cnpj: '', tags: '', ticket: '',
-                focus: Utils.nl(card.dataset.focus),
-                analysis: Utils.nl(card.dataset.analysis),
-                builtIn: true, archived: false,
-            };
-        });
-        this.writeStore(seed);
-        return seed;
-    }
-
-    updateDates() {
-        const today = new Date();
-        const fmt = today.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
-        Utils.$('#last-updated').textContent = fmt;
-        Utils.$('#last-updated-side').textContent = fmt;
-    }
-
-    addCompetitor(competitor) {
-        this.data.unshift(competitor);
-        this.writeStore(this.data);
-    }
-
-    updateCompetitor(id, updates) {
-        const index = this.data.findIndex(x => x.id === id);
-        if (index !== -1) {
-            this.data[index] = { ...this.data[index], ...updates };
-            this.writeStore(this.data);
-            return true;
-        }
-        return false;
-    }
-
-    deleteCompetitor(id) {
-        const index = this.data.findIndex(x => x.id === id);
-        if (index !== -1) {
-            this.data.splice(index, 1);
-            this.writeStore(this.data);
-            return true;
-        }
-        return false;
-    }
-
-    toggleArchive(id) {
-        const index = this.data.findIndex(x => x.id === id);
-        if (index !== -1) {
-            this.data[index].archived = !this.data[index].archived;
-            this.writeStore(this.data);
-            return true;
-        }
-        return false;
-    }
-
-    getFilteredData() {
-        let filtered = this.data.filter(d => !d.archived);
-
-        // Filtro por categoria
-        if (this.filters.category !== 'todos') {
-            filtered = filtered.filter(d => d.category === this.filters.category);
-        }
-
-        // Filtro por ameaça
-        if (this.filters.threat === 'direto') {
-            filtered = filtered.filter(d => d.threat === 'alta');
-        } else if (this.filters.threat === 'indireto') {
-            filtered = filtered.filter(d => d.threat === 'media' || d.threat === 'baixa');
-        }
-
-        // Filtro por busca
-        if (this.filters.search) {
-            const q = this.filters.search.toLowerCase();
-            filtered = filtered.filter(d =>
-                (d.name || '').toLowerCase().includes(q) ||
-                (d.location || '').toLowerCase().includes(q)
-            );
-        }
-
-        // Filtro por tag
-        if (this.filters.tag) {
-            const tg = this.filters.tag.toLowerCase();
-            filtered = filtered.filter(d =>
-                (d.tags || '').toLowerCase().split(',').map(s => Utils.nl(s)).includes(tg)
-            );
-        }
-
-        // Ordenação
-        switch (this.filters.sort) {
-            case 'az':
-                filtered.sort((a, b) => a.name.localeCompare(b.name));
-                break;
-            case 'za':
-                filtered.sort((a, b) => b.name.localeCompare(a.name));
-                break;
-            case 'cidade':
-                filtered.sort((a, b) => (a.location || '').localeCompare(b.location || ''));
-                break;
-            case 'ameaca':
-                filtered.sort((a, b) =>
-                    (CONFIG.THREAT_ORDER[a.threat] ?? 9) - (CONFIG.THREAT_ORDER[b.threat] ?? 9)
-                );
-                break;
-        }
-
-        return filtered;
-    }
-}
-
-// ===== GERENCIAMENTO DE INTERFACE =====
-class UIManager {
-    constructor(stateManager) {
-        this.state = stateManager;
-        this.modal = Utils.$('#competitor-modal');
-        this.init();
-    }
-
-    init() {
-        this.setupEventListeners();
-        this.renderDashboard();
-    }
-
-    setupEventListeners() {
-        // Navegação
-        Utils.$('#app-nav').addEventListener('click', (e) => this.handleNavigation(e));
-        Utils.$('#sidebarToggle').addEventListener('click', () => this.toggleSidebar());
-
-        // Filtros do Dashboard
-        Utils.$('#category-nav').addEventListener('click', (e) => this.handleCategoryFilter(e));
-        Utils.$('#threat-nav').addEventListener('click', (e) => this.handleThreatFilter(e));
-        Utils.$('#search-input').addEventListener('input', (e) => this.handleSearch(e));
-        Utils.$('#sort-select').addEventListener('change', (e) => this.handleSort(e));
-
-        // Modal
-        Utils.$('#modal-close-btn').addEventListener('click', () => this.closeModal());
-        this.modal.addEventListener('click', (e) => {
-            if (e.target === this.modal) this.closeModal();
-        });
-        document.addEventListener('keydown', (e) => this.handleKeyboard(e));
-
-        // Formulários
-        Utils.$('#add-form').addEventListener('submit', (e) => this.handleAddSubmit(e));
-        Utils.$('#edit-form').addEventListener('submit', (e) => this.handleEditSubmit(e));
-
-        // Ações de edição
-        Utils.$('#edit-table tbody').addEventListener('click', (e) => this.handleTableActions(e));
-        Utils.$('#edit-search').addEventListener('input', () => this.renderEditTable());
-        Utils.$('#edit-sort').addEventListener('change', () => this.renderEditTable());
-
-        // Ações em lote
-        Utils.$('#bulk-all').addEventListener('change', (e) => this.toggleBulkSelectAll(e));
-        Utils.$('#bulk-archive').addEventListener('click', () => this.handleBulkArchive());
-        Utils.$('#bulk-unarchive').addEventListener('click', () => this.handleBulkUnarchive());
-        Utils.$('#bulk-delete').addEventListener('click', () => this.handleBulkDelete());
-
-        // Import/Export
-        Utils.$('#btn-export').addEventListener('click', () => this.exportData());
-        Utils.$('#btn-import').addEventListener('click', () => this.importData());
-
-        // Relatórios
-        Utils.$('#report-refresh').addEventListener('click', () => this.buildReport());
-        Utils.$('#report-print').addEventListener('click', () => window.print());
-        Utils.$('#report-cat').addEventListener('change', () => this.buildReport());
-        Utils.$('#report-threat').addEventListener('change', () => this.buildReport());
-        Utils.$('#report-sort').addEventListener('change', () => this.buildReport());
-    }
-
-    // ===== NAVEGAÇÃO E LAYOUT =====
-    handleNavigation(e) {
-        const button = e.target.closest('button[data-view]');
-        if (!button) return;
-
-        const view = button.dataset.view;
-        this.setView(view);
-    }
-
-    setView(view) {
-        // Atualiza botões de navegação
-        Utils.$$('#app-nav [data-view]').forEach(btn => btn.classList.remove('active'));
-        Utils.$(`#app-nav [data-view="${view}"]`).classList.add('active');
-
-        // Mostra a view correspondente
-        const views = {
-            dashboard: Utils.$('#view-dashboard'),
-            add: Utils.$('#view-add'),
-            edit: Utils.$('#view-edit'),
-            io: Utils.$('#view-io'),
-            report: Utils.$('#view-report')
-        };
-
-        Object.values(views).forEach(section => section.style.display = 'none');
-        views[view].style.display = 'block';
-
-        // Fecha sidebar no mobile
-        Utils.$('#sidebar').classList.remove('open');
-        Utils.$('#content').classList.remove('dim');
-
-        // Ações específicas por view
-        if (view === 'edit') this.renderEditTable();
-        if (view === 'report') this.buildReport();
-        if (view === 'io') this.refreshIOPreview();
-    }
-
-    toggleSidebar() {
-        const sidebar = Utils.$('#sidebar');
-        const content = Utils.$('#content');
-        const isOpen = !sidebar.classList.contains('open');
-
-        sidebar.classList.toggle('open', isOpen);
-        content.classList.toggle('dim', isOpen);
-    }
-
-    // ===== DASHBOARD =====
-    handleCategoryFilter(e) {
-        const button = e.target.closest('.tab-btn');
-        if (!button) return;
-
-        Utils.$('#category-nav .active').classList.remove('active');
-        button.classList.add('active');
-
-        this.state.filters.category = button.dataset.category;
-        this.state.filters.tag = '';
-        this.renderDashboard();
-    }
-
-    handleThreatFilter(e) {
-        const button = e.target.closest('.tab-btn');
-        if (!button) return;
-
-        Utils.$('#threat-nav .active').classList.remove('active');
-        button.classList.add('active');
-
-        this.state.filters.threat = button.dataset.threat;
-        this.state.filters.tag = '';
-        this.renderDashboard();
-    }
-
-    handleSearch(e) {
-        this.state.filters.search = e.target.value;
-        this.renderDashboard();
-    }
-
-    handleSort(e) {
-        this.state.filters.sort = e.target.value;
-        this.renderDashboard();
-    }
-
-    threatClass(level) {
-        return level === 'alta' ? 'threat-high' :
-            level === 'media' ? 'threat-medium' : 'threat-low';
-    }
-
-    threatText(level) {
-        const texts = {
-            'alta': 'Alta (Direto)',
-            'media': 'Média (Indireto)',
-            'baixa': 'Baixa (Indireto)'
-        };
-        return texts[level] || level;
-    }
-
-    tagsToChipsHTML(tags) {
-        const arr = Utils.nl(tags).split(',').map(s => Utils.nl(s)).filter(Boolean);
-        if (!arr.length) return '';
-
-        return `
-            <div class="tag-chips">
-                ${arr.map(t => `<span class="chip" data-chip="${t}">${t}</span>`).join('')}
-            </div>
-        `;
-    }
-
-    cardHTML(competitor) {
-        const preview = (competitor.analysis || competitor.focus || '').trim();
-        const truncatedPreview = preview && preview.length > 140 ?
-            preview.slice(0, 140) + '...' : preview;
-
-        return `
-            <article class="competitor-card" data-id="${competitor.id}" 
-                     data-category="${competitor.category}" data-threat="${competitor.threat}">
-                <div class="card-header">
-                    <span class="threat-level ${this.threatClass(competitor.threat)}"></span>
-                    <h3>${competitor.name}</h3>
-                </div>
-                <div class="card-body">
-                    <div class="info-item">
-                        <svg><use href="#icon-location"/></svg>
-                        <span>${competitor.location || '—'}</span>
-                    </div>
-                    ${truncatedPreview ? `<p class="card-analysis-preview">${truncatedPreview}</p>` : ''}
-                    ${this.tagsToChipsHTML(competitor.tags)}
-                </div>
-            </article>
-        `;
-    }
-
-    renderDashboard() {
-        const grid = Utils.$('#competitors-grid');
-        const filteredData = this.state.getFilteredData();
-
-        grid.innerHTML = filteredData.map(competitor => this.cardHTML(competitor)).join('');
-
-        // Adiciona event listener para chips de tags
-        grid.addEventListener('click', (e) => {
-            const chip = e.target.closest('.chip');
-            if (chip) {
-                this.state.filters.tag = chip.dataset.chip || '';
-                this.renderDashboard();
-            }
-        });
-    }
-
-    // ===== MODAL - NOVO DESIGN =====
-    openModal(id) {
-        const competitor = this.state.data.find(x => x.id === id);
-        if (!competitor) return;
-
-        // Header do modal
-        Utils.$('#modal-header-content').innerHTML = `
-            <span class="threat-level ${this.threatClass(competitor.threat)}"></span>
-            <h3 style="margin:0">${competitor.name}</h3>
-        `;
-
-        // Informações básicas
-        Utils.$('#modal-location').textContent = competitor.location || '—';
-        Utils.$('#modal-focus').textContent = competitor.focus || '—';
-        Utils.$('#modal-category').textContent = competitor.category || '—';
-        Utils.$('#modal-threat').textContent = this.threatText(competitor.threat);
-
-        // Análise estratégica
-        Utils.$('#modal-analysis').textContent = competitor.analysis || '—';
-        Utils.$('#modal-tags').innerHTML = this.tagsToChipsHTML(competitor.tags);
-
-        // Links básicos
-        const basicLinksContainer = Utils.$('#modal-basic-links');
-        basicLinksContainer.innerHTML = '';
-        
-        if (competitor.website) {
-            basicLinksContainer.innerHTML += `
-                <a href="${competitor.website}" target="_blank" rel="noopener" class="basic-link">
-                    <svg><use href="#icon-website"/></svg>Website
-                </a>
-            `;
-        }
-        
-        if (competitor.instagram) {
-            basicLinksContainer.innerHTML += `
-                <a href="${competitor.instagram}" target="_blank" rel="noopener" class="basic-link">
-                    <svg><use href="#icon-instagram"/></svg>Instagram
-                </a>
-            `;
-        }
-        
-        if (!competitor.website && !competitor.instagram) {
-            basicLinksContainer.innerHTML = '<span style="color:var(--text-muted)">Sem links cadastrados</span>';
-        }
-
-        // Botões de análise de marketing
-        const domain = Utils.extractDomain(competitor.website);
-        
-        // Meta Ads
-        Utils.$('#meta-ads-btn').href = `https://www.facebook.com/ads/library/?q=${encodeURIComponent(competitor.name)}`;
-        
-        // Google Ads
-        Utils.$('#google-ads-btn').href = `https://adstransparency.google.com/?q=${encodeURIComponent(competitor.name)}`;
-        
-        // Google Search
-        Utils.$('#google-search-btn').href = `https://www.google.com/search?q=${encodeURIComponent(competitor.name + ' embalagens')}`;
-        
-        // SimilarWeb
-        if (domain) {
-            Utils.$('#traffic-analysis-btn').href = `https://similarweb.com/website/${domain}`;
-            Utils.$('#traffic-analysis-btn').style.display = 'flex';
-        } else {
-            Utils.$('#traffic-analysis-btn').style.display = 'none';
-        }
-
-        // Informações adicionais
-        Utils.$('#modal-phone').textContent = competitor.phone || '—';
-        Utils.$('#modal-cnpj').textContent = competitor.cnpj || '—';
-        Utils.$('#modal-ticket').textContent = Utils.formatCurrency(competitor.ticket);
-
-        // Mostra o modal
-        this.modal.classList.add('active');
-        this.modal.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-
-        // Foco no modal para acessibilidade
-        const focusable = this.modal.querySelectorAll('a[href], button');
-        if (focusable.length > 0) {
-            focusable[0].focus();
-        }
-    }
-
-    closeModal() {
-        this.modal.classList.remove('active');
-        this.modal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-    }
-
-    handleKeyboard(e) {
-        if (e.key === 'Escape' && this.modal.classList.contains('active')) {
-            this.closeModal();
-        }
-    }
-
-    // ===== FORMULÁRIOS =====
-    handleAddSubmit(e) {
-        e.preventDefault();
-
-        const formData = {
-            id: Utils.uid(),
-            name: Utils.nl(Utils.$('#f-name').value),
-            location: Utils.nl(Utils.$('#f-city').value),
-            threat: Utils.$('#f-threat').value,
-            category: Utils.$('#f-category').value,
-            website: Utils.nl(Utils.$('#f-website').value),
-            instagram: Utils.nl(Utils.$('#f-instagram').value),
-            phone: Utils.nl(Utils.$('#f-phone').value),
-            cnpj: Utils.nl(Utils.$('#f-cnpj').value),
-            tags: Utils.nl(Utils.$('#f-tags').value),
-            ticket: Utils.nl(Utils.$('#f-ticket').value),
-            focus: Utils.nl(Utils.$('#f-focus').value),
-            analysis: Utils.nl(Utils.$('#f-analysis').value),
-            builtIn: false,
-            archived: false
-        };
-
-        // Validação
-        if (!formData.name || !formData.location || !formData.threat || !formData.category) {
-            Utils.showNotification('Preencha Nome, Cidade/UF, Nível de Ameaça e Categoria.', 'error');
-            return;
-        }
-
-        this.state.addCompetitor(formData);
-        Utils.$('#add-form').reset();
-        Utils.showNotification('Concorrente adicionado com sucesso!');
-        this.setView('dashboard');
-        this.renderDashboard();
-    }
-
-    // ===== EDIÇÃO =====
-    renderEditTable() {
-        const tbody = Utils.$('#edit-table tbody');
-        const searchTerm = (Utils.$('#edit-search').value || '').toLowerCase();
-        const sortMode = Utils.$('#edit-sort').value;
-
-        let filteredData = this.state.data.filter(competitor =>
-            (competitor.name || '').toLowerCase().includes(searchTerm) ||
-            (competitor.location || '').toLowerCase().includes(searchTerm)
-        );
-
-        // Ordenação
-        switch (sortMode) {
-            case 'az':
-                filteredData.sort((a, b) => a.name.localeCompare(b.name));
-                break;
-            case 'za':
-                filteredData.sort((a, b) => b.name.localeCompare(a.name));
-                break;
-            case 'cidade':
-                filteredData.sort((a, b) => (a.location || '').localeCompare(b.location || ''));
-                break;
-            case 'ameaca':
-                filteredData.sort((a, b) =>
-                    (CONFIG.THREAT_ORDER[a.threat] ?? 9) - (CONFIG.THREAT_ORDER[b.threat] ?? 9)
-                );
-                break;
-        }
-
-        tbody.innerHTML = filteredData.map(competitor => `
-            <tr data-id="${competitor.id}">
-                <td><input type="checkbox" class="row-check" /></td>
-                <td>${competitor.name}</td>
-                <td>${competitor.location || '—'}</td>
-                <td>${competitor.threat}</td>
-                <td>${competitor.category}</td>
-                <td>${competitor.archived ? 'Arquivado' : (competitor.builtIn ? 'Original' : 'Custom')}</td>
-                <td>
-                    <div class="table-actions">
-                        <button class="btn" data-action="load">Editar</button>
-                        <button class="btn" data-action="toggle-archive">
-                            ${competitor.archived ? 'Desarquivar' : 'Arquivar'}
-                        </button>
-                        <button class="btn btn-danger" data-action="delete">Excluir</button>
-                    </div>
-                </td>
-            </tr>
-        `).join('') || `<tr><td colspan="7" style="color:var(--text-muted)">Nenhum item encontrado.</td></tr>`;
-
-        Utils.$('#bulk-all').checked = false;
-    }
-
-    handleTableActions(e) {
-        const button = e.target.closest('button[data-action]');
-        if (!button) return;
-
-        const row = e.target.closest('tr');
-        const id = row.dataset.id;
-        const action = button.dataset.action;
-
-        switch (action) {
-            case 'load':
-                this.loadCompetitorIntoForm(id);
-                break;
-            case 'toggle-archive':
-                this.state.toggleArchive(id);
-                this.renderEditTable();
-                this.renderDashboard();
-                Utils.showNotification('Status alterado com sucesso!');
-                break;
-            case 'delete':
-                if (confirm('Tem certeza que deseja excluir definitivamente?')) {
-                    this.state.deleteCompetitor(id);
-                    this.renderEditTable();
-                    this.renderDashboard();
-                    Utils.showNotification('Concorrente excluído!');
-                    // Se estava editando este item, limpa o form
-                    if (Utils.$('#e-id').value === id) {
-                        Utils.$('#edit-form').reset();
-                    }
-                }
-                break;
-        }
-    }
-
-    loadCompetitorIntoForm(id) {
-        const competitor = this.state.data.find(x => x.id === id);
-        if (!competitor) return;
-
-        // Preenche o formulário
-        Utils.$('#e-id').value = competitor.id;
-        Utils.$('#e-name').value = competitor.name;
-        Utils.$('#e-city').value = competitor.location || '';
-        Utils.$('#e-threat').value = competitor.threat;
-        Utils.$('#e-category').value = competitor.category || '';
-        Utils.$('#e-website').value = competitor.website || '';
-        Utils.$('#e-instagram').value = competitor.instagram || '';
-        Utils.$('#e-phone').value = competitor.phone || '';
-        Utils.$('#e-cnpj').value = competitor.cnpj || '';
-        Utils.$('#e-tags').value = competitor.tags || '';
-        Utils.$('#e-ticket').value = competitor.ticket || '';
-        Utils.$('#e-focus').value = competitor.focus || '';
-        Utils.$('#e-analysis').value = competitor.analysis || '';
-
-        Utils.$('#e-archive').textContent = competitor.archived ? 'Desarquivar' : 'Arquivar';
-        this.setView('edit');
-    }
-
-    handleEditSubmit(e) {
-        e.preventDefault();
-
-        const id = Utils.$('#e-id').value;
-        if (!id) return;
-
-        const updates = {
-            name: Utils.nl(Utils.$('#e-name').value),
-            location: Utils.nl(Utils.$('#e-city').value),
-            threat: Utils.$('#e-threat').value,
-            category: Utils.$('#e-category').value,
-            website: Utils.nl(Utils.$('#e-website').value),
-            instagram: Utils.nl(Utils.$('#e-instagram').value),
-            phone: Utils.nl(Utils.$('#e-phone').value),
-            cnpj: Utils.nl(Utils.$('#e-cnpj').value),
-            tags: Utils.nl(Utils.$('#e-tags').value),
-            ticket: Utils.nl(Utils.$('#e-ticket').value),
-            focus: Utils.nl(Utils.$('#e-focus').value),
-            analysis: Utils.nl(Utils.$('#e-analysis').value)
-        };
-
-        if (this.state.updateCompetitor(id, updates)) {
-            Utils.showNotification('Alterações salvas com sucesso!');
-            this.renderEditTable();
-            this.renderDashboard();
-        }
-    }
-
-    // ===== AÇÕES EM LOTE =====
-    getSelectedIds() {
-        return Utils.$$('.row-check', Utils.$('#edit-table tbody'))
-            .map(checkbox => checkbox.checked ? checkbox.closest('tr').dataset.id : null)
-            .filter(Boolean);
-    }
-
-    toggleBulkSelectAll(e) {
-        Utils.$$('.row-check', Utils.$('#edit-table tbody'))
-            .forEach(checkbox => checkbox.checked = e.target.checked);
-    }
-
-    handleBulkArchive() {
-        const ids = this.getSelectedIds();
-        if (!ids.length) {
-            Utils.showNotification('Selecione ao menos um item.', 'error');
-            return;
-        }
-
-        ids.forEach(id => {
-            const competitor = this.state.data.find(x => x.id === id);
-            if (competitor && !competitor.archived) {
-                competitor.archived = true;
-            }
-        });
-
-        this.state.writeStore(this.state.data);
-        this.renderEditTable();
-        this.renderDashboard();
-        Utils.showNotification(`${ids.length} item(ns) arquivado(s)!`);
-    }
-
-    handleBulkUnarchive() {
-        const ids = this.getSelectedIds();
-        if (!ids.length) {
-            Utils.showNotification('Selecione ao menos um item.', 'error');
-            return;
-        }
-
-        ids.forEach(id => {
-            const competitor = this.state.data.find(x => x.id === id);
-            if (competitor && competitor.archived) {
-                competitor.archived = false;
-            }
-        });
-
-        this.state.writeStore(this.state.data);
-        this.renderEditTable();
-        this.renderDashboard();
-        Utils.showNotification(`${ids.length} item(ns) desarquivado(s)!`);
-    }
-
-    handleBulkDelete() {
-        const ids = this.getSelectedIds();
-        if (!ids.length) {
-            Utils.showNotification('Selecione ao menos um item.', 'error');
-            return;
-        }
-
-        if (!confirm(`Excluir ${ids.length} item(ns) definitivamente?`)) return;
-
-        this.state.data = this.state.data.filter(competitor => !ids.includes(competitor.id));
-        this.state.writeStore(this.state.data);
-        this.renderEditTable();
-        this.renderDashboard();
-        Utils.showNotification(`${ids.length} item(ns) excluído(s)!`);
-    }
-
-    // ===== IMPORT/EXPORT =====
-    refreshIOPreview() {
-        Utils.$('#io-preview').value = JSON.stringify(this.state.data, null, 2);
-    }
-
-    exportData() {
-        const blob = new Blob([JSON.stringify(this.state.data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-
-        a.href = url;
-        a.download = `concorrentes_nicopel_${new Date().toISOString().slice(0, 10)}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        Utils.showNotification('Dados exportados com sucesso!');
-    }
-
-    importData() {
-        const fileInput = Utils.$('#file-import');
-        const file = fileInput.files[0];
-
-        if (!file) {
-            Utils.showNotification('Selecione um arquivo JSON para importar.', 'error');
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const parsed = JSON.parse(e.target.result);
-                if (!Array.isArray(parsed)) throw new Error('Formato inválido');
-
-                // Limpa e valida os dados
-                const cleaned = parsed.map(item => ({
-                    id: item.id || Utils.uid(),
-                    name: Utils.nl(item.name),
-                    location: Utils.nl(item.location),
-                    threat: item.threat || 'media',
-                    category: Utils.nl(item.category),
-                    website: Utils.nl(item.website),
-                    instagram: Utils.nl(item.instagram),
-                    phone: Utils.nl(item.phone),
-                    cnpj: Utils.nl(item.cnpj),
-                    tags: Utils.nl(item.tags),
-                    ticket: Utils.nl(item.ticket),
-                    focus: Utils.nl(item.focus),
-                    analysis: Utils.nl(item.analysis),
-                    builtIn: !!item.builtIn,
-                    archived: !!item.archived
-                }));
-
-                this.state.data = cleaned;
-                this.state.writeStore(this.state.data);
-
-                Utils.showNotification('Importação concluída com sucesso!');
-                this.refreshIOPreview();
-                this.renderDashboard();
-                this.renderEditTable();
-
-                // Limpa o input de arquivo
-                fileInput.value = '';
-
-            } catch (err) {
-                Utils.showNotification('Falha ao importar: ' + err.message, 'error');
-            }
-        };
-        reader.readAsText(file, 'utf-8');
-    }
-
-    // ===== RELATÓRIOS =====
-    buildReport() {
-        const reportDate = Utils.$('#report-date');
-        const tableBody = Utils.$('#report-table tbody');
-
-        if (reportDate) {
-            reportDate.textContent = new Date().toLocaleString('pt-BR');
-        }
-
-        const categoryFilter = Utils.$('#report-cat').value;
-        const threatFilter = Utils.$('#report-threat').value;
-        const sortMode = Utils.$('#report-sort').value;
-
-        let filteredData = this.state.data.filter(competitor => !competitor.archived);
-
-        // Aplica filtros
-        if (categoryFilter !== 'todos') {
-            filteredData = filteredData.filter(competitor => competitor.category === categoryFilter);
-        }
-
-        if (threatFilter !== 'todos') {
-            filteredData = filteredData.filter(competitor => competitor.threat === threatFilter);
-        }
-
-        // Aplica ordenação
-        switch (sortMode) {
-            case 'az':
-                filteredData.sort((a, b) => a.name.localeCompare(b.name));
-                break;
-            case 'cidade':
-                filteredData.sort((a, b) => (a.location || '').localeCompare(b.location || ''));
-                break;
-            case 'ameaca':
-                filteredData.sort((a, b) =>
-                    (CONFIG.THREAT_ORDER[a.threat] ?? 9) - (CONFIG.THREAT_ORDER[b.threat] ?? 9)
-                );
-                break;
-        }
-
-        tableBody.innerHTML = filteredData.map(competitor => `
-            <tr>
-                <td>${competitor.name}</td>
-                <td>${competitor.location || '—'}</td>
-                <td>${competitor.threat}</td>
-                <td>${competitor.category}</td>
-                <td>${competitor.focus || '—'}</td>
-                <td>
-                    ${competitor.instagram ? `<a href="${competitor.instagram}">Instagram</a>` : ''}
-                    ${competitor.website ? (competitor.instagram ? ' • ' : '') + `<a href="${competitor.website}">Site</a>` : ''}
-                </td>
-                <td>${Utils.nl(competitor.tags)}</td>
-            </tr>
-        `).join('') || `<tr><td colspan="7" style="color:var(--text-muted)">Sem resultados.</td></tr>`;
-    }
-}
-
-// ===== INICIALIZAÇÃO DA APLICAÇÃO =====
-class App {
-    constructor() {
-        this.stateManager = new StateManager();
-        this.uiManager = new UIManager(this.stateManager);
-        this.init();
-    }
-
-    init() {
-        console.log('🚀 Aplicação Nicopel Concorrência inicializada!');
-        
-        // Event listener global para abrir modal via cards
-        Utils.$('#competitors-grid').addEventListener('click', (e) => {
-            const card = e.target.closest('.competitor-card');
-            if (card) {
-                this.uiManager.openModal(card.dataset.id);
-            }
-        });
-
-        // Observador para atualizar preview de IO quando a view for aberta
-        new MutationObserver(() => {
-            if (Utils.$('#view-io').style.display !== 'none') {
-                this.uiManager.refreshIOPreview();
-            }
-        }).observe(Utils.$('#view-io'), { attributes: true, attributeFilter: ['style'] });
-    }
-}
-
-// Inicializa a aplicação quando o DOM estiver pronto
+const ORDEM_DOS_MESES = [
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+];
+
+const CORES_GRAFICOS = [
+    '#4F46E5', '#10B981', '#F59E0B', '#EF4444', '#3B82F6',
+    '#8B5CF6', '#EC4899', '#6EE7B7'
+];
+
+// Variáveis globais
+let fullData = [];
+let charts = {};
+let mesesOrdenados = [];
+
+// Inicialização
 document.addEventListener('DOMContentLoaded', () => {
-    new App();
+    fetchData();
 });
+
+// Função principal para buscar dados
+async function fetchData() {
+    try {
+        const response = await fetch('/api/getData');
+        
+        if (!response.ok) {
+            throw new Error(`Erro do servidor: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        fullData = processData(result.data);
+        
+        document.getElementById('loading-message').style.display = 'none';
+        document.getElementById('dashboard-body').style.display = 'block';
+        
+        initializeDashboard();
+    } catch (error) {
+        console.error("FALHA NA CONEXÃO:", error);
+        document.getElementById('loading-message').innerText = `Falha na conexão: ${error.message}`;
+    }
+}
+
+// Processamento dos dados brutos
+function processData(rawData) {
+    const processedData = [];
+    
+    rawData.forEach(sheet => {
+        if (!sheet.values || sheet.values.length <= 1) return;
+        
+        const sheetName = sheet.range.split('!')[0].replace(/'/g, '');
+        const headers = sheet.values[0];
+        const sheetRows = sheet.values.slice(1);
+        
+        // Cria índice das colunas
+        const colIndex = {};
+        for (const key in MAPEAMENTO_DE_COLUNAS) {
+            colIndex[key] = headers.indexOf(MAPEAMENTO_DE_COLUNAS[key]);
+        }
+        
+        // Processa cada linha
+        const rows = sheetRows.map(row => {
+            const status = determinarStatus(
+                row[colIndex.status_venda],
+                row[colIndex.status_qualificado]
+            );
+            
+            const valorNum = parseValorMonetario(row[colIndex.valor]);
+            
+            return {
+                mes: sheetName,
+                origem_geral: row[colIndex.origem_geral],
+                origem_crm: row[colIndex.origem_crm],
+                status: status,
+                valor: valorNum,
+                segmento: row[colIndex.segmento],
+                delegado: row[colIndex.delegado],
+                motivo_nao: row[colIndex.motivo_nao]
+            };
+        }).filter(r => r.origem_geral || r.segmento);
+        
+        processedData.push(...rows);
+    });
+    
+    return processedData;
+}
+
+// Determina o status do lead
+function determinarStatus(statusVenda, statusQualificado) {
+    if (statusVenda?.toUpperCase() === 'SIM') return 'Venda Fechada';
+    if (statusQualificado?.toUpperCase() === 'SIM') return 'Qualificado';
+    if (statusQualificado?.toUpperCase() === 'NÃO') return 'Desqualificado';
+    
+    return 'Em Negociação';
+}
+
+// Parse de valores monetários
+function parseValorMonetario(valorStr) {
+    if (!valorStr) return 0;
+    
+    const valorLimpo = valorStr
+        .replace('R$', '')
+        .replace(/\./g, '')
+        .replace(',', '.')
+        .trim();
+    
+    return parseFloat(valorLimpo) || 0;
+}
+
+// Inicialização do dashboard
+function initializeDashboard() {
+    setupEventListeners();
+    populateMonthFilter();
+    createCharts();
+    updateDashboard();
+}
+
+// Configuração dos event listeners
+function setupEventListeners() {
+    const mesFilter = document.getElementById('mes-filter');
+    const themeToggleButton = document.getElementById('theme-toggle');
+    const printButton = document.getElementById('print-button');
+    
+    mesFilter.addEventListener('change', updateDashboard);
+    
+    themeToggleButton.addEventListener('click', toggleTheme);
+    
+    printButton.addEventListener('click', () => {
+        const selectedMonth = mesFilter.value;
+        const currentData = (selectedMonth === 'todos') 
+            ? fullData 
+            : fullData.filter(lead => lead.mes === selectedMonth);
+        const selectedMonthText = mesFilter.options[mesFilter.selectedIndex].text;
+        
+        generateAndPrintReport(currentData, selectedMonthText);
+    });
+}
+
+// Preenchimento do filtro de meses
+function populateMonthFilter() {
+    const mesFilter = document.getElementById('mes-filter');
+    
+    mesesOrdenados = [...new Set(fullData.map(lead => lead.mes))]
+        .sort((a, b) => ORDEM_DOS_MESES.indexOf(a) - ORDEM_DOS_MESES.indexOf(b));
+    
+    mesesOrdenados.forEach(mes => {
+        mesFilter.innerHTML += `<option value="${mes}">${mes}</option>`;
+    });
+}
+
+// Alternância de tema
+function toggleTheme() {
+    const themeToggleButton = document.getElementById('theme-toggle');
+    const themeIcon = themeToggleButton.querySelector('i');
+    
+    document.documentElement.classList.toggle('dark-mode');
+    
+    const isDarkMode = document.documentElement.classList.contains('dark-mode');
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+    
+    themeIcon.classList.toggle('bi-moon-stars-fill', !isDarkMode);
+    themeIcon.classList.toggle('bi-sun-fill', isDarkMode);
+    
+    updateChartTheme();
+}
+
+// Atualização do dashboard
+function updateDashboard() {
+    const mesFilter = document.getElementById('mes-filter');
+    const selectedMonth = mesFilter.value;
+    
+    const currentData = (selectedMonth === 'todos') 
+        ? fullData 
+        : fullData.filter(lead => lead.mes === selectedMonth);
+    
+    const previousMonthData = getPreviousMonthData(selectedMonth);
+    
+    updateKPIs(currentData, previousMonthData);
+    updateChartTitles(selectedMonth);
+    updateChartData(currentData);
+    renderTopMotivos(currentData);
+    renderVendasDetalhadas(currentData); // NOVA FUNÇÃO
+}
+
+// Obtém dados do mês anterior para comparação
+function getPreviousMonthData(selectedMonth) {
+    if (selectedMonth === 'todos') return [];
+    
+    const previousMonthIndex = mesesOrdenados.indexOf(selectedMonth) - 1;
+    
+    if (previousMonthIndex < 0) return [];
+    
+    const previousMonth = mesesOrdenados[previousMonthIndex];
+    return fullData.filter(lead => lead.mes === previousMonth);
+}
+
+// Atualização dos KPIs
+function updateKPIs(currentData, previousData) {
+    const currentKPIs = calculateKPIs(currentData);
+    const previousKPIs = calculateKPIs(previousData);
+    
+    displayKPIs(currentKPIs, previousKPIs);
+}
+
+// Cálculo dos KPIs
+function calculateKPIs(data) {
+    if (!data || data.length === 0) {
+        return {
+            total: 0,
+            organicos: 0,
+            qualificados: 0,
+            vendas: 0,
+            desqualificados: 0,
+            faturamento: 0
+        };
+    }
+
+    // Normalização de strings para comparação
+    const normalize = (str) => str 
+        ? str.toString()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .trim()
+            .toUpperCase()
+        : '';
+
+    const vendasFechadas = data.filter(l => l.status === 'Venda Fechada');
+
+    // Conta como "Orgânico" se aparecer em origem_crm OU origem_geral
+    const organicos = data.filter(l =>
+        normalize(l.origem_crm) === 'ORGANICO' || normalize(l.origem_geral) === 'ORGANICO'
+    ).length;
+
+    return {
+        total: data.length,
+        organicos,
+        qualificados: data.filter(l => l.status === 'Qualificado').length,
+        vendas: vendasFechadas.length,
+        desqualificados: data.filter(l => l.status === 'Desqualificado').length,
+        faturamento: vendasFechadas.reduce((sum, l) => sum + l.valor, 0)
+    };
+}
+
+// Exibição dos KPIs
+function displayKPIs(current, previous) {
+    // Atualiza valores principais
+    document.getElementById('kpi-total-leads').innerText = current.total;
+    document.getElementById('kpi-leads-organicos').innerText = current.organicos;
+    document.getElementById('kpi-leads-qualificados').innerText = current.qualificados;
+    document.getElementById('kpi-vendas-fechadas').innerText = current.vendas;
+    document.getElementById('kpi-leads-desqualificados').innerText = current.desqualificados;
+    document.getElementById('kpi-faturamento').innerText = 
+        current.faturamento.toLocaleString('pt-BR', { 
+            style: 'currency', 
+            currency: 'BRL' 
+        });
+
+    // Atualiza deltas (variações percentuais)
+    updateDelta('delta-total-leads', current.total, previous.total);
+    updateDelta('delta-leads-organicos', current.organicos, previous.organicos);
+    updateDelta('delta-leads-qualificados', current.qualificados, previous.qualificados);
+    updateDelta('delta-vendas-fechadas', current.vendas, previous.vendas);
+    updateDelta('delta-leads-desqualificados', current.desqualificados, previous.desqualificados, true);
+    updateDelta('delta-faturamento', current.faturamento, previous.faturamento);
+}
+
+// Atualização das variações percentuais
+function updateDelta(elementId, current, previous, invertColors = false) {
+    const element = document.getElementById(elementId);
+    
+    if (!previous || previous === 0 || current === previous) {
+        element.innerHTML = '<span>--%</span>';
+        element.className = 'kpi-card-delta';
+        return;
+    }
+    
+    const delta = ((current - previous) / previous) * 100;
+    const isPositive = delta >= 0;
+    
+    element.innerHTML = `<span>${isPositive ? '▲' : '▼'}</span> ${Math.abs(delta).toFixed(1)}%`;
+    
+    let isGood = isPositive;
+    if (invertColors) isGood = !isPositive;
+    
+    element.className = 'kpi-card-delta';
+    element.classList.add(isGood ? 'positive' : 'negative');
+}
+
+// Atualização dos títulos dos gráficos
+function updateChartTitles(selectedMonth) {
+    const monthTitle = selectedMonth === 'todos' ? 'Geral' : selectedMonth;
+    
+    document.getElementById('origem-title').innerText = `Origem dos Leads - ${monthTitle}`;
+    document.getElementById('segmento-title').innerText = `Análise por Segmento - ${monthTitle}`;
+    document.getElementById('crm-title').innerText = `Análise de Origem (CRM) - ${monthTitle}`;
+    document.getElementById('delegados-title').innerText = `Vendedor Delegado - ${monthTitle}`;
+    document.getElementById('organic-ads-title').innerText = `Comparativo: Orgânicos vs Anúncios - ${monthTitle}`;
+    document.getElementById('motivos-title').innerText = `Top 5 Motivos de Perda - ${monthTitle}`;
+    document.getElementById('vendas-detalhadas-title').innerText = `Vendas Fechadas - Detalhes - ${monthTitle}`;
+}
+
+// Criação dos gráficos
+function createCharts() {
+    charts.origem = createChart('grafico-origem', 'doughnut');
+    charts.segmento = createChart('grafico-segmento', 'bar');
+    charts.crm = createChart('grafico-crm', 'pie');
+    charts.delegados = createChart('grafico-delegados', 'bar');
+    charts.organic_ads = createChart('grafico-organic-ads', 'doughnut'); // NOVO GRÁFICO
+    
+    updateChartTheme();
+}
+
+// Função auxiliar para criar gráficos
+function createChart(canvasId, type) {
+    const ctx = document.getElementById(canvasId);
+    
+    if (!ctx) {
+        console.error(`Canvas não encontrado: ${canvasId}`);
+        return null;
+    }
+    
+    return new Chart(ctx.getContext('2d'), {
+        type: type,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: type.includes('pie') || type.includes('doughnut') 
+                        ? 'right' 
+                        : 'none'
+                }
+            },
+            scales: type === 'bar' 
+                ? { 
+                    y: { grid: {} }, 
+                    x: { grid: { color: 'transparent' } } 
+                } 
+                : {}
+        }
+    });
+}
+
+// Atualização do tema dos gráficos
+function updateChartTheme() {
+    const isDarkMode = document.documentElement.classList.contains('dark-mode');
+    const textColor = isDarkMode ? '#9CA3AF' : '#64748B';
+    const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+    const borderColor = isDarkMode ? '#1F2937' : '#FFFFFF';
+    
+    Chart.defaults.color = textColor;
+    
+    for (const chartName in charts) {
+        const chart = charts[chartName];
+        
+        if (!chart || !chart.options) continue;
+        
+        // Atualiza cores do gráfico
+        if (chart.options.plugins && chart.options.plugins.legend) {
+            chart.options.plugins.legend.labels.color = textColor;
+        }
+        
+        if (chart.options.scales) {
+            if (chart.options.scales.y) {
+                chart.options.scales.y.ticks.color = textColor;
+                chart.options.scales.y.grid.color = gridColor;
+            }
+            
+            if (chart.options.scales.x) {
+                chart.options.scales.x.ticks.color = textColor;
+            }
+        }
+        
+        if (chart.data && chart.data.datasets) {
+            chart.data.datasets.forEach(dataset => {
+                dataset.borderColor = borderColor;
+            });
+        }
+        
+        chart.update();
+    }
+}
+
+// Atualização dos dados dos gráficos
+function updateChartData(data) {
+    updateChartDataForProperty(charts.origem, data, 'origem_geral');
+    updateChartDataForProperty(charts.segmento, data, 'segmento');
+    updateChartDataForProperty(charts.crm, data, 'origem_crm');
+    updateChartDataForProperty(charts.delegados, data, 'delegado');
+    updateOrganicAdsChart(data); // NOVA FUNÇÃO
+}
+
+// Função auxiliar para atualizar dados de gráfico por propriedade
+function updateChartDataForProperty(chart, data, property) {
+    if (!chart) return;
+    
+    const counts = data.reduce((acc, item) => {
+        const key = item[property] || 'Não preenchido';
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+    }, {});
+    
+    chart.data.labels = Object.keys(counts);
+    chart.data.datasets = [{
+        data: Object.values(counts),
+        backgroundColor: CORES_GRAFICOS
+    }];
+    
+    chart.update();
+}
+
+// NOVA FUNÇÃO: Atualiza o gráfico de orgânicos vs anúncios
+function updateOrganicAdsChart(data) {
+    if (!charts.organic_ads) return;
+    
+    // Normalização de strings para comparação
+    const normalize = (str) => str 
+        ? str.toString()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .trim()
+            .toUpperCase()
+        : '';
+    
+    let organicos = 0;
+    let anuncios = 0;
+    
+    data.forEach(lead => {
+        const isOrganico = normalize(lead.origem_crm) === 'ORGANICO' || 
+                          normalize(lead.origem_geral) === 'ORGANICO';
+        
+        const isAnuncio = normalize(lead.origem_crm).includes('ANUNCIO') || 
+                         normalize(lead.origem_geral).includes('ANUNCIO') ||
+                         normalize(lead.origem_crm).includes('ADS') || 
+                         normalize(lead.origem_geral).includes('ADS') ||
+                         normalize(lead.origem_crm).includes('PAGO') || 
+                         normalize(lead.origem_geral).includes('PAGO') ||
+                         normalize(lead.origem_crm).includes('GOOGLE') || 
+                         normalize(lead.origem_geral).includes('GOOGLE') ||
+                         normalize(lead.origem_crm).includes('FACEBOOK') || 
+                         normalize(lead.origem_geral).includes('FACEBOOK') ||
+                         normalize(lead.origem_crm).includes('META') || 
+                         normalize(lead.origem_geral).includes('META');
+        
+        if (isOrganico) {
+            organicos++;
+        } else if (isAnuncio) {
+            anuncios++;
+        }
+    });
+    
+    charts.organic_ads.data.labels = ['Orgânicos', 'Anúncios'];
+    charts.organic_ads.data.datasets = [{
+        data: [organicos, anuncios],
+        backgroundColor: ['#10B981', '#3B82F6'] // Verde para orgânicos, azul para anúncios
+    }];
+    
+    charts.organic_ads.update();
+}
+
+// Renderização dos motivos de perda
+function renderTopMotivos(data) {
+    const container = document.getElementById('top-motivos-container');
+    container.innerHTML = '';
+    
+    const motivos = data
+        .filter(lead => lead.status === 'Desqualificado' && lead.motivo_nao)
+        .reduce((acc, lead) => {
+            const motivo = lead.motivo_nao.trim();
+            acc[motivo] = (acc[motivo] || 0) + 1;
+            return acc;
+        }, {});
+    
+    const topMotivos = Object.entries(motivos)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 5);
+    
+    if (topMotivos.length === 0) {
+        container.innerHTML = `
+            <p style="color: var(--cor-texto-secundario); padding-top: 20px; text-align: center;">
+                Nenhum motivo de perda registrado.
+            </p>
+        `;
+        return;
+    }
+    
+    const list = document.createElement('ol');
+    
+    topMotivos.forEach(([motivo, count]) => {
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `${motivo} <span style="float: right; font-weight: bold;">${count}</span>`;
+        list.appendChild(listItem);
+    });
+    
+    container.appendChild(list);
+}
+
+// NOVA FUNÇÃO: Renderiza a tabela de vendas detalhadas
+function renderVendasDetalhadas(data) {
+    const container = document.getElementById('vendas-detalhadas-container');
+    
+    // Filtra apenas vendas fechadas
+    const vendasFechadas = data.filter(lead => lead.status === 'Venda Fechada');
+    
+    if (vendasFechadas.length === 0) {
+        container.innerHTML = `
+            <p style="color: var(--cor-texto-secundario); text-align: center; padding: 2rem;">
+                Nenhuma venda fechada no período selecionado.
+            </p>
+        `;
+        return;
+    }
+    
+    // Ordena por valor (maior primeiro)
+    vendasFechadas.sort((a, b) => b.valor - a.valor);
+    
+    let tableHTML = `
+        <table class="vendas-table">
+            <thead>
+                <tr>
+                    <th>Valor do Pedido</th>
+                    <th>Segmento</th>
+                    <th>Origem</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    vendasFechadas.forEach(venda => {
+        tableHTML += `
+            <tr>
+                <td class="valor-cell">${venda.valor.toLocaleString('pt-BR', { 
+                    style: 'currency', 
+                    currency: 'BRL' 
+                })}</td>
+                <td>${venda.segmento || 'Não informado'}</td>
+                <td>${venda.origem_geral || venda.origem_crm || 'Não informado'}</td>
+            </tr>
+        `;
+    });
+    
+    tableHTML += `
+            </tbody>
+        </table>
+        <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--cor-texto-secundario);">
+            Total de ${vendasFechadas.length} venda(s) fechada(s)
+        </p>
+    `;
+    
+    container.innerHTML = tableHTML;
+}
+
+// Geração de relatório para impressão
+function generateAndPrintReport(data, period) {
+    const printArea = document.getElementById('print-area');
+    const kpis = calculateKPIs(data);
+    
+    const createCardGrid = (title, items) => {
+        if (Object.keys(items).length === 0) return '';
+        
+        let gridHTML = `<h2>${title}</h2><div class="print-grid">`;
+        
+        for (const [key, value] of Object.entries(items)) {
+            gridHTML += `
+                <div class="print-card">
+                    <div class="print-card-title">${key}</div>
+                    <div class="print-card-value">${value}</div>
+                </div>
+            `;
+        }
+        
+        gridHTML += `</div>`;
+        return gridHTML;
+    };
+    
+    // KPIs
+    const kpiItems = {
+        'Total de Leads': kpis.total,
+        'Leads Orgânicos': kpis.organicos,
+        'Leads Qualificados': kpis.qualificados,
+        'Vendas Fechadas': kpis.vendas,
+        'Leads Desqualificados': kpis.desqualificados,
+        'Faturamento Total': kpis.faturamento.toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        })
+    };
+    
+    // Contagens por categoria
+    const origemCounts = countByProperty(data, 'origem_geral');
+    const segmentoCounts = countByProperty(data, 'segmento');
+    const delegadoCounts = countByProperty(data, 'delegado');
+    
+    // Contagem orgânicos vs anúncios
+    const normalize = (str) => str 
+        ? str.toString()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .trim()
+            .toUpperCase()
+        : '';
+    
+    let organicos = 0;
+    let anuncios = 0;
+    
+    data.forEach(lead => {
+        const isOrganico = normalize(lead.origem_crm) === 'ORGANICO' || 
+                          normalize(lead.origem_geral) === 'ORGANICO';
+        
+        const isAnuncio = normalize(lead.origem_crm).includes('ANUNCIO') || 
+                         normalize(lead.origem_geral).includes('ANUNCIO') ||
+                         normalize(lead.origem_crm).includes('ADS') || 
+                         normalize(lead.origem_geral).includes('ADS') ||
+                         normalize(lead.origem_crm).includes('PAGO') || 
+                         normalize(lead.origem_geral).includes('PAGO') ||
+                         normalize(lead.origem_crm).includes('GOOGLE') || 
+                         normalize(lead.origem_geral).includes('GOOGLE') ||
+                         normalize(lead.origem_crm).includes('FACEBOOK') || 
+                         normalize(lead.origem_geral).includes('FACEBOOK') ||
+                         normalize(lead.origem_crm).includes('META') || 
+                         normalize(lead.origem_geral).includes('META');
+        
+        if (isOrganico) {
+            organicos++;
+        } else if (isAnuncio) {
+            anuncios++;
+        }
+    });
+    
+    const organicAdsCounts = {
+        'Orgânicos': organicos,
+        'Anúncios': anuncios
+    };
+    
+    // Motivos de perda
+    const topMotivos = data
+        .filter(lead => lead.status === 'Desqualificado' && lead.motivo_nao)
+        .reduce((acc, lead) => {
+            const motivo = lead.motivo_nao.trim();
+            acc[motivo] = (acc[motivo] || 0) + 1;
+            return acc;
+        }, {});
+    
+    // Vendas fechadas para o relatório
+    const vendasFechadas = data.filter(lead => lead.status === 'Venda Fechada');
+    const vendasItems = {};
+    vendasFechadas.forEach((venda, index) => {
+        vendasItems[`Venda ${index + 1}`] = 
+            `${venda.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} | ${venda.segmento || 'N/I'} | ${venda.origem_geral || venda.origem_crm || 'N/I'}`;
+    });
+    
+    // Monta o HTML do relatório
+    let reportHTML = `
+        <h1>Relatório de Análise de Leads</h1>
+        <p>Dados referentes ao período: ${period}</p>
+        ${createCardGrid('Resumo Geral (KPIs)', kpiItems)}
+        ${createCardGrid('Origem dos Leads', origemCounts)}
+        ${createCardGrid('Análise por Segmento', segmentoCounts)}
+        ${createCardGrid('Distribuição por Responsável', delegadoCounts)}
+        ${createCardGrid('Orgânicos vs Anúncios', organicAdsCounts)}
+        ${createCardGrid('Top 5 Motivos de Perda', topMotivos)}
+        ${createCardGrid('Vendas Fechadas Detalhadas', vendasItems)}
+    `;
+    
+    printArea.innerHTML = reportHTML;
+    window.print();
+}
+
+// Função auxiliar para contar por propriedade
+function countByProperty(data, property) {
+    return data.reduce((acc, item) => {
+        const key = item[property] || 'N/A';
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+    }, {});
+}
