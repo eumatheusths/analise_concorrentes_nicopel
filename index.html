@@ -1,1349 +1,715 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Concorrência - Nicopel Embalagens</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-
-  <style>
-    :root {
-      --primary-color: #2563eb;
-      --primary-dark: #1d4ed8;
-      --secondary-color: #64748b;
-      --background-color: #f8fafc;
-      --card-background: #ffffff;
-      --text-color: #1e293b;
-      --text-muted: #64748b;
-      --border-color: #e2e8f0;
-      --border-light: #f1f5f9;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-      --sidebar: #0f172a;
-      --sidebar-hover: #1e293b;
-      --sidebar-active: #334155;
-      --sidebar-text: #f1f5f9;
-      --sidebar-muted: #94a3b8;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --danger-dark: #dc2626;
-      --radius: 12px;
-      --radius-sm: 8px;
-      --transition: all 0.2s ease-in-out;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: var(--background-color);
-      color: var(--text-color);
-      line-height: 1.6;
-      font-weight: 400;
-    }
-
-    /* LAYOUT PRINCIPAL */
-    .app {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      min-height: 100dvh;
-    }
-
-    /* SIDEBAR */
-    aside {
-      background: var(--sidebar);
-      color: var(--sidebar-text);
-      padding: 24px 20px;
-      position: sticky;
-      top: 0;
-      align-self: start;
-      min-height: 100dvh;
-      border-right: 1px solid var(--sidebar-hover);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 24px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--sidebar-hover);
-    }
-
-    .brand-icon {
-      width: 32px;
-      height: 32px;
-      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 700;
-      font-size: 14px;
-    }
-
-    .brand h2 {
-      margin: 0;
-      font-size: 1.2rem;
-      font-weight: 700;
-      letter-spacing: -0.025em;
-    }
-
-    .sidebar-note {
-      color: var(--sidebar-muted);
-      font-size: 0.875rem;
-      margin: 0 0 24px;
-      line-height: 1.5;
-    }
-
-    .nav {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .nav button {
-      all: unset;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      border-radius: var(--radius-sm);
-      color: var(--sidebar-text);
-      cursor: pointer;
-      font-weight: 500;
-      transition: var(--transition);
-      font-size: 0.95rem;
-    }
-
-    .nav button:hover {
-      background: var(--sidebar-hover);
-    }
-
-    .nav button.active {
-      background: var(--primary-color);
-      color: white;
-      box-shadow: var(--shadow);
-    }
-
-    .sidebar-footer {
-      margin-top: auto;
-      padding-top: 20px;
-      border-top: 1px solid var(--sidebar-hover);
-    }
-
-    .sidebar-toggle {
-      display: none;
-      position: fixed;
-      top: 16px;
-      left: 16px;
-      z-index: 1100;
-      background: var(--card-background);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius);
-      padding: 10px 12px;
-      font-weight: 600;
-      box-shadow: var(--shadow-lg);
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .sidebar-toggle:hover {
-      box-shadow: var(--shadow-hover);
-    }
-
-    /* RESPONSIVIDADE */
-    @media (max-width: 900px) {
-      .app {
-        grid-template-columns: 1fr;
-      }
-      
-      aside {
-        position: fixed;
-        inset: 0 35% 0 0;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-        z-index: 1000;
-        box-shadow: var(--shadow-lg);
-      }
-      
-      aside.open {
-        transform: translateX(0);
-      }
-      
-      .content.dim::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 999;
-        backdrop-filter: blur(2px);
-      }
-      
-      .sidebar-toggle {
-        display: block;
-      }
-    }
-
-    @media (max-width: 640px) {
-      aside {
-        inset: 0 25% 0 0;
-      }
-    }
-
-    /* CONTEÚDO PRINCIPAL */
-    .content {
-      min-width: 0;
-      padding: 0;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: clamp(16px, 3vw, 32px);
-    }
-
-    header {
-      margin-bottom: clamp(20px, 4vw, 32px);
-    }
-
-    header h1 {
-      margin: 0 0 8px;
-      font-weight: 700;
-      font-size: clamp(1.5rem, 3vw + 0.5rem, 2.5rem);
-      letter-spacing: -0.025em;
-      background: linear-gradient(135deg, var(--text-color), var(--primary-color));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    header p {
-      margin: 0;
-      color: var(--text-muted);
-      font-size: clamp(0.95rem, 1.5vw + 0.5rem, 1.1rem);
-      font-weight: 400;
-    }
-
-    /* COMPONENTES */
-    .filter-group {
-      background: var(--card-background);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-bottom: 24px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border-light);
-    }
-
-    .tabs-nav {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      padding: 4px 0;
-    }
-
-    .tabs-nav::-webkit-scrollbar {
-      display: none;
-    }
-
-    .tab-btn {
-      flex: 0 0 auto;
-      white-space: nowrap;
-      font-weight: 600;
-      font-size: 0.9rem;
-      padding: 10px 20px;
-      border: 1px solid var(--border-color);
-      background: var(--card-background);
-      color: var(--text-muted);
-      border-radius: 999px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .tab-btn:hover {
-      background: var(--border-light);
-      transform: translateY(-1px);
-    }
-
-    .tab-btn.active {
-      background: var(--primary-color);
-      color: white;
-      border-color: var(--primary-color);
-      box-shadow: var(--shadow);
-    }
-
-    .toolbar {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      margin: 24px 0 16px;
-    }
-
-    .search {
-      flex: 1;
-      min-width: 280px;
-      position: relative;
-    }
-
-    .search input {
-      width: 100%;
-      padding: 12px 16px 12px 44px;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius);
-      background: var(--card-background);
-      font-size: 0.95rem;
-      transition: var(--transition);
-      box-shadow: var(--shadow);
-    }
-
-    .search input:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-
-    .search-icon {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      z-index: 2;
-      pointer-events: none;
-    }
-
-    .sort {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    select {
-      padding: 12px 16px;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius);
-      background: var(--card-background);
-      font-size: 0.95rem;
-      transition: var(--transition);
-      box-shadow: var(--shadow);
-      cursor: pointer;
-    }
-
-    select:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-
-    /* GRID DE CONCORRENTES */
-    #competitors-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: clamp(16px, 2.5vw, 24px);
-      margin-top: 8px;
-    }
-
-    .competitor-card {
-      cursor: pointer;
-      background: var(--card-background);
-      border: 1px solid var(--border-light);
-      border-radius: var(--radius);
-      padding: clamp(16px, 2vw, 24px);
-      box-shadow: var(--shadow);
-      transition: var(--transition);
-      display: flex;
-      flex-direction: column;
-      min-height: 180px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .competitor-card::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
-    }
-
-    .competitor-card:hover {
-      transform: translateY(-6px);
-      box-shadow: var(--shadow-hover);
-    }
-
-    .competitor-card.hidden {
-      display: none;
-    }
-
-    .card-header {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .threat-level {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      margin-top: 4px;
-      box-shadow: 0 0 0 3px rgba(0,0,0,0.1);
-    }
-
-    .threat-high { background: var(--danger); }
-    .threat-medium { background: var(--warning); }
-    .threat-low { background: var(--success); }
-
-    .card-header h3 {
-      margin: 0;
-      font-size: clamp(1.1rem, 1.5vw + 0.8rem, 1.4rem);
-      font-weight: 700;
-      line-height: 1.3;
-      color: var(--text-color);
-    }
-
-    .card-body {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .info-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-    }
-
-    .info-item svg {
-      width: 16px;
-      height: 16px;
-      color: var(--text-muted);
-      flex-shrink: 0;
-    }
-
-    .card-analysis-preview {
-      font-size: 0.875rem;
-      color: var(--text-muted);
-      line-height: 1.5;
-      margin: 8px 0;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .tag-chips {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
-
-    .chip {
-      display: inline-block;
-      padding: 6px 12px;
-      border: 1px solid var(--border-color);
-      border-radius: 999px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      background: var(--border-light);
-      color: var(--text-muted);
-      transition: var(--transition);
-      font-weight: 500;
-    }
-
-    .chip:hover {
-      background: var(--primary-color);
-      color: white;
-      border-color: var(--primary-color);
-      transform: translateY(-1px);
-    }
-
-    /* MODAL */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-      padding: 1rem;
-      backdrop-filter: blur(4px);
-    }
-
-    .modal-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .modal-content {
-      background: var(--card-background);
-      border-radius: var(--radius);
-      width: 100%;
-      max-width: 800px;
-      max-height: min(90vh, 700px);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      transform: translateY(20px) scale(0.95);
-      transition: transform 0.3s ease;
-      box-shadow: var(--shadow-hover);
-    }
-
-    .modal-overlay.active .modal-content {
-      transform: translateY(0) scale(1);
-    }
-
-    .modal-header {
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--border-light);
-      position: sticky;
-      top: 0;
-      background: var(--card-background);
-      z-index: 1;
-    }
-
-    .modal-close-btn {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: var(--border-light);
-      border: none;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      font-size: 1.2rem;
-      cursor: pointer;
-      color: var(--text-muted);
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-close-btn:hover {
-      background: var(--danger);
-      color: white;
-    }
-
-    .modal-body {
-      padding: 24px;
-      overflow: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .modal-footer {
-      padding: 20px 24px;
-      border-top: 1px solid var(--border-light);
-      background: var(--background-color);
-      position: sticky;
-      bottom: 0;
-    }
-
-    .modal-body .info-item {
-      color: var(--text-color);
-      font-size: 1rem;
-    }
-
-    .modal-body .info-item svg {
-      color: var(--primary-color);
-    }
-
-    @media (max-width: 767px) {
-      .modal-content {
-        width: 100%;
-        height: 100%;
-        max-width: none;
-        max-height: none;
-        border-radius: 0;
-      }
-    }
-
-    /* FORMULÁRIOS E TABELAS */
-    .card {
-      background: var(--card-background);
-      border: 1px solid var(--border-light);
-      border-radius: var(--radius);
-      padding: 24px;
-      box-shadow: var(--shadow);
-      margin-bottom: 24px;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 16px;
-    }
-
-    .form-grid .col-12 { grid-column: span 12; }
-    .form-grid .col-6 { grid-column: span 6; }
-    .form-grid .col-4 { grid-column: span 4; }
-    .form-grid .col-3 { grid-column: span 3; }
-    .form-grid .col-8 { grid-column: span 8; }
-
-    @media (max-width: 800px) {
-      .form-grid .col-6,
-      .form-grid .col-4,
-      .form-grid .col-3,
-      .form-grid .col-8 {
-        grid-column: span 12;
-      }
-    }
-
-    label {
-      font-weight: 600;
-      font-size: 0.92rem;
-      margin-bottom: 6px;
-      display: block;
-      color: var(--text-color);
-    }
-
-    input[type="text"],
-    input[type="url"],
-    input[type="number"],
-    select,
-    textarea {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      background: var(--card-background);
-      font: inherit;
-      transition: var(--transition);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-
-    textarea {
-      min-height: 120px;
-      resize: vertical;
-      line-height: 1.5;
-    }
-
-    .form-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: flex-end;
-      margin-top: 24px;
-      padding-top: 20px;
-      border-top: 1px solid var(--border-light);
-    }
-
-    .btn {
-      appearance: none;
-      border: 1px solid var(--border-color);
-      background: var(--card-background);
-      padding: 12px 20px;
-      border-radius: var(--radius-sm);
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      font-size: 0.95rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow);
-    }
-
-    .btn-primary {
-      background: var(--primary-color);
-      color: white;
-      border-color: var(--primary-color);
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-dark);
-      border-color: var(--primary-dark);
-    }
-
-    .btn-danger {
-      background: var(--danger);
-      color: white;
-      border-color: var(--danger);
-    }
-
-    .btn-danger:hover {
-      background: var(--danger-dark);
-      border-color: var(--danger-dark);
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .help {
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      margin-top: 8px;
-      line-height: 1.4;
-    }
-
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-      background: var(--card-background);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-    }
-
-    .table th,
-    .table td {
-      border-bottom: 1px solid var(--border-light);
-      padding: 14px 16px;
-      text-align: left;
-      font-size: 0.95rem;
-    }
-
-    .table th {
-      color: var(--text-color);
-      font-weight: 700;
-      background: var(--background-color);
-    }
-
-    .table-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .bulk {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-      padding: 16px 0;
-    }
-
-    /* RELATÓRIOS */
-    .report-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    .report-grid {
-      border: 1px solid var(--border-light);
-      border-radius: var(--radius);
-      overflow: hidden;
-      background: var(--card-background);
-      box-shadow: var(--shadow);
-    }
-
-    .report-grid table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .report-grid th,
-    .report-grid td {
-      border-bottom: 1px solid var(--border-light);
-      padding: 14px 16px;
-      font-size: 0.95rem;
-    }
-
-    .report-grid th {
-      background: var(--background-color);
-      text-align: left;
-      font-weight: 600;
-    }
-
-    .no-print { display: block; }
-    .only-print { display: none; }
-
-    /* IMPRESSÃO */
-    @media print {
-      @page { size: A4; margin: 12mm; }
-      
-      aside,
-      .sidebar-toggle,
-      .no-print {
-        display: none !important;
-      }
-      
-      .only-print { display: block; }
-      
-      body { background: #fff; }
-      
-      .container {
-        max-width: none;
-        padding: 0;
-      }
-      
-      header { text-align: left; margin: 0 0 12px; }
-      
-      .report-header { margin: 0 0 12px; }
-      
-      .report-grid th,
-      .report-grid td {
-        padding: 8px 12px;
-        font-size: 0.85rem;
-      }
-      
-      .report-grid {
-        box-shadow: none;
-        border: 1px solid #ddd;
-      }
-    }
-
-    /* ANIMAÇÕES */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .competitor-card {
-      animation: fadeIn 0.4s ease-out;
-    }
-
-    /* SCROLLBAR PERSONALIZADA */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--border-light);
-      border-radius: 3px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--text-muted);
-      border-radius: 3px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--primary-color);
-    }
-
-    /* NOTIFICAÇÕES */
-    .notification {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 12px 20px;
-      border-radius: 8px;
-      color: white;
-      font-weight: 500;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      z-index: 10000;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      animation: slideIn 0.3s ease;
-    }
-    
-    .notification.success {
-      background: #10b981;
-    }
-    
-    .notification.error {
-      background: #ef4444;
-    }
-    
-    .notification button {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 18px;
-      cursor: pointer;
-      padding: 0;
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-
-    /* IMPORT/EXPORT */
-    .io-actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .file-input-wrapper {
-      position: relative;
-      display: inline-block;
-    }
-
-    .file-input-wrapper input[type="file"] {
-      position: absolute;
-      left: 0;
-      top: 0;
-      opacity: 0;
-      width: 100%;
-      height: 100%;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-  <button class="sidebar-toggle" id="sidebarToggle">☰ Menu</button>
-
-  <!-- Ícones SVG -->
-  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
-    <symbol id="icon-location" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></symbol>
-    <symbol id="icon-focus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></symbol>
-    <symbol id="icon-website" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></symbol>
-    <symbol id="icon-instagram" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></symbol>
-  </svg>
-
-  <div class="app">
-    <!-- Sidebar -->
-    <aside id="sidebar">
-      <div class="brand">
-        <div class="brand-icon">N</div>
-        <h2>Concorrência Nicopel</h2>
-      </div>
-      <p class="sidebar-note">Navegue entre o Dashboard e as ferramentas de análise de mercado.</p>
-      
-      <nav class="nav" id="app-nav">
-        <button class="active" data-view="dashboard">📊 Dashboard</button>
-        <button data-view="add">➕ Adicionar Concorrente</button>
-        <button data-view="edit">✏️ Editar / Excluir</button>
-        <button data-view="io">📁 Importar / Exportar</button>
-        <button data-view="report">🖨️ Relatórios</button>
-      </nav>
-      
-      <div class="sidebar-footer">
-        <p class="sidebar-note">Atualizado em <span id="last-updated-side"></span></p>
-      </div>
-    </aside>
-
-    <!-- Conteúdo Principal -->
-    <main class="content" id="content">
-      <!-- DASHBOARD -->
-      <section id="view-dashboard">
-        <div class="container">
-          <header>
-            <h1>Dashboard de Concorrência</h1>
-            <p>Análise estratégica de mercado para Nicopel Embalagens</p>
-          </header>
-
-          <div class="filter-group">
-            <nav id="category-nav" class="tabs-nav" aria-label="Categorias de Produto">
-              <button class="tab-btn active" data-category="todos" type="button">Todas Categorias</button>
-              <button class="tab-btn" data-category="potes-copos" type="button">Potes e Copos</button>
-              <button class="tab-btn" data-category="caixas-sorvete" type="button">Caixas de Sorvete</button>
-              <button class="tab-btn" data-category="caixas-pizza" type="button">Caixas de Pizza</button>
-              <button class="tab-btn" data-category="embalagens-industriais" type="button">Embalagens Industriais</button>
-            </nav>
-          </div>
-
-          <div class="toolbar">
-            <div class="tabs-nav" id="threat-nav" aria-label="Tipo de Concorrência" style="padding:0">
-              <button class="tab-btn active" data-threat="todos" type="button">Todos</button>
-              <button class="tab-btn" data-threat="direto" type="button">⚡ Diretos</button>
-              <button class="tab-btn" data-threat="indireto" type="button">🔄 Indiretos</button>
-            </div>
-
-            <div class="search">
-              <div class="search-icon">🔍</div>
-              <input id="search-input" type="text" placeholder="Buscar por nome ou cidade..." />
-            </div>
-
-            <div class="sort">
-              <label for="sort-select">Ordenar:</label>
-              <select id="sort-select">
-                <option value="az">Nome (A–Z)</option>
-                <option value="za">Nome (Z–A)</option>
-                <option value="cidade">Cidade</option>
-                <option value="ameaca">Nível de ameaça</option>
-              </select>
-            </div>
-          </div>
-
-          <main id="competitors-grid">
-            <!-- Os cards serão gerados dinamicamente pelo JavaScript -->
-          </main>
-
-          <footer style="text-align:center; margin-top:32px; color:var(--text-muted)">
-            <p>Dashboard atualizado em <span id="last-updated"></span></p>
-          </footer>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Concorrência - Nicopel Embalagens</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <button class="sidebar-toggle" id="sidebarToggle">☰ Menu</button>
+
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
+      <symbol
+        id="icon-location"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+        <circle cx="12" cy="10" r="3"></circle>
+      </symbol>
+      <symbol
+        id="icon-focus"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="10"></circle>
+        <circle cx="12" cy="12" r="6"></circle>
+        <circle cx="12" cy="12" r="2"></circle>
+      </symbol>
+      <symbol
+        id="icon-website"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="2" y1="12" x2="22" y2="12"></line>
+        <path
+          d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+        ></path>
+      </symbol>
+      <symbol
+        id="icon-instagram"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+        <path
+          d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"
+        ></path>
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+      </symbol>
+    </svg>
+
+    <div class="app">
+      <aside id="sidebar">
+        <div class="brand">
+          <div class="brand-icon">N</div>
+          <h2>Concorrência Nicopel</h2>
         </div>
-      </section>
+        <p class="sidebar-note">
+          Navegue entre o Dashboard e as ferramentas de análise de mercado.
+        </p>
 
-      <!-- ADICIONAR CONCORRENTE -->
-      <section id="view-add" style="display:none">
-        <div class="container">
-          <header>
-            <h1>Adicionar Concorrente</h1>
-            <p>Preencha os campos abaixo para cadastrar um novo concorrente no sistema</p>
-          </header>
+        <nav class="nav" id="app-nav">
+          <button class="active" data-view="dashboard">📊 Dashboard</button>
+          <button data-view="add">➕ Adicionar Concorrente</button>
+          <button data-view="edit">✏️ Editar / Excluir</button>
+          <button data-view="io">📁 Importar / Exportar</button>
+          <button data-view="report">🖨️ Relatórios</button>
+        </nav>
 
-          <div class="card">
-            <form id="add-form">
-              <div class="form-grid">
-                <div class="col-6">
-                  <label for="f-name">Nome *</label>
-                  <input id="f-name" type="text" required />
-                </div>
-                <div class="col-6">
-                  <label for="f-city">Cidade/UF *</label>
-                  <input id="f-city" type="text" required />
-                </div>
-                <div class="col-4">
-                  <label for="f-threat">Nível de Ameaça *</label>
-                  <select id="f-threat" required>
-                    <option value="">Selecione</option>
-                    <option value="alta">Alta (Direto)</option>
-                    <option value="media">Média (Indireto)</option>
-                    <option value="baixa">Baixa (Indireto)</option>
-                  </select>
-                </div>
-                <div class="col-8">
-                  <label for="f-category">Categoria *</label>
-                  <select id="f-category" required>
-                    <option value="">Selecione</option>
-                    <option value="potes-copos">Potes e Copos</option>
-                    <option value="caixas-sorvete">Caixas de Sorvete</option>
-                    <option value="caixas-pizza">Caixas de Pizza</option>
-                    <option value="embalagens-industriais">Embalagens Industriais</option>
-                  </select>
-                </div>
-                <div class="col-6">
-                  <label for="f-website">Website</label>
-                  <input id="f-website" type="url" placeholder="https://..." />
-                </div>
-                <div class="col-6">
-                  <label for="f-instagram">Instagram</label>
-                  <input id="f-instagram" type="url" placeholder="https://instagram.com/..." />
-                </div>
-                <div class="col-6">
-                  <label for="f-phone">Telefone</label>
-                  <input id="f-phone" type="text" placeholder="(11) 99999-9999" />
-                </div>
-                <div class="col-6">
-                  <label for="f-cnpj">CNPJ</label>
-                  <input id="f-cnpj" type="text" placeholder="00.000.000/0000-00" />
-                </div>
-                <div class="col-6">
-                  <label for="f-tags">Tags</label>
-                  <input id="f-tags" type="text" placeholder="ex.: sorvete, premium, kraft, e-commerce" />
-                </div>
-                <div class="col-6">
-                  <label for="f-ticket">Ticket médio (R$)</label>
-                  <input id="f-ticket" type="number" step="0.01" min="0" />
-                </div>
-                <div class="col-12">
-                  <label for="f-focus">Foco de atuação</label>
-                  <input id="f-focus" type="text" placeholder="Segmento ou nicho de mercado" />
-                </div>
-                <div class="col-12">
-                  <label for="f-analysis">Análise estratégica</label>
-                  <textarea id="f-analysis" placeholder="Observações, pontos fortes, oportunidades..."></textarea>
-                </div>
-              </div>
-              <div class="form-actions">
-                <button type="reset" class="btn">🔄 Limpar</button>
-                <button id="btn-save" type="submit" class="btn btn-primary">💾 Salvar Concorrente</button>
-              </div>
-            </form>
-          </div>
+        <div class="sidebar-footer">
+          <p class="sidebar-note">
+            Atualizado em <span id="last-updated-side"></span>
+          </p>
         </div>
-      </section>
+      </aside>
 
-      <!-- EDITAR/EXCLUIR -->
-      <section id="view-edit" style="display:none">
-        <div class="container">
-          <header>
-            <h1>Editar / Excluir Concorrentes</h1>
-            <p>Gerencie os dados dos concorrentes e utilize seleção múltipla para ações em lote</p>
-          </header>
+      <main class="content" id="content">
+        <section id="view-dashboard">
+          <div class="container">
+            <header>
+              <h1>Dashboard de Concorrência</h1>
+              <p>Análise estratégica de mercado para Nicopel Embalagens</p>
+            </header>
 
-          <div class="card" style="margin-bottom:16px">
-            <div class="form-grid">
-              <div class="col-8">
-                <input id="edit-search" type="text" placeholder="Buscar por nome ou cidade..." />
+            <div class="filter-group">
+              <nav
+                id="category-nav"
+                class="tabs-nav"
+                aria-label="Categorias de Produto"
+              >
+                <button class="tab-btn active" data-category="todos" type="button">
+                  Todas Categorias
+                </button>
+                <button
+                  class="tab-btn"
+                  data-category="potes-copos"
+                  type="button"
+                >
+                  Potes e Copos
+                </button>
+                <button
+                  class="tab-btn"
+                  data-category="caixas-sorvete"
+                  type="button"
+                >
+                  Caixas de Sorvete
+                </button>
+                <button
+                  class="tab-btn"
+                  data-category="caixas-pizza"
+                  type="button"
+                >
+                  Caixas de Pizza
+                </button>
+                <button
+                  class="tab-btn"
+                  data-category="embalagens-industriais"
+                  type="button"
+                >
+                  Embalagens Industriais
+                </button>
+              </nav>
+            </div>
+
+            <div class="toolbar">
+              <div
+                class="tabs-nav"
+                id="threat-nav"
+                aria-label="Tipo de Concorrência"
+                style="padding: 0"
+              >
+                <button class="tab-btn active" data-threat="todos" type="button">
+                  Todos
+                </button>
+                <button class="tab-btn" data-threat="direto" type="button">
+                  ⚡ Diretos
+                </button>
+                <button class="tab-btn" data-threat="indireto" type="button">
+                  🔄 Indiretos
+                </button>
               </div>
-              <div class="col-4">
-                <select id="edit-sort">
+
+              <div class="search">
+                <div class="search-icon">🔍</div>
+                <input
+                  id="search-input"
+                  type="text"
+                  placeholder="Buscar por nome ou cidade..."
+                />
+              </div>
+
+              <div class="sort">
+                <label for="ecommerce-filter">E-commerce:</label>
+                <select id="ecommerce-filter">
+                  <option value="todos">Todos</option>
+                  <option value="sim">Sim</option>
+                  <option value="nao">Não</option>
+                </select>
+              </div>
+
+              <div class="sort">
+                <label for="sort-select">Ordenar:</label>
+                <select id="sort-select">
                   <option value="az">Nome (A–Z)</option>
                   <option value="za">Nome (Z–A)</option>
                   <option value="cidade">Cidade</option>
                   <option value="ameaca">Nível de ameaça</option>
                 </select>
               </div>
-              <div class="col-12 bulk">
-                <label><input type="checkbox" id="bulk-all" /> Selecionar tudo</label>
-                <button class="btn" id="bulk-archive">📁 Arquivar</button>
-                <button class="btn" id="bulk-unarchive">📂 Desarquivar</button>
-                <button class="btn btn-danger" id="bulk-delete">🗑️ Excluir</button>
-              </div>
+            </div>
+
+            <main id="competitors-grid">
+              </main>
+
+            <footer
+              style="text-align: center; margin-top: 32px; color: var(--text-muted)"
+            >
+              <p>Dashboard atualizado em <span id="last-updated"></span></p>
+            </footer>
+          </div>
+        </section>
+
+        <section id="view-add" style="display: none">
+          <div class="container">
+            <header>
+              <h1>Adicionar Concorrente</h1>
+              <p>
+                Preencha os campos abaixo para cadastrar um novo concorrente no
+                sistema
+              </p>
+            </header>
+
+            <div class="card">
+              <form id="add-form">
+                <div class="form-grid">
+                  <div class="col-6">
+                    <label for="f-name">Nome *</label>
+                    <input id="f-name" type="text" required />
+                  </div>
+                  <div class="col-6">
+                    <label for="f-city">Cidade/UF *</label>
+                    <input id="f-city" type="text" required />
+                  </div>
+                  <div class="col-4">
+                    <label for="f-threat">Nível de Ameaça *</label>
+                    <select id="f-threat" required>
+                      <option value="">Selecione</option>
+                      <option value="alta">Alta (Direto)</option>
+                      <option value="media">Média (Indireto)</option>
+                      <option value="baixa">Baixa (Indireto)</option>
+                    </select>
+                  </div>
+                  <div class="col-8">
+                    <label for="f-category">Categoria *</label>
+                    <select id="f-category" required>
+                      <option value="">Selecione</option>
+                      <option value="potes-copos">Potes e Copos</option>
+                      <option value="caixas-sorvete">Caixas de Sorvete</option>
+                      <option value="caixas-pizza">Caixas de Pizza</option>
+                      <option value="embalagens-industriais">
+                        Embalagens Industriais
+                      </option>
+                    </select>
+                  </div>
+                  <div class="col-6">
+                    <label for="f-website">Website</label>
+                    <input id="f-website" type="url" placeholder="https://..." />
+                  </div>
+                  <div class="col-6">
+                    <label for="f-instagram">Instagram</label>
+                    <input
+                      id="f-instagram"
+                      type="url"
+                      placeholder="https://instagram.com/..."
+                    />
+                  </div>
+
+                  <div class="col-6">
+                    <label for="f-meta-ads">Biblioteca de Anúncios Meta</label>
+                    <input
+                      id="f-meta-ads"
+                      type="url"
+                      placeholder="https://www.facebook.com/ads/library/..."
+                    />
+                  </div>
+                  <div class="col-6">
+                    <label for="f-google-ads"
+                      >Biblioteca de Anúncios Google</label
+                    >
+                    <input
+                      id="f-google-ads"
+                      type="url"
+                      placeholder="https://adstransparency.google.com/..."
+                    />
+                  </div>
+
+                  <div class="col-6">
+                    <label for="f-phone">Telefone</label>
+                    <input
+                      id="f-phone"
+                      type="text"
+                      placeholder="(11) 99999-9999"
+                    />
+                  </div>
+                  <div class="col-6">
+                    <label for="f-cnpj">CNPJ</label>
+                    <input
+                      id="f-cnpj"
+                      type="text"
+                      placeholder="00.000.000/0000-00"
+                    />
+                  </div>
+                  <div class="col-6">
+                    <label for="f-tags">Tags</label>
+                    <input
+                      id="f-tags"
+                      type="text"
+                      placeholder="ex.: sorvete, premium, kraft, e-commerce"
+                    />
+                  </div>
+                  <div class="col-6">
+                    <label for="f-ticket">Ticket médio (R$)</label>
+                    <input id="f-ticket" type="number" step="0.01" min="0" />
+                  </div>
+
+                  <div class="col-12" style="padding-top: 10px">
+                    <label
+                      for="f-ecommerce"
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 8px;
+                        cursor: pointer;
+                      "
+                    >
+                      <input
+                        id="f-ecommerce"
+                        type="checkbox"
+                        style="width: auto"
+                      />
+                      Possui E-commerce
+                    </label>
+                  </div>
+
+                  <div class="col-12">
+                    <label for="f-focus">Foco de atuação</label>
+                    <input
+                      id="f-focus"
+                      type="text"
+                      placeholder="Segmento ou nicho de mercado"
+                    />
+                  </div>
+                  <div class="col-12">
+                    <label for="f-analysis">Análise estratégica</label>
+                    <textarea
+                      id="f-analysis"
+                      placeholder="Observações, pontos fortes, oportunidades..."
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button type="reset" class="btn">🔄 Limpar</button>
+                  <button id="btn-save" type="submit" class="btn btn-primary">
+                    💾 Salvar Concorrente
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
+        </section>
 
-          <div class="card">
-            <table class="table" id="edit-table">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>Nome</th>
-                  <th>Cidade</th>
-                  <th>Ameaça</th>
-                  <th>Categoria</th>
-                  <th>Status</th>
-                  <th style="width:200px">Ações</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+        <section id="view-edit" style="display: none">
+          <div class="container">
+            <header>
+              <h1>Editar / Excluir Concorrentes</h1>
+              <p>
+                Gerencie os dados dos concorrentes e utilize seleção múltipla
+                para ações em lote
+              </p>
+            </header>
 
-          <div class="card" style="margin-top:16px">
-            <h3 style="margin-top:0">Formulário de Edição</h3>
-            <form id="edit-form">
-              <input type="hidden" id="e-id" />
+            <div class="card" style="margin-bottom: 16px">
               <div class="form-grid">
-                <div class="col-6">
-                  <label for="e-name">Nome *</label>
-                  <input id="e-name" type="text" required />
-                </div>
-                <div class="col-6">
-                  <label for="e-city">Cidade/UF *</label>
-                  <input id="e-city" type="text" required />
+                <div class="col-8">
+                  <input
+                    id="edit-search"
+                    type="text"
+                    placeholder="Buscar por nome ou cidade..."
+                  />
                 </div>
                 <div class="col-4">
-                  <label for="e-threat">Nível de Ameaça *</label>
-                  <select id="e-threat" required>
+                  <select id="edit-sort">
+                    <option value="az">Nome (A–Z)</option>
+                    <option value="za">Nome (Z–A)</option>
+                    <option value="cidade">Cidade</option>
+                    <option value="ameaca">Nível de ameaça</option>
+                  </select>
+                </div>
+                <div class="col-12 bulk">
+                  <label
+                    ><input type="checkbox" id="bulk-all" /> Selecionar
+                    tudo</label
+                  >
+                  <button class="btn" id="bulk-archive">📁 Arquivar</button>
+                  <button class="btn" id="bulk-unarchive">📂 Desarquivar</button>
+                  <button class="btn btn-danger" id="bulk-delete">
+                    🗑️ Excluir
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <table class="table" id="edit-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Nome</th>
+                    <th>Cidade</th>
+                    <th>Ameaça</th>
+                    <th>Categoria</th>
+                    <th>Status</th>
+                    <th style="width: 200px">Ações</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+
+            <div class="card" style="margin-top: 16px">
+              <h3 style="margin-top: 0">Formulário de Edição</h3>
+              <form id="edit-form">
+                <input type="hidden" id="e-id" />
+                <div class="form-grid">
+                  <div class="col-6">
+                    <label for="e-name">Nome *</label>
+                    <input id="e-name" type="text" required />
+                  </div>
+                  <div class="col-6">
+                    <label for="e-city">Cidade/UF *</label>
+                    <input id="e-city" type="text" required />
+                  </div>
+                  <div class="col-4">
+                    <label for="e-threat">Nível de Ameaça *</label>
+                    <select id="e-threat" required>
+                      <option value="alta">Alta</option>
+                      <option value="media">Média</option>
+                      <option value="baixa">Baixa</option>
+                    </select>
+                  </div>
+                  <div class="col-8">
+                    <label for="e-category">Categoria *</label>
+                    <select id="e-category" required>
+                      <option value="potes-copos">Potes e Copos</option>
+                      <option value="caixas-sorvete">Caixas de Sorvete</option>
+                      <option value="caixas-pizza">Caixas de Pizza</option>
+                      <option value="embalagens-industriais">
+                        Embalagens Industriais
+                      </option>
+                    </select>
+                  </div>
+                  <div class="col-6">
+                    <label for="e-website">Website</label>
+                    <input id="e-website" type="url" />
+                  </div>
+                  <div class="col-6">
+                    <label for="e-instagram">Instagram</label>
+                    <input id="e-instagram" type="url" />
+                  </div>
+
+                  <div class="col-6">
+                    <label for="e-meta-ads">Biblioteca de Anúncios Meta</label>
+                    <input
+                      id="e-meta-ads"
+                      type="url"
+                      placeholder="https://www.facebook.com/ads/library/..."
+                    />
+                  </div>
+                  <div class="col-6">
+                    <label for="e-google-ads"
+                      >Biblioteca de Anúncios Google</label
+                    >
+                    <input
+                      id="e-google-ads"
+                      type="url"
+                      placeholder="https://adstransparency.google.com/..."
+                    />
+                  </div>
+
+                  <div class="col-6">
+                    <label for="e-phone">Telefone</label>
+                    <input id="e-phone" type="text" />
+                  </div>
+                  <div class="col-6">
+                    <label for="e-cnpj">CNPJ</label>
+                    <input id="e-cnpj" type="text" />
+                  </div>
+                  <div class="col-6">
+                    <label for="e-tags">Tags</label>
+                    <input id="e-tags" type="text" />
+                  </div>
+                  <div class="col-6">
+                    <label for="e-ticket">Ticket médio (R$)</label>
+                    <input id="e-ticket" type="number" step="0.01" min="0" />
+                  </div>
+
+                  <div class="col-12" style="padding-top: 10px">
+                    <label
+                      for="e-ecommerce"
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 8px;
+                        cursor: pointer;
+                      "
+                    >
+                      <input
+                        id="e-ecommerce"
+                        type="checkbox"
+                        style="width: auto"
+                      />
+                      Possui E-commerce
+                    </label>
+                  </div>
+
+                  <div class="col-12">
+                    <label for="e-focus">Foco de atuação</label>
+                    <input id="e-focus" type="text" />
+                  </div>
+                  <div class="col-12">
+                    <label for="e-analysis">Análise estratégica</label>
+                    <textarea id="e-analysis"></textarea>
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button type="button" id="e-archive" class="btn">
+                    📁 Arquivar
+                  </button>
+                  <button type="button" id="e-delete" class="btn btn-danger">
+                    🗑️ Excluir
+                  </button>
+                  <button type="submit" class="btn btn-primary">
+                    💾 Salvar Alterações
+                  </button>
+                </div>
+                <p class="help">
+                  "Arquivar" oculta o concorrente dos grids sem apagar do
+                  histórico. "Excluir" remove definitivamente.
+                </p>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-io" style="display: none">
+          <div class="container">
+            <header>
+              <h1>Importar / Exportar Dados</h1>
+              <p>
+                Faça backup dos concorrentes ou importe dados de arquivos JSON,
+                CSV ou Excel
+              </p>
+            </header>
+
+            <div class="card" style="margin-bottom: 16px">
+              <div class="io-actions">
+                <button id="btn-export-json" class="btn">
+                  📥 Exportar JSON
+                </button>
+                <button id="btn-export-csv" class="btn">📊 Exportar CSV</button>
+                <button id="btn-export-excel" class="btn">
+                  📈 Exportar Excel
+                </button>
+
+                <div class="file-input-wrapper">
+                  <button class="btn btn-primary">📤 Importar JSON</button>
+                  <input type="file" id="file-import-json" accept=".json" />
+                </div>
+
+                <div class="file-input-wrapper">
+                  <button class="btn btn-primary">📤 Importar CSV</button>
+                  <input type="file" id="file-import-csv" accept=".csv" />
+                </div>
+
+                <div class="file-input-wrapper">
+                  <button class="btn btn-primary">📤 Importar Excel</button>
+                  <input
+                    type="file"
+                    id="file-import-excel"
+                    accept=".xlsx,.xls"
+                  />
+                </div>
+              </div>
+              <p class="help">
+                <strong>JSON:</strong> Formato nativo do sistema •
+                <strong>CSV:</strong> Compatível com Excel e Google Sheets •
+                <strong>Excel:</strong> Planilha formatada
+              </p>
+            </div>
+
+            <div class="card">
+              <h3 style="margin: 0 0 12px">Pré-visualização dos Dados</h3>
+              <textarea
+                id="io-preview"
+                style="
+                  width: 100%;
+                  min-height: 300px;
+                  font-family: monospace;
+                  font-size: 0.9rem;
+                "
+                readonly
+              ></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-report" style="display: none">
+          <div class="container">
+            <header class="report-header">
+              <div>
+                <h1 style="margin: 0">Relatório de Concorrentes</h1>
+                <p
+                  class="only-print"
+                  style="margin: 0.25rem 0 0; color: var(--text-muted)"
+                >
+                  Gerado em <span id="report-date"></span>
+                </p>
+              </div>
+              <div class="no-print">
+                <button class="btn" id="report-refresh">🔄 Atualizar</button>
+                <button class="btn btn-primary" id="report-print">
+                  🖨️ Imprimir
+                </button>
+                <button class="btn" id="report-export">📊 Exportar</button>
+              </div>
+            </header>
+
+            <div class="card no-print" style="margin-bottom: 16px">
+              <div class="form-grid">
+                <div class="col-4">
+                  <label>Categoria</label>
+                  <select id="report-cat">
+                    <option value="todos">Todas</option>
+                    <option value="potes-copos">Potes e Copos</option>
+                    <option value="caixas-sorvete">Caixas de Sorvete</option>
+                    <option value="caixas-pizza">Caixas de Pizza</option>
+                    <option value="embalagens-industriais">
+                      Embalagens Industriais
+                    </option>
+                  </select>
+                </div>
+                <div class="col-4">
+                  <label>Ameaça</label>
+                  <select id="report-threat">
+                    <option value="todos">Todos</option>
                     <option value="alta">Alta</option>
                     <option value="media">Média</option>
                     <option value="baixa">Baixa</option>
                   </select>
                 </div>
-                <div class="col-8">
-                  <label for="e-category">Categoria *</label>
-                  <select id="e-category" required>
-                    <option value="potes-copos">Potes e Copos</option>
-                    <option value="caixas-sorvete">Caixas de Sorvete</option>
-                    <option value="caixas-pizza">Caixas de Pizza</option>
-                    <option value="embalagens-industriais">Embalagens Industriais</option>
+                <div class="col-4">
+                  <label>Ordenar</label>
+                  <select id="report-sort">
+                    <option value="az">Nome (A–Z)</option>
+                    <option value="cidade">Cidade</option>
+                    <option value="ameaca">Ameaça</option>
                   </select>
                 </div>
-                <div class="col-6">
-                  <label for="e-website">Website</label>
-                  <input id="e-website" type="url" />
-                </div>
-                <div class="col-6">
-                  <label for="e-instagram">Instagram</label>
-                  <input id="e-instagram" type="url" />
-                </div>
-                <div class="col-6">
-                  <label for="e-phone">Telefone</label>
-                  <input id="e-phone" type="text" />
-                </div>
-                <div class="col-6">
-                  <label for="e-cnpj">CNPJ</label>
-                  <input id="e-cnpj" type="text" />
-                </div>
-                <div class="col-6">
-                  <label for="e-tags">Tags</label>
-                  <input id="e-tags" type="text" />
-                </div>
-                <div class="col-6">
-                  <label for="e-ticket">Ticket médio (R$)</label>
-                  <input id="e-ticket" type="number" step="0.01" min="0" />
-                </div>
-                <div class="col-12">
-                  <label for="e-focus">Foco de atuação</label>
-                  <input id="e-focus" type="text" />
-                </div>
-                <div class="col-12">
-                  <label for="e-analysis">Análise estratégica</label>
-                  <textarea id="e-analysis"></textarea>
-                </div>
-              </div>
-              <div class="form-actions">
-                <button type="button" id="e-archive" class="btn">📁 Arquivar</button>
-                <button type="button" id="e-delete" class="btn btn-danger">🗑️ Excluir</button>
-                <button type="submit" class="btn btn-primary">💾 Salvar Alterações</button>
-              </div>
-              <p class="help">"Arquivar" oculta o concorrente dos grids sem apagar do histórico. "Excluir" remove definitivamente.</p>
-            </form>
-          </div>
-        </div>
-      </section>
-
-      <!-- IMPORTAR/EXPORTAR -->
-      <section id="view-io" style="display:none">
-        <div class="container">
-          <header>
-            <h1>Importar / Exportar Dados</h1>
-            <p>Faça backup dos concorrentes ou importe dados de arquivos JSON, CSV ou Excel</p>
-          </header>
-
-          <div class="card" style="margin-bottom:16px">
-            <div class="io-actions">
-              <button id="btn-export-json" class="btn">📥 Exportar JSON</button>
-              <button id="btn-export-csv" class="btn">📊 Exportar CSV</button>
-              <button id="btn-export-excel" class="btn">📈 Exportar Excel</button>
-              
-              <div class="file-input-wrapper">
-                <button class="btn btn-primary">📤 Importar JSON</button>
-                <input type="file" id="file-import-json" accept=".json" />
-              </div>
-              
-              <div class="file-input-wrapper">
-                <button class="btn btn-primary">📤 Importar CSV</button>
-                <input type="file" id="file-import-csv" accept=".csv" />
-              </div>
-              
-              <div class="file-input-wrapper">
-                <button class="btn btn-primary">📤 Importar Excel</button>
-                <input type="file" id="file-import-excel" accept=".xlsx,.xls" />
               </div>
             </div>
-            <p class="help">
-              <strong>JSON:</strong> Formato nativo do sistema • 
-              <strong>CSV:</strong> Compatível com Excel e Google Sheets • 
-              <strong>Excel:</strong> Planilha formatada
-            </p>
-          </div>
 
-          <div class="card">
-            <h3 style="margin:0 0 12px">Pré-visualização dos Dados</h3>
-            <textarea id="io-preview" style="width:100%; min-height:300px; font-family: monospace; font-size:0.9rem" readonly></textarea>
-          </div>
-        </div>
-      </section>
-
-      <!-- RELATÓRIOS -->
-      <section id="view-report" style="display:none">
-        <div class="container">
-          <header class="report-header">
-            <div>
-              <h1 style="margin:0">Relatório de Concorrentes</h1>
-              <p class="only-print" style="margin:.25rem 0 0; color:var(--text-muted)">Gerado em <span id="report-date"></span></p>
-            </div>
-            <div class="no-print">
-              <button class="btn" id="report-refresh">🔄 Atualizar</button>
-              <button class="btn btn-primary" id="report-print">🖨️ Imprimir</button>
-              <button class="btn" id="report-export">📊 Exportar</button>
-            </div>
-          </header>
-
-          <div class="card no-print" style="margin-bottom:16px">
-            <div class="form-grid">
-              <div class="col-4">
-                <label>Categoria</label>
-                <select id="report-cat">
-                  <option value="todos">Todas</option>
-                  <option value="potes-copos">Potes e Copos</option>
-                  <option value="caixas-sorvete">Caixas de Sorvete</option>
-                  <option value="caixas-pizza">Caixas de Pizza</option>
-                  <option value="embalagens-industriais">Embalagens Industriais</option>
-                </select>
-              </div>
-              <div class="col-4">
-                <label>Ameaça</label>
-                <select id="report-threat">
-                  <option value="todos">Todos</option>
-                  <option value="alta">Alta</option>
-                  <option value="media">Média</option>
-                  <option value="baixa">Baixa</option>
-                </select>
-              </div>
-              <div class="col-4">
-                <label>Ordenar</label>
-                <select id="report-sort">
-                  <option value="az">Nome (A–Z)</option>
-                  <option value="cidade">Cidade</option>
-                  <option value="ameaca">Ameaça</option>
-                </select>
-              </div>
+            <div class="report-grid">
+              <table id="report-table">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Cidade</th>
+                    <th>Ameaça</th>
+                    <th>Categoria</th>
+                    <th>Foco</th>
+                    <th>Instagram / Site</th>
+                    <th>Tags</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
             </div>
           </div>
-
-          <div class="report-grid">
-            <table id="report-table">
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>Cidade</th>
-                  <th>Ameaça</th>
-                  <th>Categoria</th>
-                  <th>Foco</th>
-                  <th>Instagram / Site</th>
-                  <th>Tags</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <!-- MODAL DE DETALHES -->
-  <div id="competitor-modal" class="modal-overlay" aria-hidden="true" role="dialog" aria-modal="true">
-    <div class="modal-content">
-      <header class="modal-header">
-        <div id="modal-header-content" class="card-header"></div>
-        <button id="modal-close-btn" class="modal-close-btn" aria-label="Fechar modal">&times;</button>
-      </header>
-      <div class="modal-body">
-        <div id="modal-location" class="info-item"></div>
-        <div id="modal-focus" class="info-item"></div>
-        <div id="modal-analysis" style="margin:0; line-height: 1.7;"></div>
-        <div id="modal-tags" class="tag-chips"></div>
-      </div>
-      <footer class="modal-footer">
-        <div id="modal-actions" class="card-actions"></div>
-      </footer>
+        </section>
+      </main>
     </div>
-  </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="script.js"></script>
-</body>
+    <div
+      id="competitor-modal"
+      class="modal-overlay"
+      aria-hidden="true"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="modal-content">
+        <header class="modal-header">
+          <div id="modal-header-content" class="card-header"></div>
+          <button
+            id="modal-close-btn"
+            class="modal-close-btn"
+            aria-label="Fechar modal"
+          >
+            &times;
+          </button>
+        </header>
+        <div class="modal-body">
+          <div id="modal-location" class="info-item"></div>
+          <div id="modal-focus" class="info-item"></div>
+          <div id="modal-analysis" style="margin: 0; line-height: 1.7"></div>
+          <div id="modal-tags" class="tag-chips"></div>
+        </div>
+        <footer class="modal-footer">
+          <div id="modal-actions"></div>
+        </footer>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="script.js"></script>
+  </body>
 </html>
