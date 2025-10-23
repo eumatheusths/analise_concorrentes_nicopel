@@ -14,6 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
+
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -75,6 +76,29 @@
         ></path>
         <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
       </symbol>
+      
+      <symbol 
+        id="icon-meta" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round">
+        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+      </symbol>
+      <symbol 
+        id="icon-search" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </symbol>
+
     </svg>
 
     <div class="app">
@@ -205,7 +229,8 @@
               </div>
             </div>
 
-            <main id="competitors-grid"></main>
+            <main id="competitors-grid">
+              </main>
 
             <footer
               style="
@@ -710,13 +735,11 @@
         <div class="modal-body">
           <div id="modal-location" class="info-item"></div>
           <div id="modal-focus" class="info-item"></div>
-          <div id="modal-analysis" style="margin: 0; line-height: 1.7"></div>
+          <div id="modal-analysis" class="modal-analysis-text"></div>
           <div id="modal-tags" class="tag-chips"></div>
+          <div id="modal-links-container"></div>
         </div>
-        <footer class="modal-footer">
-          <div id="modal-actions"></div>
-        </footer>
-      </div>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
