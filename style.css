@@ -12,11 +12,13 @@
   --border-light: #f1f5f9; /* Borda mais clara */
 
   /* Sombras inspiradas no estilo moderno e clean */
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.04);
   --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
     0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 
   /* Cores da Sidebar para harmonizar com a paleta */
   --sidebar: #213034; /* Cinza escuro do Style Guide */
@@ -43,7 +45,7 @@
 
 /* Base Body e Fontes (usando Inter como alternativa moderna) */
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif; /* 'SF UI Display' não é uma fonte web padrão, 'Inter' é uma ótima alternativa moderna */
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background: var(--background-color);
   color: var(--text-color);
   line-height: 1.6;
@@ -523,41 +525,10 @@ select:focus {
   box-shadow: var(--shadow-sm);
 }
 
-/* Estilos para botões de anúncios nos cards */
-.card-footer {
-  display: flex;
-  gap: 10px;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border-light);
-  justify-content: space-around; /* Distribui os botões */
-}
-
-.card-footer .btn-ad {
-  flex: 1;
-  padding: 8px 12px;
-  font-size: 0.85rem;
-  text-align: center;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-color);
-  background: var(--background-color);
-  color: var(--text-muted);
-  font-weight: 600;
-  transition: var(--transition);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.card-footer .btn-ad:hover {
-  background: var(--border-light);
-  border-color: var(--secondary-color);
-  color: var(--text-color);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
-}
+/* REMOVIDO: Estilos para botões de anúncios nos cards
+.card-footer { ... }
+.card-footer .btn-ad { ... }
+*/
 
 /* MODAL (ajustado para o novo design) */
 .modal-overlay {
@@ -611,10 +582,11 @@ select:focus {
 }
 
 .modal-header .card-header {
-  margin-bottom: 0;
+  margin-bottom: 0; /* Remove margem do card-header dentro do modal-header */
 }
 
 .modal-close-btn {
+  position: static; /* Botão agora flui com o header */
   background: var(--border-light);
   border: none;
   width: 38px;
@@ -642,21 +614,10 @@ select:focus {
   overflow: auto;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  font-size: 1rem;
+  gap: 24px; /* Espaçamento entre os itens do modal */
 }
 
-.modal-footer {
-  padding: 20px 24px;
-  border-top: 1px solid var(--border-light);
-  background: var(--background-color);
-  position: sticky;
-  bottom: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: flex-start; /* Alinha botões à esquerda */
-}
+/* REMOVIDO: .modal-footer { ... } */
 
 .modal-body .info-item {
   color: var(--text-color);
@@ -666,6 +627,62 @@ select:focus {
 .modal-body .info-item svg {
   color: var(--primary-color);
 }
+
+/* NOVO: Estilo para o texto de análise */
+.modal-analysis-text {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-color);
+}
+
+/* NOVO: Container para os botões-card */
+#modal-links-container {
+  display: grid;
+  grid-template-columns: 1fr; /* 1 coluna por padrão */
+  gap: 16px;
+  margin-top: 8px; /* Espaço após as tags */
+}
+
+/* Em telas maiores, 2 colunas */
+@media (min-width: 600px) {
+  #modal-links-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* NOVO: Estilo para os botões-card (inspirado em image_81d69a.png) */
+.modal-link-card {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* Mais espaço entre ícone e texto */
+  padding: 20px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background: var(--card-background);
+  text-decoration: none;
+  color: var(--text-color);
+  transition: var(--transition);
+  box-shadow: var(--shadow);
+}
+
+.modal-link-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--primary-color);
+}
+
+.modal-link-card svg {
+  width: 40px;
+  height: 40px;
+  color: var(--primary-color);
+  flex-shrink: 0;
+}
+
+.modal-link-card span {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
 
 @media (max-width: 767px) {
   .modal-content {
@@ -679,6 +696,9 @@ select:focus {
     position: absolute; /* Volta a ser absoluto para mobile */
     top: 16px;
     right: 16px;
+  }
+  .modal-header .card-header {
+    max-width: calc(100% - 50px); /* Garante que o título não sobreponha o X */
   }
 }
 
