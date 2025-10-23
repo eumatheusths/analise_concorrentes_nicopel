@@ -343,7 +343,7 @@ header p {
 
 .search-icon {
   position: absolute;
-  left: 200px;
+  left: 90%;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
