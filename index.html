@@ -14,7 +14,6 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
-
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -117,7 +116,11 @@
                 class="tabs-nav"
                 aria-label="Categorias de Produto"
               >
-                <button class="tab-btn active" data-category="todos" type="button">
+                <button
+                  class="tab-btn active"
+                  data-category="todos"
+                  type="button"
+                >
                   Todas Categorias
                 </button>
                 <button
@@ -158,7 +161,11 @@
                 aria-label="Tipo de Concorrência"
                 style="padding: 0"
               >
-                <button class="tab-btn active" data-threat="todos" type="button">
+                <button
+                  class="tab-btn active"
+                  data-threat="todos"
+                  type="button"
+                >
                   Todos
                 </button>
                 <button class="tab-btn" data-threat="direto" type="button">
@@ -198,11 +205,14 @@
               </div>
             </div>
 
-            <main id="competitors-grid">
-              </main>
+            <main id="competitors-grid"></main>
 
             <footer
-              style="text-align: center; margin-top: 32px; color: var(--text-muted)"
+              style="
+                text-align: center;
+                margin-top: 32px;
+                color: var(--text-muted);
+              "
             >
               <p>Dashboard atualizado em <span id="last-updated"></span></p>
             </footer>
@@ -417,7 +427,7 @@
             </div>
 
             <div class="card" style="margin-top: 16px">
-              <h3 style="margin-top: 0">Formulário de Edição</h3>
+              <h3 style="margin: 0 0 12px">Formulário de Edição</h3>
               <form id="edit-form">
                 <input type="hidden" id="e-id" />
                 <div class="form-grid">
