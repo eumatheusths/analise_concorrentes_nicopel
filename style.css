@@ -461,6 +461,26 @@ select:focus {
   line-height: 1.3;
   color: var(--text-color);
   letter-spacing: -0.02em;
+  flex: 1; /* ATUALIZADO: Permite que o h3 cresça */
+  min-width: 0; /* ATUALIZADO: Evita overflow */
+}
+
+/* NOVO: Estilo para o selo E-commerce */
+.ecommerce-badge {
+  background-color: #7c3aed; /* Roxo */
+  color: #ffffff; /* Branco */
+  padding: 4px 10px;
+  border-radius: 999px; /* Pill shape */
+  font-size: 0.75rem; /* Pequeno */
+  font-weight: 700; /* Negrito */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap; /* Não quebrar linha */
+  margin-left: auto; /* Joga para a direita */
+  flex-shrink: 0; /* Não encolher */
+  margin-top: 4px; /* Alinhar visualmente com o h3 */
+  cursor: default; /* Impede de parecer clicável (a menos que tenha ação) */
 }
 
 .card-body {
@@ -683,7 +703,6 @@ select:focus {
   font-weight: 600;
 }
 
-
 @media (max-width: 767px) {
   .modal-content {
     width: 100%;
@@ -698,7 +717,9 @@ select:focus {
     right: 16px;
   }
   .modal-header .card-header {
-    max-width: calc(100% - 50px); /* Garante que o título não sobreponha o X */
+    max-width: calc(
+      100% - 50px
+    ); /* Garante que o título não sobreponha o X */
   }
 }
 
