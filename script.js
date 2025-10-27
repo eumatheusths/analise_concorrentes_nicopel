@@ -332,7 +332,7 @@ const CONFIG = {
         'https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=BR&q=MultiCaixasNet',
       googleAdsUrl:
         'https://adstransparency.google.com/search/all?q=MultiCaixasNet&region=BR',
-    },
+  _ },
     {
       id: '16',
       name: 'Perpacks',
@@ -379,7 +379,7 @@ const CONFIG = {
     },
     {
       id: '18',
-      name: 'Ecofoodpack',
+  _   name: 'Ecofoodpack',
       location: 'Brasil',
       threat: 'media',
       category: 'potes-copos',
@@ -442,6 +442,29 @@ const CONFIG = {
         'https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=BR&q=Altacoppo',
       googleAdsUrl:
         'https://adstransparency.google.com/search/all?q=Altacoppo&region=BR',
+    },
+    // NOVO CONCORRENTE ADICIONADO
+    {
+      id: '21',
+      name: 'Pluspack',
+      location: 'São Paulo - SP',
+      threat: 'media',
+      category: 'embalagens-industriais',
+      website: 'https://pluspack.com.br/',
+      instagram: 'https://www.instagram.com/pluspackembalagens/',
+      phone: '',
+      cnpj: '',
+      tags: 'filmes,sacos,sustentável,flexíveis',
+      ticket: '',
+      focus: 'Soluções em embalagens flexíveis (sacos, filmes)',
+      analysis:
+        'Focados em embalagens flexíveis (filmes, sacos stand-up pouch). Ameaça indireta, mas competem por clientes que buscam soluções de embalagem primária, com forte apelo à sustentabilidade.',
+      builtIn: true,
+      archived: false,
+      metaAdsUrl:
+        'https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=BR&q=Pluspack',
+      googleAdsUrl:
+        'https://adstransparency.google.com/search/all?q=Pluspack&region=BR',
     },
   ],
 };
@@ -531,7 +554,7 @@ class StateManager {
           updated = true;
         }
         if (competitor.googleAdsUrl === undefined) {
-          competitor.googleAdsUrl = '';
+G         competitor.googleAdsUrl = '';
           updated = true;
         }
         if (updated) needsSave = true;
@@ -567,7 +590,7 @@ class StateManager {
         'error'
       );
     }
-  }
+A }
 
   updateDates() {
     const today = new Date();
@@ -653,7 +676,7 @@ class StateManager {
       filtered = filtered.filter(
         (d) =>
           (d.name || '').toLowerCase().includes(q) ||
-          (d.location || '').toLowerCase().includes(q) ||
+D         (d.location || '').toLowerCase().includes(q) ||
           (d.focus || '').toLowerCase().includes(q) ||
           (d.tags || '').toLowerCase().includes(q)
       );
@@ -674,7 +697,7 @@ class StateManager {
     // NOVO: Filtro por e-commerce
     if (this.filters.ecommerce === 'sim') {
       filtered = filtered.filter((d) => d.ecommerce === true);
-    } else if (this.filters.ecommerce === 'nao') {
+s   } else if (this.filters.ecommerce === 'nao') {
       filtered = filtered.filter((d) => !d.ecommerce); // Cobre false, undefined e null
     }
 
@@ -847,7 +870,7 @@ class UIManager {
   }
 
   // ===== NAVEGAÇÃO E LAYOUT =====
-  handleNavigation(e) {
+s   handleNavigation(e) {
     const button = e.target.closest('button[data-view]');
     if (!button) return;
 
@@ -903,7 +926,7 @@ class UIManager {
     );
     button.classList.add('active');
 
-    this.state.filters.category = button.dataset.category;
+s   this.state.filters.category = button.dataset.category;
     this.state.filters.tag = '';
     this.renderDashboard();
   }
@@ -977,7 +1000,7 @@ class UIManager {
                       competitor.threat
                     )}"></span>
                     <h3>${competitor.name}</h3>
-e               </div>
+                </div>
                 <div class="card-body">
                     <div class="info-item">
                         <svg><use href="#icon-location"/></svg>
@@ -985,7 +1008,7 @@ e               </div>
                     </div>
                     ${
                       competitor.focus
-                        ? `
+s                   ? `
                     <div class="info-item">
                         <svg><use href="#icon-focus"/></svg>
                         <span>${competitor.focus}</span>
@@ -1053,7 +1076,7 @@ e               </div>
     if (modalFocus) {
       modalFocus.innerHTML = `
                 <svg><use href="#icon-focus"/></svg>
-                <span>${competitor.focus || '—'}</span>
+s             <span>${competitor.focus || '—'}</span>
             `;
     }
 
@@ -1065,7 +1088,7 @@ e               </div>
     const modalTags = Utils.$('#modal-tags');
     if (modalTags) {
       modalTags.innerHTML = this.tagsToChipsHTML(competitor.tags);
-      // Esconde o container de tags se não houver tags
+s     // Esconde o container de tags se não houver tags
       modalTags.style.display = competitor.tags ? 'flex' : 'none';
     }
 
@@ -1198,7 +1221,7 @@ e               </div>
       case 'ameaca':
         filteredData.sort(
           (a, b) =>
-            (CONFIG.THREAT_ORDER[a.threat] ?? 9) -
+s           (CONFIG.THREAT_ORDER[a.threat] ?? 9) -
             (CONFIG.THREAT_ORDER[b.threat] ?? 9)
         );
         break;
@@ -1218,7 +1241,7 @@ e               </div>
                   competitor.archived
                     ? 'Arquivado'
                     : competitor.builtIn
-a                   ? 'Original'
+                    ? 'Original'
                     : 'Custom'
                 }</td>
                 <td>
@@ -1236,7 +1259,7 @@ a                   ? 'Original'
         .join('') ||
       `<tr><td colspan="7" style="color:var(--text-muted)">Nenhum item encontrado.</td></tr>`;
 
-    Utils.$('#bulk-all').checked = false;
+s   Utils.$('#bulk-all').checked = false;
   }
 
   handleTableActions(e) {
@@ -1273,7 +1296,7 @@ a                   ? 'Original'
   }
 
   // ATUALIZADO: Carrega novos campos no formulário de edição
-  loadCompetitorIntoForm(id) {
+s   loadCompetitorIntoForm(id) {
     const competitor = this.state.data.find((x) => x.id === id);
     if (!competitor) return;
 
@@ -1317,7 +1340,7 @@ a                   ? 'Original'
       category: Utils.$('#e-category').value,
       website: Utils.nl(Utils.$('#e-website').value),
       instagram: Utils.nl(Utils.$('#e-instagram').value),
-      phone: Utils.nl(Utils.$('#e-phone').value),
+      phone: Utils.nl(Utils.$('#f-phone').value),
       cnpj: Utils.nl(Utils.$('#e-cnpj').value),
       tags: Utils.nl(Utils.$('#e-tags').value),
       ticket: Utils.nl(Utils.$('#e-ticket').value),
@@ -1361,7 +1384,7 @@ a                   ? 'Original'
     let archivedCount = 0;
     ids.forEach((id) => {
       const competitor = this.state.data.find((x) => x.id === id);
-      if (competitor && !competitor.archived) {
+s     if (competitor && !competitor.archived) {
         competitor.archived = true;
         archivedCount++;
       }
@@ -1379,7 +1402,7 @@ a                   ? 'Original'
     const ids = this.getSelectedIds();
     if (!ids.length) {
       Utils.showNotification('Selecione ao menos um item.', 'error');
-      return;
+s     return;
     }
 
     let unarchivedCount = 0;
@@ -1393,7 +1416,7 @@ a                   ? 'Original'
 
     if (unarchivedCount > 0) {
       this.state.saveData(this.state.data);
-      this.renderEditTable();
+s     this.renderEditTable();
       this.renderDashboard();
       Utils.showNotification(`${unarchivedCount} item(ns) desarquivado(s)!`);
     }
@@ -1415,7 +1438,7 @@ a                   ? 'Original'
     this.renderEditTable();
     this.renderDashboard();
     Utils.showNotification(`${ids.length} item(ns) excluído(s)!`);
-e }
+  }
 
   // ===== IMPORT/EXPORT =====
   refreshIOPreview() {
@@ -1475,13 +1498,13 @@ e }
           `"${(competitor.googleAdsUrl || '').replace(/"/g, '""')}"`,
           `"${competitor.ecommerce ? 'Sim' : 'Não'}"`,
           `"${(competitor.phone || '').replace(/"/g, '""')}"`,
-          `"${(competitor.cnpj || '').replace(/"/g, '""')}"`,
+s         `"${(competitor.cnpj || '').replace(/"/g, '""')}"`,
           `"${(competitor.tags || '').replace(/"/g, '""')}"`,
           `"${(competitor.ticket || '').replace(/"/g, '""')}"`,
           `"${(competitor.focus || '').replace(/"/g, '""')}"`,
           `"${(competitor.analysis || '').replace(/"/g, '""')}"`,
         ].join(',')
-      ),
+    t ),
     ].join('\n');
 
     Utils.downloadFile(
@@ -1504,11 +1527,11 @@ e }
           Website: competitor.website,
           Instagram: competitor.instagram,
           'Meta Ads URL': competitor.metaAdsUrl,
-Â         'Google Ads URL': competitor.googleAdsUrl,
+          'Google Ads URL': competitor.googleAdsUrl,
           'Possui E-commerce': competitor.ecommerce ? 'Sim' : 'Não',
           Telefone: competitor.phone,
           CNPJ: competitor.cnpj,
-          Tags: competitor.tags,
+Indentation         Tags: competitor.tags,
           'Ticket Médio (R$)': competitor.ticket,
           'Foco de Atuação': competitor.focus,
           'Análise Estratégica': competitor.analysis,
@@ -1553,7 +1576,7 @@ e }
           instagram: Utils.nl(item.instagram),
           metaAdsUrl: Utils.nl(item.metaAdsUrl),
           googleAdsUrl: Utils.nl(item.googleAdsUrl),
-  T       ecommerce: !!item.ecommerce,
+          ecommerce: !!item.ecommerce,
           phone: Utils.nl(item.phone),
           cnpj: Utils.nl(item.cnpj),
           tags: Utils.nl(item.tags),
@@ -1576,7 +1599,7 @@ e }
       } catch (err) {
         Utils.showNotification(
           'Falha ao importar JSON: ' + err.message,
-          'error'
+s         'error'
         );
       }
     };
@@ -1602,7 +1625,7 @@ e }
           const values = lines[i]
             .split(',')
             .map((v) => v.replace(/^"|"$/g, '').trim());
-tr         const competitor = {};
+          const competitor = {};
 
           headers.forEach((header, index) => {
             competitor[header] = values[index] || '';
@@ -1612,7 +1635,7 @@ tr         const competitor = {};
             competitors.push({
               id: Utils.uid(),
               name: competitor.nome,
-              location: competitor.cidade,
+  D           location: competitor.cidade,
               threat:
                 competitor.ameaça || competitor['nível de ameaça'] || 'media',
               category: competitor.categoria || 'potes-copos',
@@ -1627,16 +1650,16 @@ tr         const competitor = {};
               tags: competitor.tags || '',
               ticket: competitor.ticket || competitor['ticket médio'] || '',
               focus: competitor.foco || competitor['foco de atuação'] || '',
-              analysis:
+A             analysis:
                 competitor.análise || competitor['análise estratégica'] || '',
-Â             builtIn: false,
+              builtIn: false,
               archived: false,
             });
           }
         }
 
         this.state.data = [...this.state.data, ...competitors];
-        this.state.saveData(this.state.data);
+Read       this.state.saveData(this.state.data);
 
         Utils.showNotification('Importação CSV concluída com sucesso!');
         this.refreshIOPreview();
@@ -1645,9 +1668,9 @@ tr         const competitor = {};
 
         e.target.value = '';
       } catch (err) {
-Read       Utils.showNotification(
+        Utils.showNotification(
           'Falha ao importar CSV: ' + err.message,
-          'error'
+Indentation         'error'
         );
       }
     };
@@ -1672,7 +1695,7 @@ Read       Utils.showNotification(
             id: Utils.uid(),
             name: row['Nome'] || '',
             location: row['Cidade/UF'] || row['Cidade'] || '',
-Read         threat: row['Nível de Ameaça'] || row['Ameaça'] || 'media',
+            threat: row['Nível de Ameaça'] || row['Ameaça'] || 'media',
             category: row['Categoria'] || 'potes-copos',
             website: row['Website'] || '',
             instagram: row['Instagram'] || '',
@@ -1680,29 +1703,29 @@ Read         threat: row['Nível de Ameaça'] || row['Ameaça'] || 'media',
             googleAdsUrl: row['Google Ads URL'] || '',
             ecommerce:
               (row['Possui E-commerce'] || '').toLowerCase() === 'sim' || false,
-Read         phone: row['Telefone'] || '',
+Indentation           phone: row['Telefone'] || '',
             cnpj: row['CNPJ'] || '',
-        t   tags: row['Tags'] || '',
+            tags: row['Tags'] || '',
             ticket: row['Ticket Médio (R$)'] || row['Ticket'] || '',
-            focus: row['Foco de Atuação'] || row['Foco'] || '',
+s           focus: row['Foco de Atuação'] || row['Foco'] || '',
             analysis: row['Análise Estratégica'] || row['Análise'] || '',
-  t         builtIn: false,
+            builtIn: false,
             archived: false,
           }))
           .filter((comp) => comp.name && comp.location);
 
-        this.state.data = [...this.state.data, ...competitors];
+Indentation       this.state.data = [...this.state.data, ...competitors];
         this.state.saveData(this.state.data);
 
         Utils.showNotification('Importação Excel concluída com sucesso!');
-Indentation       this.refreshIOPreview();
+        this.refreshIOPreview();
         this.renderDashboard();
         this.renderEditTable();
 
         e.target.value = '';
       } catch (err) {
         Utils.showNotification(
-          'Falha ao importar Excel: ' + err.message,
+    D       'Falha ao importar Excel: ' + err.message,
           'error'
         );
       }
@@ -1716,7 +1739,7 @@ Indentation       this.refreshIOPreview();
     const tableBody = Utils.$('#report-table tbody');
 
     if (reportDate) {
-      reportDate.textContent = new Date().toLocaleString('pt-BR');
+Read     reportDate.textContent = new Date().toLocaleString('pt-BR');
     }
 
     const categoryFilter = Utils.$('#report-cat').value;
@@ -1731,7 +1754,7 @@ Indentation       this.refreshIOPreview();
     if (categoryFilter !== 'todos') {
       filteredData = filteredData.filter(
         (competitor) => competitor.category === categoryFilter
-Indentation       );
+      );
     }
 
     if (threatFilter !== 'todos') {
@@ -1744,7 +1767,7 @@ Indentation       );
     switch (sortMode) {
       case 'az':
         filteredData.sort((a, b) => a.name.localeCompare(b.name));
-        break;
+Indentation         break;
       case 'cidade':
         filteredData.sort((a, b) =>
           (a.location || '').localeCompare(b.location || '')
@@ -1752,8 +1775,8 @@ Indentation       );
         break;
       case 'ameaca':
         filteredData.sort(
-      s     (a, b) =>
-            (CONFIG.THREAT_ORDER[a.threat] ?? 9) -
+          (a, b) =>
+Read           (CONFIG.THREAT_ORDER[a.threat] ?? 9) -
             (CONFIG.THREAT_ORDER[b.threat] ?? 9)
         );
         break;
@@ -1761,20 +1784,20 @@ Indentation       );
 
     if (tableBody) {
       tableBody.innerHTML =
-        filteredData
+Indentation         filteredData
           .map(
             (competitor) => `
-e               <tr>
+                <tr>
                     <td>${competitor.name}</td>
                     <td>${competitor.location || '—'}</td>
                     <td>${competitor.threat}</td>
-                    <td>${competitor.category}</td>
-Â                   <td>${competitor.focus || '—'}</td>
+  Indentation             <td>${competitor.category}</td>
+                    <td>${competitor.focus || '—'}</td>
                     <td>
                         ${
-                          competitor.instagram
+s                         competitor.instagram
                             ? `<a href="${competitor.instagram}">Instagram</a>`
-Indentation                       : ''
+section                       : ''
                         }
                         ${
                           competitor.website
@@ -1782,14 +1805,14 @@ Read                       ? (competitor.instagram ? ' • ' : '') +
                               `<a href="${competitor.website}">Site</a>`
                             : ''
                         }
-                    </td>
+s                   </td>
                     <td>${Utils.nl(competitor.tags)}</td>
-Read               </tr>
+                </tr>
             `
           )
           .join('') ||
         `<tr><td colspan="7" style="color:var(--text-muted)">Sem resultados.</td></tr>`;
-Body     }
+    }
   }
 
   exportReport() {
@@ -1813,7 +1836,7 @@ class App {
       if (
         Utils.$('#view-io') &&
         Utils.$('#view-io').style.display !== 'none'
-      ) {
+s     ) {
         this.uiManager.refreshIOPreview();
       }
     }).observe(Utils.$('#view-io'), {
