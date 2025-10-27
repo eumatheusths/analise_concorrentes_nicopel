@@ -332,7 +332,7 @@ const CONFIG = {
         'https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=BR&q=MultiCaixasNet',
       googleAdsUrl:
         'https://adstransparency.google.com/search/all?q=MultiCaixasNet&region=BR',
-  _ },
+    },
     {
       id: '16',
       name: 'Perpacks',
@@ -379,7 +379,7 @@ const CONFIG = {
     },
     {
       id: '18',
-  _   name: 'Ecofoodpack',
+      name: 'Ecofoodpack',
       location: 'Brasil',
       threat: 'media',
       category: 'potes-copos',
@@ -398,7 +398,7 @@ const CONFIG = {
         'https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=BR&q=Ecofoodpack',
       googleAdsUrl:
         'https://adstransparency.google.com/search/all?q=Ecofoodpack&region=BR',
-    },
+  st },
     {
       id: '19',
       name: 'DCX Embalagens',
@@ -554,7 +554,7 @@ class StateManager {
           updated = true;
         }
         if (competitor.googleAdsUrl === undefined) {
-G         competitor.googleAdsUrl = '';
+          competitor.googleAdsUrl = '';
           updated = true;
         }
         if (updated) needsSave = true;
@@ -590,7 +590,7 @@ G         competitor.googleAdsUrl = '';
         'error'
       );
     }
-A }
+  }
 
   updateDates() {
     const today = new Date();
@@ -676,7 +676,7 @@ A }
       filtered = filtered.filter(
         (d) =>
           (d.name || '').toLowerCase().includes(q) ||
-D         (d.location || '').toLowerCase().includes(q) ||
+          (d.location || '').toLowerCase().includes(q) ||
           (d.focus || '').toLowerCase().includes(q) ||
           (d.tags || '').toLowerCase().includes(q)
       );
@@ -697,7 +697,7 @@ D         (d.location || '').toLowerCase().includes(q) ||
     // NOVO: Filtro por e-commerce
     if (this.filters.ecommerce === 'sim') {
       filtered = filtered.filter((d) => d.ecommerce === true);
-s   } else if (this.filters.ecommerce === 'nao') {
+    } else if (this.filters.ecommerce === 'nao') {
       filtered = filtered.filter((d) => !d.ecommerce); // Cobre false, undefined e null
     }
 
@@ -870,7 +870,7 @@ class UIManager {
   }
 
   // ===== NAVEGAÇÃO E LAYOUT =====
-s   handleNavigation(e) {
+  handleNavigation(e) {
     const button = e.target.closest('button[data-view]');
     if (!button) return;
 
@@ -926,7 +926,7 @@ s   handleNavigation(e) {
     );
     button.classList.add('active');
 
-s   this.state.filters.category = button.dataset.category;
+    this.state.filters.category = button.dataset.category;
     this.state.filters.tag = '';
     this.renderDashboard();
   }
@@ -1008,7 +1008,7 @@ s   this.state.filters.category = button.dataset.category;
                     </div>
                     ${
                       competitor.focus
-s                   ? `
+                        ? `
                     <div class="info-item">
                         <svg><use href="#icon-focus"/></svg>
                         <span>${competitor.focus}</span>
@@ -1076,7 +1076,7 @@ s                   ? `
     if (modalFocus) {
       modalFocus.innerHTML = `
                 <svg><use href="#icon-focus"/></svg>
-s             <span>${competitor.focus || '—'}</span>
+                <span>${competitor.focus || '—'}</span>
             `;
     }
 
@@ -1088,7 +1088,7 @@ s             <span>${competitor.focus || '—'}</span>
     const modalTags = Utils.$('#modal-tags');
     if (modalTags) {
       modalTags.innerHTML = this.tagsToChipsHTML(competitor.tags);
-s     // Esconde o container de tags se não houver tags
+      // Esconde o container de tags se não houver tags
       modalTags.style.display = competitor.tags ? 'flex' : 'none';
     }
 
@@ -1221,7 +1221,7 @@ s     // Esconde o container de tags se não houver tags
       case 'ameaca':
         filteredData.sort(
           (a, b) =>
-s           (CONFIG.THREAT_ORDER[a.threat] ?? 9) -
+            (CONFIG.THREAT_ORDER[a.threat] ?? 9) -
             (CONFIG.THREAT_ORDER[b.threat] ?? 9)
         );
         break;
@@ -1259,7 +1259,7 @@ s           (CONFIG.THREAT_ORDER[a.threat] ?? 9) -
         .join('') ||
       `<tr><td colspan="7" style="color:var(--text-muted)">Nenhum item encontrado.</td></tr>`;
 
-s   Utils.$('#bulk-all').checked = false;
+    Utils.$('#bulk-all').checked = false;
   }
 
   handleTableActions(e) {
@@ -1296,7 +1296,7 @@ s   Utils.$('#bulk-all').checked = false;
   }
 
   // ATUALIZADO: Carrega novos campos no formulário de edição
-s   loadCompetitorIntoForm(id) {
+  loadCompetitorIntoForm(id) {
     const competitor = this.state.data.find((x) => x.id === id);
     if (!competitor) return;
 
@@ -1340,7 +1340,7 @@ s   loadCompetitorIntoForm(id) {
       category: Utils.$('#e-category').value,
       website: Utils.nl(Utils.$('#e-website').value),
       instagram: Utils.nl(Utils.$('#e-instagram').value),
-      phone: Utils.nl(Utils.$('#f-phone').value),
+      phone: Utils.nl(Utils.$('#e-phone').value), // <<< CORRIGIDO (era f-phone)
       cnpj: Utils.nl(Utils.$('#e-cnpj').value),
       tags: Utils.nl(Utils.$('#e-tags').value),
       ticket: Utils.nl(Utils.$('#e-ticket').value),
@@ -1384,7 +1384,7 @@ s   loadCompetitorIntoForm(id) {
     let archivedCount = 0;
     ids.forEach((id) => {
       const competitor = this.state.data.find((x) => x.id === id);
-s     if (competitor && !competitor.archived) {
+      if (competitor && !competitor.archived) {
         competitor.archived = true;
         archivedCount++;
       }
@@ -1402,7 +1402,7 @@ s     if (competitor && !competitor.archived) {
     const ids = this.getSelectedIds();
     if (!ids.length) {
       Utils.showNotification('Selecione ao menos um item.', 'error');
-s     return;
+      return;
     }
 
     let unarchivedCount = 0;
@@ -1416,7 +1416,7 @@ s     return;
 
     if (unarchivedCount > 0) {
       this.state.saveData(this.state.data);
-s     this.renderEditTable();
+      this.renderEditTable();
       this.renderDashboard();
       Utils.showNotification(`${unarchivedCount} item(ns) desarquivado(s)!`);
     }
@@ -1498,13 +1498,13 @@ s     this.renderEditTable();
           `"${(competitor.googleAdsUrl || '').replace(/"/g, '""')}"`,
           `"${competitor.ecommerce ? 'Sim' : 'Não'}"`,
           `"${(competitor.phone || '').replace(/"/g, '""')}"`,
-s         `"${(competitor.cnpj || '').replace(/"/g, '""')}"`,
+          `"${(competitor.cnpj || '').replace(/"/g, '""')}"`,
           `"${(competitor.tags || '').replace(/"/g, '""')}"`,
           `"${(competitor.ticket || '').replace(/"/g, '""')}"`,
           `"${(competitor.focus || '').replace(/"/g, '""')}"`,
           `"${(competitor.analysis || '').replace(/"/g, '""')}"`,
         ].join(',')
-    t ),
+      ),
     ].join('\n');
 
     Utils.downloadFile(
@@ -1531,7 +1531,7 @@ s         `"${(competitor.cnpj || '').replace(/"/g, '""')}"`,
           'Possui E-commerce': competitor.ecommerce ? 'Sim' : 'Não',
           Telefone: competitor.phone,
           CNPJ: competitor.cnpj,
-Indentation         Tags: competitor.tags,
+          Tags: competitor.tags,
           'Ticket Médio (R$)': competitor.ticket,
           'Foco de Atuação': competitor.focus,
           'Análise Estratégica': competitor.analysis,
@@ -1599,7 +1599,7 @@ Indentation         Tags: competitor.tags,
       } catch (err) {
         Utils.showNotification(
           'Falha ao importar JSON: ' + err.message,
-s         'error'
+          'error'
         );
       }
     };
@@ -1635,7 +1635,7 @@ s         'error'
             competitors.push({
               id: Utils.uid(),
               name: competitor.nome,
-  D           location: competitor.cidade,
+              location: competitor.cidade,
               threat:
                 competitor.ameaça || competitor['nível de ameaça'] || 'media',
               category: competitor.categoria || 'potes-copos',
@@ -1650,7 +1650,7 @@ s         'error'
               tags: competitor.tags || '',
               ticket: competitor.ticket || competitor['ticket médio'] || '',
               focus: competitor.foco || competitor['foco de atuação'] || '',
-A             analysis:
+              analysis:
                 competitor.análise || competitor['análise estratégica'] || '',
               builtIn: false,
               archived: false,
@@ -1659,7 +1659,7 @@ A             analysis:
         }
 
         this.state.data = [...this.state.data, ...competitors];
-Read       this.state.saveData(this.state.data);
+        this.state.saveData(this.state.data);
 
         Utils.showNotification('Importação CSV concluída com sucesso!');
         this.refreshIOPreview();
@@ -1670,7 +1670,7 @@ Read       this.state.saveData(this.state.data);
       } catch (err) {
         Utils.showNotification(
           'Falha ao importar CSV: ' + err.message,
-Indentation         'error'
+          'error'
         );
       }
     };
@@ -1703,18 +1703,18 @@ Indentation         'error'
             googleAdsUrl: row['Google Ads URL'] || '',
             ecommerce:
               (row['Possui E-commerce'] || '').toLowerCase() === 'sim' || false,
-Indentation           phone: row['Telefone'] || '',
+            phone: row['Telefone'] || '',
             cnpj: row['CNPJ'] || '',
             tags: row['Tags'] || '',
             ticket: row['Ticket Médio (R$)'] || row['Ticket'] || '',
-s           focus: row['Foco de Atuação'] || row['Foco'] || '',
+            focus: row['Foco de Atuação'] || row['Foco'] || '',
             analysis: row['Análise Estratégica'] || row['Análise'] || '',
             builtIn: false,
             archived: false,
           }))
           .filter((comp) => comp.name && comp.location);
 
-Indentation       this.state.data = [...this.state.data, ...competitors];
+        this.state.data = [...this.state.data, ...competitors];
         this.state.saveData(this.state.data);
 
         Utils.showNotification('Importação Excel concluída com sucesso!');
@@ -1725,7 +1725,7 @@ Indentation       this.state.data = [...this.state.data, ...competitors];
         e.target.value = '';
       } catch (err) {
         Utils.showNotification(
-    D       'Falha ao importar Excel: ' + err.message,
+          'Falha ao importar Excel: ' + err.message,
           'error'
         );
       }
@@ -1739,7 +1739,7 @@ Indentation       this.state.data = [...this.state.data, ...competitors];
     const tableBody = Utils.$('#report-table tbody');
 
     if (reportDate) {
-Read     reportDate.textContent = new Date().toLocaleString('pt-BR');
+      reportDate.textContent = new Date().toLocaleString('pt-BR');
     }
 
     const categoryFilter = Utils.$('#report-cat').value;
@@ -1767,7 +1767,7 @@ Read     reportDate.textContent = new Date().toLocaleString('pt-BR');
     switch (sortMode) {
       case 'az':
         filteredData.sort((a, b) => a.name.localeCompare(b.name));
-Indentation         break;
+        break;
       case 'cidade':
         filteredData.sort((a, b) =>
           (a.location || '').localeCompare(b.location || '')
@@ -1776,7 +1776,7 @@ Indentation         break;
       case 'ameaca':
         filteredData.sort(
           (a, b) =>
-Read           (CONFIG.THREAT_ORDER[a.threat] ?? 9) -
+            (CONFIG.THREAT_ORDER[a.threat] ?? 9) -
             (CONFIG.THREAT_ORDER[b.threat] ?? 9)
         );
         break;
@@ -1784,34 +1784,34 @@ Read           (CONFIG.THREAT_ORDER[a.threat] ?? 9) -
 
     if (tableBody) {
       tableBody.innerHTML =
-Indentation         filteredData
+        filteredData
           .map(
             (competitor) => `
                 <tr>
                     <td>${competitor.name}</td>
                     <td>${competitor.location || '—'}</td>
                     <td>${competitor.threat}</td>
-  Indentation             <td>${competitor.category}</td>
+                    <td>${competitor.category}</td>
                     <td>${competitor.focus || '—'}</td>
                     <td>
                         ${
 s                         competitor.instagram
                             ? `<a href="${competitor.instagram}">Instagram</a>`
-section                       : ''
+                            : ''
                         }
                         ${
                           competitor.website
-Read                       ? (competitor.instagram ? ' • ' : '') +
+                            ? (competitor.instagram ? ' • ' : '') +
                               `<a href="${competitor.website}">Site</a>`
                             : ''
                         }
-s                   </td>
+G                   </td>
                     <td>${Utils.nl(competitor.tags)}</td>
                 </tr>
             `
           )
           .join('') ||
-        `<tr><td colspan="7" style="color:var(--text-muted)">Sem resultados.</td></tr>`;
+  s   `<tr><td colspan="7" style="color:var(--text-muted)">Sem resultados.</td></tr>`;
     }
   }
 
@@ -1836,7 +1836,7 @@ class App {
       if (
         Utils.$('#view-io') &&
         Utils.$('#view-io').style.display !== 'none'
-s     ) {
+      ) {
         this.uiManager.refreshIOPreview();
       }
     }).observe(Utils.$('#view-io'), {
@@ -1848,5 +1848,5 @@ s     ) {
 
 // Inicializa a aplicação quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', () => {
-  new App();
+s   new App();
 });
