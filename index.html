@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Concorrência - Nicopel Embalagens</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <button class="sidebar-toggle" id="sidebarToggle">☰ Menu</button>
+
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
+      <symbol
+        id="icon-location"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+        <circle cx="12" cy="10" r="3"></circle>
+      </symbol>
+      <symbol
+        id="icon-focus"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="10"></circle>
+        <circle cx="12" cy="12" r="6"></circle>
+        <circle cx="12" cy="12" r="2"></circle>
+      </symbol>
+      <symbol
+        id="icon-website"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="2" y1="12" x2="22" y2="12"></line>
+        <path
+          d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+        ></path>
+      </symbol>
+      <symbol
+        id="icon-instagram"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+        <path
+          d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"
+        ></path>
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+      </symbol>
+      
+      <symbol 
+        id="icon-meta" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round">
+        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+      </symbol>
+      <symbol 
+        id="icon-search" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </symbol>
+
+    </svg>
+
+    <div class="app">
+      <aside id="sidebar">
+        <div class="brand">
+          <div class="brand-icon">N</div>
+          <h2>Concorrência Nicopel</h2>
+        </div>
+        <p class="sidebar-note">
+          Navegue entre o Dashboard e as ferramentas de análise de mercado.
+        </p>
+
+        <nav class="nav" id="app-nav">
+          <button class="active" data-view="dashboard">📊 Dashboard</button>
+          <button data-view="add">➕ Adicionar Concorrente</button>
+          <button data-view="edit">✏️ Editar / Excluir</button>
+          <button data-view="io">📁 Importar / Exportar</button>
+          <button data-view="report">🖨️ Relatórios</button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <p class="sidebar-note">
+            Atualizado em <span id="last-updated-side"></span>
+          </p>
+        </div>
+      </aside>
+
+      <main class="content" id="content">
+        <section id="view-dashboard">
+          <div class="container">
+            <header>
+              <h1>Dashboard de Concorrência</h1>
+              <p>Análise estratégica de mercado para Nicopel Embalagens</p>
+            </header>
+
+            <div class="filter-group">
+              <nav
+                id="category-nav"
+                class="tabs-nav"
+                aria-label="Categorias de Produto"
+              >
+                <button
+                  class="tab-btn active"
+                  data-category="todos"
+                  type="button"
+                >
+                  Todas Categorias
+                </button>
+                <button
+                  class="tab-btn"
+                  data-category="potes-copos"
+                  type="button"
+                >
+                  Potes e Copos
+                </button>
+                <button
+                  class="tab-btn"
+                  data-category="caixas-sorvete"
+                  type="button"
+                >
+                  Caixas de Sorvete
+                </button>
+                <button
+                  class="tab-btn"
+                  data-category="caixas-pizza"
+                  type="button"
+                >
+                  Caixas de Pizza
+                </button>
+                <button
+                  class="tab-btn"
+                  data-category="embalagens-industriais"
+                  type="button"
+                >
+                  Embalagens Industriais
+                </button>
+              </nav>
+            </div>
+
+            <div class="toolbar">
+              <div
+                class="tabs-nav"
+                id="threat-nav"
+                aria-label="Tipo de Concorrência"
+                style="padding: 0"
+              >
+                <button
+                  class="tab-btn active"
+                  data-threat="todos"
+                  type="button"
+                >
+                  Todos
+                </button>
+                <button class="tab-btn" data-threat="direto" type="button">
+                  ⚡ Diretos
+                </button>
+                <button class="tab-btn" data-threat="indireto" type="button">
+                  🔄 Indiretos
+                </button>
+              </div>
+
+              <div class="search">
+                <div class="search-icon">🔍</div>
+                <input
+                  id="search-input"
+                  type="text"
+                  placeholder="Buscar por nome ou cidade..."
+                />
+              </div>
+
+              <div class="sort">
+                <label for="ecommerce-filter">E-commerce:</label>
+                <select id="ecommerce-filter">
+                  <option value="todos">Todos</option>
+                  <option value="sim">Sim</option>
+                  <option value="nao">Não</option>
+                </select>
+              </div>
+
+              <div class="sort">
+                <label for="sort-select">Ordenar:</label>
+                <select id="sort-select">
+                  <option value="az">Nome (A–Z)</option>
+                  <option value="za">Nome (Z–A)</option>
+                  <option value="cidade">Cidade</option>
+                  <option value="ameaca">Nível de ameaça</option>
+                </select>
+              </div>
+            </div>
+
+            <main id="competitors-grid">
+              </main>
+
+            <footer
+              style="
+                text-align: center;
+                margin-top: 32px;
+                color: var(--text-muted);
+              "
+            >
+              <p>Dashboard atualizado em <span id="last-updated"></span></p>
+            </footer>
+          </div>
+        </section>
+
+        <section id="view-add" style="display: none">
+          <div class="container">
+            <header>
+              <h1>Adicionar Concorrente</h1>
+              <p>
+                Preencha os campos abaixo para cadastrar um novo concorrente no
+                sistema
+              </p>
+            </header>
+
+            <div class="card">
+              <form id="add-form">
+                <div class="form-grid">
+                  <div class="col-6">
+                    <label for="f-name">Nome *</label>
+                    <input id="f-name" type="text" required />
+                  </div>
+                  <div class="col-6">
+                    <label for="f-city">Cidade/UF *</label>
+                    <input id="f-city" type="text" required />
+                  </div>
+                  <div class="col-4">
+                    <label for="f-threat">Nível de Ameaça *</label>
+                    <select id="f-threat" required>
+                      <option value="">Selecione</option>
+                      <option value="alta">Alta (Direto)</option>
+                      <option value="media">Média (Indireto)</option>
+                      <option value="baixa">Baixa (Indireto)</option>
+                    </select>
+                  </div>
+                  <div class="col-8">
+                    <label for="f-category">Categoria *</label>
+                    <select id="f-category" required>
+                      <option value="">Selecione</option>
+                      <option value="potes-copos">Potes e Copos</option>
+                      <option value="caixas-sorvete">Caixas de Sorvete</option>
+                      <option value="caixas-pizza">Caixas de Pizza</option>
+                      <option value="embalagens-industriais">
+                        Embalagens Industriais
+                      </option>
+                    </select>
+                  </div>
+                  <div class="col-6">
+                    <label for="f-website">Website</label>
+                    <input id="f-website" type="url" placeholder="https://..." />
+                  </div>
+                  <div class="col-6">
+                    <label for="f-instagram">Instagram</label>
+                    <input
+                      id="f-instagram"
+                      type="url"
+                      placeholder="https://instagram.com/..."
+                    />
+                  </div>
+
+                  <div class="col-6">
+                    <label for="f-meta-ads">Biblioteca de Anúncios Meta</label>
+                    <input
+                      id="f-meta-ads"
+                      type="url"
+                      placeholder="https://www.facebook.com/ads/library/..."
+                    />
+                  </div>
+                  <div class="col-6">
+                    <label for="f-google-ads"
+                      >Biblioteca de Anúncios Google</label
+                    >
+                    <input
+                      id="f-google-ads"
+                      type="url"
+                      placeholder="https://adstransparency.google.com/..."
+                    />
+                  </div>
+
+                  <div class="col-6">
+                    <label for="f-phone">Telefone</label>
+                    <input
+                      id="f-phone"
+                      type="text"
+                      placeholder="(11) 99999-9999"
+                    />
+                  </div>
+                  <div class="col-6">
+                    <label for="f-cnpj">CNPJ</label>
+                    <input
+                      id="f-cnpj"
+                      type="text"
+                      placeholder="00.000.000/0000-00"
+                    />
+                  </div>
+                  <div class="col-6">
+                    <label for="f-tags">Tags</label>
+                    <input
+                      id="f-tags"
+                      type="text"
+                      placeholder="ex.: sorvete, premium, kraft, e-commerce"
+                    />
+                  </div>
+                  <div class="col-6">
+                    <label for="f-ticket">Ticket médio (R$)</label>
+                    <input id="f-ticket" type="number" step="0.01" min="0" />
+                  </div>
+
+                  <div class="col-12" style="padding-top: 10px">
+                    <label
+                      for="f-ecommerce"
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 8px;
+                        cursor: pointer;
+                      "
+                    >
+                      <input
+                        id="f-ecommerce"
+                        type="checkbox"
+                        style="width: auto"
+                      />
+                      Possui E-commerce
+                    </label>
+                  </div>
+
+                  <div class="col-12">
+                    <label for="f-focus">Foco de atuação</label>
+                    <input
+                      id="f-focus"
+                      type="text"
+                      placeholder="Segmento ou nicho de mercado"
+                    />
+                  </div>
+                  <div class="col-12">
+                    <label for="f-analysis">Análise estratégica</label>
+                    <textarea
+                      id="f-analysis"
+                      placeholder="Observações, pontos fortes, oportunidades..."
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button type="reset" class="btn">🔄 Limpar</button>
+                  <button id="btn-save" type="submit" class="btn btn-primary">
+                    💾 Salvar Concorrente
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-edit" style="display: none">
+          <div class="container">
+            <header>
+              <h1>Editar / Excluir Concorrentes</h1>
+              <p>
+                Gerencie os dados dos concorrentes e utilize seleção múltipla
+                para ações em lote
+              </p>
+            </header>
+
+            <div class="card" style="margin-bottom: 16px">
+              <div class="form-grid">
+                <div class="col-8">
+                  <input
+                    id="edit-search"
+                    type="text"
+                    placeholder="Buscar por nome ou cidade..."
+                  />
+                </div>
+                <div class="col-4">
+                  <select id="edit-sort">
+                    <option value="az">Nome (A–Z)</option>
+                    <option value="za">Nome (Z–A)</option>
+                    <option value="cidade">Cidade</option>
+                    <option value="ameaca">Nível de ameaça</option>
+                  </select>
+                </div>
+                <div class="col-12 bulk">
+                  <label
+                    ><input type="checkbox" id="bulk-all" /> Selecionar
+                    tudo</label
+                  >
+                  <button class="btn" id="bulk-archive">📁 Arquivar</button>
+                  <button class="btn" id="bulk-unarchive">📂 Desarquivar</button>
+                  <button class="btn btn-danger" id="bulk-delete">
+                    🗑️ Excluir
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <table class="table" id="edit-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Nome</th>
+                    <th>Cidade</th>
+                    <th>Ameaça</th>
+                    <th>Categoria</th>
+                    <th>Status</th>
+                    <th style="width: 200px">Ações</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+
+            <div class="card" style="margin-top: 16px">
+              <h3 style="margin: 0 0 12px">Formulário de Edição</h3>
+              <form id="edit-form">
+                <input type="hidden" id="e-id" />
+                <div class="form-grid">
+                  <div class="col-6">
+                    <label for="e-name">Nome *</label>
+                    <input id="e-name" type="text" required />
+                  </div>
+                  <div class="col-6">
+                    <label for="e-city">Cidade/UF *</label>
+                    <input id="e-city" type="text" required />
+                  </div>
+                  <div class="col-4">
+                    <label for="e-threat">Nível de Ameaça *</label>
+                    <select id="e-threat" required>
+                      <option value="alta">Alta</option>
+                      <option value="media">Média</option>
+                      <option value="baixa">Baixa</option>
+                    </select>
+                  </div>
+                  <div class="col-8">
+                    <label for="e-category">Categoria *</label>
+                    <select id="e-category" required>
+                      <option value="potes-copos">Potes e Copos</option>
+                      <option value="caixas-sorvete">Caixas de Sorvete</option>
+                      <option value="caixas-pizza">Caixas de Pizza</option>
+                      <option value="embalagens-industriais">
+                        Embalagens Industriais
+                      </option>
+                    </select>
+                  </div>
+                  <div class="col-6">
+                    <label for="e-website">Website</label>
+                    <input id="e-website" type="url" />
+                  </div>
+                  <div class="col-6">
+                    <label for="e-instagram">Instagram</label>
+                    <input id="e-instagram" type="url" />
+                  </div>
+
+                  <div class="col-6">
+                    <label for="e-meta-ads">Biblioteca de Anúncios Meta</label>
+                    <input
+                      id="e-meta-ads"
+                      type="url"
+                      placeholder="https://www.facebook.com/ads/library/..."
+                    />
+                  </div>
+                  <div class="col-6">
+                    <label for="e-google-ads"
+                      >Biblioteca de Anúncios Google</label
+                    >
+                    <input
+                      id="e-google-ads"
+                      type="url"
+                      placeholder="https://adstransparency.google.com/..."
+                    />
+                  </div>
+
+                  <div class="col-6">
+                    <label for="e-phone">Telefone</label>
+                    <input id="e-phone" type="text" />
+                  </div>
+                  <div class="col-6">
+                    <label for="e-cnpj">CNPJ</label>
+                    <input id="e-cnpj" type="text" />
+                  </div>
+                  <div class="col-6">
+                    <label for="e-tags">Tags</label>
+                    <input id="e-tags" type="text" />
+                  </div>
+                  <div class="col-6">
+                    <label for="e-ticket">Ticket médio (R$)</label>
+                    <input id="e-ticket" type="number" step="0.01" min="0" />
+                  </div>
+
+                  <div class="col-12" style="padding-top: 10px">
+                    <label
+                      for="e-ecommerce"
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 8px;
+                        cursor: pointer;
+                      "
+                    >
+                      <input
+                        id="e-ecommerce"
+                        type="checkbox"
+                        style="width: auto"
+                      />
+                      Possui E-commerce
+                    </label>
+                  </div>
+
+                  <div class="col-12">
+                    <label for="e-focus">Foco de atuação</label>
+                    <input id="e-focus" type="text" />
+                  </div>
+                  <div class="col-12">
+                    <label for="e-analysis">Análise estratégica</label>
+                    <textarea id="e-analysis"></textarea>
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button type="button" id="e-archive" class="btn">
+                    📁 Arquivar
+                  </button>
+                  <button type="button" id="e-delete" class="btn btn-danger">
+                    🗑️ Excluir
+                  </button>
+                  <button type="submit" class="btn btn-primary">
+                    💾 Salvar Alterações
+                  </button>
+                </div>
+                <p class="help">
+                  "Arquivar" oculta o concorrente dos grids sem apagar do
+                  histórico. "Excluir" remove definitivamente.
+                </p>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-io" style="display: none">
+          <div class="container">
+            <header>
+              <h1>Importar / Exportar Dados</h1>
+              <p>
+                Faça backup dos concorrentes ou importe dados de arquivos JSON,
+                CSV ou Excel
+              </p>
+            </header>
+
+            <div class="card" style="margin-bottom: 16px">
+              <div class="io-actions">
+                <button id="btn-export-json" class="btn">
+                  📥 Exportar JSON
+                </button>
+                <button id="btn-export-csv" class="btn">📊 Exportar CSV</button>
+                <button id="btn-export-excel" class="btn">
+                  📈 Exportar Excel
+                </button>
+
+                <div class="file-input-wrapper">
+                  <button class="btn btn-primary">📤 Importar JSON</button>
+                  <input type="file" id="file-import-json" accept=".json" />
+                </div>
+
+                <div class="file-input-wrapper">
+                  <button class="btn btn-primary">📤 Importar CSV</button>
+                  <input type="file" id="file-import-csv" accept=".csv" />
+                </div>
+
+                <div class="file-input-wrapper">
+                  <button class="btn btn-primary">📤 Importar Excel</button>
+                  <input
+                    type="file"
+                    id="file-import-excel"
+                    accept=".xlsx,.xls"
+                  />
+                </div>
+              </div>
+              <p class="help">
+                <strong>JSON:</strong> Formato nativo do sistema •
+                <strong>CSV:</strong> Compatível com Excel e Google Sheets •
+                <strong>Excel:</strong> Planilha formatada
+              </p>
+            </div>
+
+            <div class="card">
+              <h3 style="margin: 0 0 12px">Pré-visualização dos Dados</h3>
+              <textarea
+                id="io-preview"
+                style="
+                  width: 100%;
+                  min-height: 300px;
+                  font-family: monospace;
+                  font-size: 0.9rem;
+                "
+                readonly
+              ></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-report" style="display: none">
+          <div class="container">
+            <header class="report-header">
+              <div>
+                <h1 style="margin: 0">Relatório de Concorrentes</h1>
+                <p
+                  class="only-print"
+                  style="margin: 0.25rem 0 0; color: var(--text-muted)"
+                >
+                  Gerado em <span id="report-date"></span>
+                </p>
+              </div>
+              <div class="no-print">
+                <button class="btn" id="report-refresh">🔄 Atualizar</button>
+                <button class="btn btn-primary" id="report-print">
+                  🖨️ Imprimir
+                </button>
+                <button class="btn" id="report-export">📊 Exportar</button>
+              </div>
+            </header>
+
+            <div class="card no-print" style="margin-bottom: 16px">
+              <div class="form-grid">
+                <div class="col-4">
+                  <label>Categoria</label>
+                  <select id="report-cat">
+                    <option value="todos">Todas</option>
+                    <option value="potes-copos">Potes e Copos</option>
+                    <option value="caixas-sorvete">Caixas de Sorvete</option>
+                    <option value="caixas-pizza">Caixas de Pizza</option>
+                    <option value="embalagens-industriais">
+                      Embalagens Industriais
+                    </option>
+                  </select>
+                </div>
+                <div class="col-4">
+                  <label>Ameaça</label>
+                  <select id="report-threat">
+                    <option value="todos">Todos</option>
+                    <option value="alta">Alta</option>
+                    <option value="media">Média</option>
+                    <option value="baixa">Baixa</option>
+                  </select>
+                </div>
+                <div class="col-4">
+                  <label>Ordenar</label>
+                  <select id="report-sort">
+                    <option value="az">Nome (A–Z)</option>
+                    <option value="cidade">Cidade</option>
+                    <option value="ameaca">Ameaça</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="report-grid">
+              <table id="report-table">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Cidade</th>
+                    <th>Ameaça</th>
+                    <th>Categoria</th>
+                    <th>Foco</th>
+                    <th>Instagram / Site</th>
+                    <th>Tags</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div
+      id="competitor-modal"
+      class="modal-overlay"
+      aria-hidden="true"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="modal-content">
+        <header class="modal-header">
+          <div id="modal-header-content" class="card-header"></div>
+          <button
+            id="modal-close-btn"
+            class="modal-close-btn"
+            aria-label="Fechar modal"
+          >
+            &times;
+          </button>
+        </header>
+        <div class="modal-body">
+          <div id="modal-location" class="info-item"></div>
+          <div id="modal-focus" class="info-item"></div>
+          <div id="modal-analysis" class="modal-analysis-text"></div>
+          <div id="modal-tags" class="tag-chips"></div>
+          <div id="modal-links-container"></div>
+        </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
