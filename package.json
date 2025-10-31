@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "google-auth-library": "^9.2.0",
+    "google-auth-library": "^7.14.1",
     "google-spreadsheet": "3.3.0"
   }
 }
