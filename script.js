@@ -1,8 +1,6 @@
 // ===== CONFIGURAÇÕES E CONSTANTES =====
 const CONFIG = {
   // A FONTE DE DADOS AGORA É A API, NÃO O LOCALSTORAGE
-  // STORAGE_KEY: 'nicopel_concorrentes_v5', (REMOVIDO)
-  // INITIAL_DATA: [...] (REMOVIDO)
   THREAT_ORDER: { alta: 0, media: 1, baixa: 2 },
 };
 
@@ -108,6 +106,7 @@ class StateManager {
     try {
       const response = await fetch('/api/concorrentes');
       if (!response.ok) {
+        // Esta é a linha que está a ser ativada (script.js:111:15)
         throw new Error(`Erro de rede: ${response.statusText}`);
       }
       const dataFromApi = await response.json();
